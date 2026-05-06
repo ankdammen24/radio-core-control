@@ -61,9 +61,20 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     }).filter((f) => !!f.path);
 
     const icecastXml = renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]);
-    const liquidsoapLiq = renderLiquidsoapLiq(
+    let liquidsoapLiq = renderLiquidsoapLiq(
       station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null, fallbacks,
     );
+
+    // Append outputs from the pluggable adapter system
+    const outputs = (outs ?? []) as unknown as StreamingOutput[];
+    if (outputs.length > 0) {
+      const outputsLiq = renderOutputsLiq(outputs, {
+        station: { id: (station as StationRow).id, name: (station as StationRow).name, slug: (station as StationRow).slug },
+        sourceVar: "radio",
+      });
+      liquidsoapLiq += `\n\n# === Streaming outputs (adapters) ===\n${outputsLiq}`;
+    }
+
     const m3uFiles = playlists.map((p, i) => ({
       name: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
       content: renderM3u(p.files),
