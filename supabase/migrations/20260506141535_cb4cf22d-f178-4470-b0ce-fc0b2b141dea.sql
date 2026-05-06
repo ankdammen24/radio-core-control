@@ -1,0 +1,35 @@
+DO $$
+DECLARE sid uuid := '22222222-2222-2222-2222-222222222222';
+BEGIN
+  DELETE FROM play_history WHERE station_id=sid;
+  DELETE FROM listener_stats WHERE station_id=sid;
+  DELETE FROM now_playing WHERE station_id=sid;
+  DELETE FROM song_requests WHERE station_id=sid;
+  DELETE FROM live_takeover_events WHERE station_id=sid;
+  DELETE FROM service_health WHERE station_id=sid;
+  DELETE FROM stereo_tool_events WHERE station_id=sid;
+  DELETE FROM audit_logs WHERE station_id=sid;
+  DELETE FROM playlist_assignments WHERE playlist_id IN (SELECT id FROM playlists WHERE station_id=sid);
+  DELETE FROM rundown_items WHERE episode_id IN (SELECT e.id FROM episodes e JOIN shows s ON s.id=e.show_id WHERE s.station_id=sid);
+  DELETE FROM episodes WHERE show_id IN (SELECT id FROM shows WHERE station_id=sid);
+  DELETE FROM ad_spots WHERE campaign_id IN (SELECT id FROM ad_campaigns WHERE station_id=sid);
+  DELETE FROM ad_campaigns WHERE station_id=sid;
+  DELETE FROM playlists WHERE station_id=sid;
+  DELETE FROM shows WHERE station_id=sid;
+  DELETE FROM rotation_rules WHERE station_id=sid;
+  DELETE FROM schedule_blocks WHERE station_id=sid;
+  DELETE FROM live_takeover_schedule WHERE station_id=sid;
+  DELETE FROM fallback_tracks WHERE station_id=sid;
+  DELETE FROM live_inputs WHERE station_id=sid;
+  DELETE FROM stream_mounts WHERE station_id=sid;
+  DELETE FROM streaming_outputs WHERE station_id=sid;
+  DELETE FROM icecast_configs WHERE station_id=sid;
+  DELETE FROM liquidsoap_configs WHERE station_id=sid;
+  DELETE FROM stereo_tool_configs WHERE station_id=sid;
+  DELETE FROM stereo_tool_presets WHERE station_id=sid;
+  DELETE FROM azuracast_connections WHERE station_id=sid;
+  DELETE FROM media_files WHERE station_id=sid;
+  DELETE FROM voicetracks WHERE station_id=sid;
+  DELETE FROM stack_tokens WHERE station_id=sid;
+  DELETE FROM stations WHERE id=sid;
+END $$;
