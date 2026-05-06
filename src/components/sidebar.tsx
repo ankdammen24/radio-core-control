@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Building2, Radio, Music, FolderOpen, Tag, ListMusic,
   Calendar, Repeat, Plug, HardDrive, RefreshCw, ScrollText, Settings, LogOut, Moon, Sun,
-  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare,
+  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -27,6 +27,7 @@ const items = [
   { to: "/now-playing", label: "Now Playing", icon: Activity },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
+  { to: "/stereo-tool", label: "Stereo Tool", icon: Sliders },
   { to: "/health", label: "Service Health", icon: Server },
   { to: "/azuracast", label: "AzuraCast", icon: Plug },
   { to: "/storage", label: "Storage Settings", icon: HardDrive },
