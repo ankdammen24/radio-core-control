@@ -27,6 +27,7 @@ const items = [
   { to: "/now-playing", label: "Now Playing", icon: Activity },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
+  { to: "/configs", label: "Config Generator", icon: RefreshCw },
   { to: "/stereo-tool", label: "Stereo Tool", icon: Sliders },
   { to: "/health", label: "Service Health", icon: Server },
   { to: "/azuracast", label: "AzuraCast", icon: Plug },
