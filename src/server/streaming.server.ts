@@ -24,6 +24,7 @@ export type LiveInputRow = {
   fade_in_seconds: number; fade_out_seconds: number;
   is_enabled: boolean;
 };
+export type FallbackEntry = { label: string; path: string; priority: number };
 
 const xmlEscape = (s: string) => s.replace(/[<>&"]/g, (c) =>
   ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
