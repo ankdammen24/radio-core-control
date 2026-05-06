@@ -16,6 +16,14 @@ export type LiqRow = {
   telnet_host: string; telnet_port: number;
 };
 export type PlaylistEntry = { name: string; weight: number; files: string[] };
+export type LiveInputRow = {
+  mount_path: string; harbor_port: number;
+  source_user: string; source_password: string;
+  format: string; bitrate: number;
+  auto_takeover: boolean; forced_takeover: boolean;
+  fade_in_seconds: number; fade_out_seconds: number;
+  is_enabled: boolean;
+};
 
 const xmlEscape = (s: string) => s.replace(/[<>&"]/g, (c) =>
   ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]!));
