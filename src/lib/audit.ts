@@ -12,6 +12,6 @@ export async function logAudit(action: string, entity_type?: string, entity_id?:
     action,
     entity_type: entity_type ?? null,
     entity_id: entity_id ?? null,
-    new_value: payload ?? null,
+    new_value: (payload as any) ?? null,
   });
 }
