@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
-  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry,
+  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow,
 } from "./streaming.server";
 
 type GenInput = { stationId: string; persist?: boolean };
@@ -14,12 +14,13 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     const { supabase } = context;
     const stationId = data.stationId;
 
-    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }] = await Promise.all([
+    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }] = await Promise.all([
       supabase.from("stations").select("id,name,slug").eq("id", stationId).maybeSingle(),
       supabase.from("icecast_configs").select("*").eq("station_id", stationId).maybeSingle(),
       supabase.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", stationId).eq("is_active", true),
       supabase.from("liquidsoap_configs").select("*").eq("station_id", stationId).maybeSingle(),
       supabase.from("playlists").select("id,name,priority,is_active").eq("station_id", stationId).eq("is_active", true),
+      supabase.from("live_inputs").select("*").eq("station_id", stationId).maybeSingle(),
     ]);
 
     if (!station) throw new Error("Station not found");
@@ -49,7 +50,7 @@ export const generateStationConfig = createServerFn({ method: "POST" })
 
     const icecastXml = renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]);
     const liquidsoapLiq = renderLiquidsoapLiq(
-      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken,
+      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null,
     );
     const m3uFiles = playlists.map((p, i) => ({
       name: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,

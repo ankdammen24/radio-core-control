@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
-  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry,
+  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow,
 } from "@/server/streaming.server";
 
 // GET /api/public/station-config?station=<slug>  with x-stack-token header
@@ -25,11 +25,12 @@ export const Route = createFileRoute("/api/public/station-config")({
         const { data: station } = await supabaseAdmin.from("stations").select("id,name,slug").eq("slug", slug).maybeSingle();
         if (!station) return new Response("Not found", { status: 404 });
 
-        const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }] = await Promise.all([
+        const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }] = await Promise.all([
           supabaseAdmin.from("icecast_configs").select("*").eq("station_id", station.id).maybeSingle(),
           supabaseAdmin.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", station.id).eq("is_active", true),
           supabaseAdmin.from("liquidsoap_configs").select("*").eq("station_id", station.id).maybeSingle(),
           supabaseAdmin.from("playlists").select("id,name,priority,is_active").eq("station_id", station.id).eq("is_active", true),
+          supabaseAdmin.from("live_inputs").select("*").eq("station_id", station.id).maybeSingle(),
         ]);
         if (!ic || !liq || !mounts?.length) return Response.json({ error: "Station not fully configured" }, { status: 409 });
 
@@ -52,7 +53,7 @@ export const Route = createFileRoute("/api/public/station-config")({
         return Response.json({
           station,
           icecast_xml: renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]),
-          liquidsoap_liq: renderLiquidsoapLiq(station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, token),
+          liquidsoap_liq: renderLiquidsoapLiq(station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, token, live as LiveInputRow | null),
           playlists: playlists.map((p, i) => ({
             file: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
             content: renderM3u(p.files),
