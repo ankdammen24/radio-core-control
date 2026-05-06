@@ -28,6 +28,7 @@ import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as EpisodesRouteImport } from './routes/episodes'
+import { Route as ConfigsRouteImport } from './routes/configs'
 import { Route as CompanionRouteImport } from './routes/companion'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -137,6 +138,11 @@ const EpisodesRoute = EpisodesRouteImport.update({
   path: '/episodes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfigsRoute = ConfigsRouteImport.update({
+  id: '/configs',
+  path: '/configs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompanionRoute = CompanionRouteImport.update({
   id: '/companion',
   path: '/companion',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/companion': typeof CompanionRoute
+  '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/companion': typeof CompanionRoute
+  '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
@@ -280,6 +288,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/companion': typeof CompanionRoute
+  '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/companion'
+    | '/configs'
     | '/episodes'
     | '/files'
     | '/health'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/companion'
+    | '/configs'
     | '/episodes'
     | '/files'
     | '/health'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/companion'
+    | '/configs'
     | '/episodes'
     | '/files'
     | '/health'
@@ -419,6 +431,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
   CompanionRoute: typeof CompanionRoute
+  ConfigsRoute: typeof ConfigsRoute
   EpisodesRoute: typeof EpisodesRoute
   FilesRoute: typeof FilesRoute
   HealthRoute: typeof HealthRoute
@@ -581,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EpisodesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configs': {
+      id: '/configs'
+      path: '/configs'
+      fullPath: '/configs'
+      preLoaderRoute: typeof ConfigsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/companion': {
       id: '/companion'
       path: '/companion'
@@ -683,6 +703,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
   CompanionRoute: CompanionRoute,
+  ConfigsRoute: ConfigsRoute,
   EpisodesRoute: EpisodesRoute,
   FilesRoute: FilesRoute,
   HealthRoute: HealthRoute,
