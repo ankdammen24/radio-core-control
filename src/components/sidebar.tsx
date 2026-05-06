@@ -36,6 +36,7 @@ const items = [
   { to: "/storage", label: "Storage Settings", icon: HardDrive },
   { to: "/sync-jobs", label: "Sync Jobs", icon: RefreshCw },
   { to: "/audit", label: "Audit Logs", icon: ScrollText },
+  { to: "/backup", label: "Backup & Restore", icon: Archive },
   { to: "/settings", label: "System Settings", icon: Settings },
 ] as const;
 
