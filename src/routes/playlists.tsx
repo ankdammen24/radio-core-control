@@ -11,10 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
+import { Plus, RefreshCw, Trash2, ListMusic } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { playlistSchema, formatZodError } from "@/lib/validation";
+import { logAudit } from "@/lib/audit";
 
 export const Route = createFileRoute("/playlists")({ component: PlaylistsPage });
 
@@ -24,21 +28,29 @@ function PlaylistsPage() {
   const qc = useQueryClient();
   const { isEditor, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
+  const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name:"", description:"", playlist_type:"rotation", priority: 5, station_id: "", azuracast_playlist_id: "" });
 
   const { data: stations } = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
-  const { data, isLoading } = useQuery({
+  const playlists = useQuery({
     queryKey: ["playlists"],
-    queryFn: async () => (await supabase.from("playlists").select("*, stations(name), playlist_assignments(id)").order("priority", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("playlists").select("*, stations(name), playlist_assignments(id)").order("priority", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
   });
 
   const create = useMutation({
     mutationFn: async () => {
-      const payload = { ...form, azuracast_playlist_id: form.azuracast_playlist_id || null };
+      const parsed = playlistSchema.safeParse(form);
+      if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
+      setErrs(null);
+      const payload = { ...parsed.data, azuracast_playlist_id: form.azuracast_playlist_id || null };
       const { error } = await supabase.from("playlists").insert(payload as any);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Playlist created"); setOpen(false); qc.invalidateQueries({ queryKey:["playlists"] }); },
+    onSuccess: () => { toast.success("Playlist created"); setOpen(false); setForm({ name:"", description:"", playlist_type:"rotation", priority: 5, station_id: "", azuracast_playlist_id: "" }); qc.invalidateQueries({ queryKey:["playlists"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
@@ -46,9 +58,10 @@ function PlaylistsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey:["playlists"] }),
   });
   const sync = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("sync_jobs").insert({ job_type: "playlist_sync", status: "pending", payload: { playlist_id: id } });
+    mutationFn: async (p: any) => {
+      const { error } = await supabase.from("sync_jobs").insert({ station_id: p.station_id, job_type: "playlist_sync", status: "pending", payload: { playlist_id: p.id } });
       if (error) throw error;
+      await logAudit("sync.queue.playlist", "playlists", p.id);
     },
     onSuccess: () => toast.success("Sync job queued"),
     onError: (e: any) => toast.error(e.message),
@@ -56,6 +69,7 @@ function PlaylistsPage() {
   const del = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["playlists"] }); },
+    onError: (e: any) => toast.error(e.message),
   });
 
   return (
@@ -66,8 +80,8 @@ function PlaylistsPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>New playlist</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div><Label>Station</Label>
+              <div><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div><Label>Station *</Label>
                 <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Select station" /></SelectTrigger>
                   <SelectContent>{stations?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
@@ -84,34 +98,58 @@ function PlaylistsPage() {
               </div>
               <div><Label>AzuraCast Playlist ID</Label><Input value={form.azuracast_playlist_id} onChange={(e) => setForm({ ...form, azuracast_playlist_id: e.target.value })} /></div>
               <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              {errs && <p className="text-xs text-destructive">{errs}</p>}
             </div>
-            <DialogFooter><Button onClick={() => create.mutate()} disabled={!form.name || !form.station_id || create.isPending}>Create</Button></DialogFooter>
+            <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Creating…" : "Create"}</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       )
     }>
-      <Card className="overflow-hidden">
-        <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>Station</TableHead><TableHead>Tracks</TableHead><TableHead>Priority</TableHead><TableHead>Active</TableHead><TableHead className="w-32" /></TableRow></TableHeader>
-          <TableBody>
-            {isLoading && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>}
-            {data?.map((p: any) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.name}</TableCell>
-                <TableCell><Badge variant="outline" className="uppercase text-[10px]">{p.playlist_type}</Badge></TableCell>
-                <TableCell className="text-muted-foreground">{p.stations?.name}</TableCell>
-                <TableCell>{p.playlist_assignments?.length ?? 0}</TableCell>
-                <TableCell className="tabular-nums">{p.priority}</TableCell>
-                <TableCell><Switch checked={p.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: p.id, val: v })} /></TableCell>
-                <TableCell className="text-right">
-                  {isEditor && <Button variant="ghost" size="icon" title="Sync to AzuraCast" onClick={() => sync.mutate(p.id)}><RefreshCw className="w-4 h-4" /></Button>}
-                  {isAdmin && <Button variant="ghost" size="icon" onClick={() => confirm(`Delete ${p.name}?`) && del.mutate(p.id)}><Trash2 className="w-4 h-4" /></Button>}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      {playlists.error && <ErrorState error={playlists.error} onRetry={() => playlists.refetch()} />}
+      {!playlists.error && (
+        <Card className="overflow-hidden">
+          {playlists.isLoading ? <LoadingRows cols={7} /> : (
+            <Table>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>Station</TableHead><TableHead>Tracks</TableHead><TableHead>Priority</TableHead><TableHead>Active</TableHead><TableHead className="w-32" /></TableRow></TableHeader>
+              <TableBody>
+                {playlists.data?.map((p: any) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="font-medium">{p.name}</TableCell>
+                    <TableCell><Badge variant="outline" className="uppercase text-[10px]">{p.playlist_type}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground">{p.stations?.name}</TableCell>
+                    <TableCell>{p.playlist_assignments?.length ?? 0}</TableCell>
+                    <TableCell className="tabular-nums">{p.priority}</TableCell>
+                    <TableCell><Switch checked={p.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: p.id, val: v })} /></TableCell>
+                    <TableCell className="text-right">
+                      {isEditor && (
+                        <ConfirmDialog
+                          title={`Sync "${p.name}" to AzuraCast?`}
+                          description="This queues a background job to push playlist tracks to AzuraCast."
+                          confirmText="Queue sync"
+                          onConfirm={() => sync.mutateAsync(p)}
+                          trigger={<Button variant="ghost" size="icon" title="Sync to AzuraCast"><RefreshCw className="w-4 h-4" /></Button>}
+                        />
+                      )}
+                      {isAdmin && (
+                        <ConfirmDialog
+                          title={`Delete "${p.name}"?`}
+                          description="Schedule blocks referencing this playlist will lose the link."
+                          confirmText="Delete" destructive
+                          onConfirm={() => del.mutateAsync(p.id)}
+                          trigger={<Button variant="ghost" size="icon"><Trash2 className="w-4 h-4" /></Button>}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+          {!playlists.isLoading && !playlists.data?.length && (
+            <div className="p-6"><EmptyState icon={ListMusic} title="No playlists" description="Create rotation, jingle, sweeper or promo playlists." /></div>
+          )}
+        </Card>
+      )}
     </AppLayout>
   );
 }

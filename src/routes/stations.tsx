@@ -12,10 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/status-badge";
-import { Plus, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
+import { Plus, Trash2, Radio } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { stationSchema, formatZodError } from "@/lib/validation";
 
 export const Route = createFileRoute("/stations")({ component: StationsPage });
 
@@ -23,21 +26,29 @@ function StationsPage() {
   const qc = useQueryClient();
   const { isEditor, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
+  const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", slug: "", description: "", account_id: "", azuracast_station_id: "", is_active: true });
 
   const { data: accounts } = useQuery({ queryKey: ["accounts-list"], queryFn: async () => (await supabase.from("accounts").select("id,name").order("name")).data ?? [] });
-  const { data, isLoading } = useQuery({
+  const stations = useQuery({
     queryKey: ["stations"],
-    queryFn: async () => (await supabase.from("stations").select("*, accounts(name)").order("name")).data ?? [],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("stations").select("*, accounts(name)").order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
   });
 
   const create = useMutation({
     mutationFn: async () => {
-      const payload = { ...form, account_id: form.account_id || null, azuracast_station_id: form.azuracast_station_id || null };
-      const { error } = await supabase.from("stations").insert(payload);
+      const parsed = stationSchema.safeParse(form);
+      if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
+      setErrs(null);
+      const payload = { ...parsed.data, is_active: true, account_id: form.account_id || null, azuracast_station_id: form.azuracast_station_id || null };
+      const { error } = await supabase.from("stations").insert(payload as any);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Station created"); setOpen(false); qc.invalidateQueries({ queryKey:["stations"] }); },
+    onSuccess: () => { toast.success("Station created"); setOpen(false); setForm({ name:"", slug:"", description:"", account_id:"", azuracast_station_id:"", is_active:true }); qc.invalidateQueries({ queryKey:["stations"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
@@ -59,8 +70,8 @@ function StationsPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>New station</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s+/g,'-') })} /></div>
+              <div><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div><Label>Slug *</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s+/g,'-') })} /></div>
               <div><Label>Account</Label>
                 <Select value={form.account_id} onValueChange={(v) => setForm({ ...form, account_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
@@ -69,31 +80,49 @@ function StationsPage() {
               </div>
               <div><Label>AzuraCast Station ID</Label><Input value={form.azuracast_station_id} onChange={(e) => setForm({ ...form, azuracast_station_id: e.target.value })} /></div>
               <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              {errs && <p className="text-xs text-destructive">{errs}</p>}
             </div>
-            <DialogFooter><Button onClick={() => create.mutate()} disabled={!form.name || !form.slug || create.isPending}>Create</Button></DialogFooter>
+            <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Creating…" : "Create"}</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       )
     }>
-      <Card className="overflow-hidden">
-        <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
-          <TableBody>
-            {isLoading && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>}
-            {data?.map((s: any) => (
-              <TableRow key={s.id}>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell className="text-muted-foreground font-mono text-xs">{s.slug}</TableCell>
-                <TableCell className="text-muted-foreground">{s.accounts?.name ?? "—"}</TableCell>
-                <TableCell className="text-muted-foreground font-mono text-xs">{s.azuracast_station_id ?? "—"}</TableCell>
-                <TableCell><StatusBadge status={s.azuracast_station_id ? "ok" : "untested"} /></TableCell>
-                <TableCell><Switch checked={s.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: s.id, val: v })} /></TableCell>
-                <TableCell>{isAdmin && <Button variant="ghost" size="icon" onClick={() => confirm(`Delete ${s.name}?`) && del.mutate(s.id)}><Trash2 className="w-4 h-4" /></Button>}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      {stations.error && <ErrorState error={stations.error} onRetry={() => stations.refetch()} />}
+      {!stations.error && (
+        <Card className="overflow-hidden">
+          {stations.isLoading ? <LoadingRows cols={7} /> : (
+            <Table>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
+              <TableBody>
+                {stations.data?.map((s: any) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.name}</TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-xs">{s.slug}</TableCell>
+                    <TableCell className="text-muted-foreground">{s.accounts?.name ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-xs">{s.azuracast_station_id ?? "—"}</TableCell>
+                    <TableCell><StatusBadge status={s.azuracast_station_id ? "ok" : "untested"} /></TableCell>
+                    <TableCell><Switch checked={s.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: s.id, val: v })} /></TableCell>
+                    <TableCell>
+                      {isAdmin && (
+                        <ConfirmDialog
+                          title={`Delete station "${s.name}"?`}
+                          description="This removes the station from Radio Core. AzuraCast data is not deleted."
+                          confirmText="Delete" destructive
+                          onConfirm={() => del.mutateAsync(s.id)}
+                          trigger={<Button variant="ghost" size="icon"><Trash2 className="w-4 h-4" /></Button>}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+          {!stations.isLoading && !stations.data?.length && (
+            <div className="p-6"><EmptyState icon={Radio} title="No stations yet" description="Create your first station to begin broadcasting." /></div>
+          )}
+        </Card>
+      )}
     </AppLayout>
   );
 }

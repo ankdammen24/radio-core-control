@@ -11,10 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
+import { Plus, Trash2, Repeat } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { rotationRuleSchema, formatZodError } from "@/lib/validation";
 
 export const Route = createFileRoute("/rotation")({ component: RotationPage });
 
@@ -24,16 +27,27 @@ function RotationPage() {
   const qc = useQueryClient();
   const { isEditor } = useAuth();
   const [open, setOpen] = useState(false);
+  const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name:"", description:"", category:"heavy", min_minutes_between_same_artist:30, min_minutes_between_same_track:120, max_tracks_per_hour:12, priority:5, station_id:"" });
 
   const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
-  const { data, isLoading } = useQuery({
+  const rules = useQuery({
     queryKey:["rotation_rules"],
-    queryFn: async () => (await supabase.from("rotation_rules").select("*, stations(name)").order("priority", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("rotation_rules").select("*, stations(name)").order("priority", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
   });
 
   const create = useMutation({
-    mutationFn: async () => { const { error } = await supabase.from("rotation_rules").insert(form as any); if (error) throw error; },
+    mutationFn: async () => {
+      const parsed = rotationRuleSchema.safeParse(form);
+      if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
+      setErrs(null);
+      const { error } = await supabase.from("rotation_rules").insert(parsed.data as any);
+      if (error) throw error;
+    },
     onSuccess: () => { toast.success("Rule created"); setOpen(false); qc.invalidateQueries({ queryKey:["rotation_rules"] }); },
     onError: (e: any) => toast.error(e.message),
   });
@@ -43,7 +57,8 @@ function RotationPage() {
   });
   const del = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.from("rotation_rules").delete().eq("id", id); if (error) throw error; },
-    onSuccess: () => qc.invalidateQueries({ queryKey:["rotation_rules"] }),
+    onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["rotation_rules"] }); },
+    onError: (e: any) => toast.error(e.message),
   });
 
   return (
@@ -54,8 +69,8 @@ function RotationPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>New rotation rule</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div><Label>Station</Label>
+              <div><Label>Name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div><Label>Station *</Label>
                 <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                   <SelectContent>{stations?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
@@ -74,33 +89,50 @@ function RotationPage() {
                 <div><Label>Priority</Label><Input type="number" value={form.priority} onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })} /></div>
               </div>
               <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              {errs && <p className="text-xs text-destructive">{errs}</p>}
             </div>
-            <DialogFooter><Button onClick={() => create.mutate()} disabled={!form.name || !form.station_id}>Create</Button></DialogFooter>
+            <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Creating…" : "Create"}</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       )
     }>
-      <Card className="overflow-hidden">
-        <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Category</TableHead><TableHead>Station</TableHead><TableHead>Artist sep.</TableHead><TableHead>Track sep.</TableHead><TableHead>Max/hr</TableHead><TableHead>Priority</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
-          <TableBody>
-            {isLoading && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>}
-            {data?.map((r: any) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-medium">{r.name}</TableCell>
-                <TableCell><Badge variant="outline" className="uppercase text-[10px]">{r.category}</Badge></TableCell>
-                <TableCell className="text-muted-foreground">{r.stations?.name}</TableCell>
-                <TableCell className="tabular-nums">{r.min_minutes_between_same_artist}m</TableCell>
-                <TableCell className="tabular-nums">{r.min_minutes_between_same_track}m</TableCell>
-                <TableCell className="tabular-nums">{r.max_tracks_per_hour}</TableCell>
-                <TableCell className="tabular-nums">{r.priority}</TableCell>
-                <TableCell><Switch checked={r.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: r.id, val: v })} /></TableCell>
-                <TableCell>{isEditor && <Button variant="ghost" size="icon" onClick={() => confirm("Delete rule?") && del.mutate(r.id)}><Trash2 className="w-4 h-4" /></Button>}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      {rules.error && <ErrorState error={rules.error} onRetry={() => rules.refetch()} />}
+      {!rules.error && (
+        <Card className="overflow-hidden">
+          {rules.isLoading ? <LoadingRows cols={9} /> : (
+            <Table>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Category</TableHead><TableHead>Station</TableHead><TableHead>Artist sep.</TableHead><TableHead>Track sep.</TableHead><TableHead>Max/hr</TableHead><TableHead>Priority</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
+              <TableBody>
+                {rules.data?.map((r: any) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-medium">{r.name}</TableCell>
+                    <TableCell><Badge variant="outline" className="uppercase text-[10px]">{r.category}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground">{r.stations?.name}</TableCell>
+                    <TableCell className="tabular-nums">{r.min_minutes_between_same_artist}m</TableCell>
+                    <TableCell className="tabular-nums">{r.min_minutes_between_same_track}m</TableCell>
+                    <TableCell className="tabular-nums">{r.max_tracks_per_hour}</TableCell>
+                    <TableCell className="tabular-nums">{r.priority}</TableCell>
+                    <TableCell><Switch checked={r.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: r.id, val: v })} /></TableCell>
+                    <TableCell>
+                      {isEditor && (
+                        <ConfirmDialog
+                          title={`Delete rule "${r.name}"?`}
+                          confirmText="Delete" destructive
+                          onConfirm={() => del.mutateAsync(r.id)}
+                          trigger={<Button variant="ghost" size="icon"><Trash2 className="w-4 h-4" /></Button>}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+          {!rules.isLoading && !rules.data?.length && (
+            <div className="p-6"><EmptyState icon={Repeat} title="No rotation rules" description="Define artist/track separation and per-hour caps." /></div>
+          )}
+        </Card>
+      )}
     </AppLayout>
   );
 }
