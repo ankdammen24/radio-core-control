@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Building2, Radio, Music, FolderOpen, Tag, ListMusic,
   Calendar, Repeat, Plug, HardDrive, RefreshCw, ScrollText, Settings, LogOut, Moon, Sun,
-  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert, Archive,
+  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert, Archive, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
