@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Building2, Radio, Music, FolderOpen, Tag, ListMusic,
   Calendar, Repeat, Plug, HardDrive, RefreshCw, ScrollText, Settings, LogOut, Moon, Sun,
-  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert,
+  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert, Archive,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -36,6 +36,7 @@ const items = [
   { to: "/storage", label: "Storage Settings", icon: HardDrive },
   { to: "/sync-jobs", label: "Sync Jobs", icon: RefreshCw },
   { to: "/audit", label: "Audit Logs", icon: ScrollText },
+  { to: "/backup", label: "Backup & Restore", icon: Archive },
   { to: "/settings", label: "System Settings", icon: Settings },
 ] as const;
 
