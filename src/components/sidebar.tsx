@@ -25,6 +25,7 @@ const items = [
   { to: "/inbox", label: "Studio Inbox", icon: MessageSquare },
   { to: "/voicetracks", label: "Voicetracks", icon: Mic },
   { to: "/live", label: "Live / Takeover", icon: Radio },
+  { to: "/fallback", label: "Fallback Audio", icon: ShieldAlert },
   { to: "/now-playing", label: "Now Playing", icon: Activity },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
