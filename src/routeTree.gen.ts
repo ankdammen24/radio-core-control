@@ -9,38 +9,348 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsersRouteImport } from './routes/users'
+import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
+import { Route as StorageRouteImport } from './routes/storage'
+import { Route as StationsRouteImport } from './routes/stations'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SchedulerRouteImport } from './routes/scheduler'
+import { Route as RotationRouteImport } from './routes/rotation'
+import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as MediaRouteImport } from './routes/media'
+import { Route as FilesRouteImport } from './routes/files'
+import { Route as AzuracastRouteImport } from './routes/azuracast'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuditRouteImport } from './routes/audit'
+import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
+import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
 
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SyncJobsRoute = SyncJobsRouteImport.update({
+  id: '/sync-jobs',
+  path: '/sync-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StorageRoute = StorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StationsRoute = StationsRouteImport.update({
+  id: '/stations',
+  path: '/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchedulerRoute = SchedulerRouteImport.update({
+  id: '/scheduler',
+  path: '/scheduler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RotationRoute = RotationRouteImport.update({
+  id: '/rotation',
+  path: '/rotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistsRoute = PlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaRoute = MediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesRoute = FilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AzuracastRoute = AzuracastRouteImport.update({
+  id: '/azuracast',
+  path: '/azuracast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuditRoute = AuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetadataIndexRoute = MetadataIndexRouteImport.update({
+  id: '/metadata/',
+  path: '/metadata/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetadataIdRoute = MetadataIdRouteImport.update({
+  id: '/metadata/$id',
+  path: '/metadata/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/audit': typeof AuditRoute
+  '/auth': typeof AuthRoute
+  '/azuracast': typeof AzuracastRoute
+  '/files': typeof FilesRoute
+  '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
+  '/settings': typeof SettingsRoute
+  '/stations': typeof StationsRoute
+  '/storage': typeof StorageRoute
+  '/sync-jobs': typeof SyncJobsRoute
+  '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata/': typeof MetadataIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/audit': typeof AuditRoute
+  '/auth': typeof AuthRoute
+  '/azuracast': typeof AzuracastRoute
+  '/files': typeof FilesRoute
+  '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
+  '/settings': typeof SettingsRoute
+  '/stations': typeof StationsRoute
+  '/storage': typeof StorageRoute
+  '/sync-jobs': typeof SyncJobsRoute
+  '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata': typeof MetadataIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/audit': typeof AuditRoute
+  '/auth': typeof AuthRoute
+  '/azuracast': typeof AzuracastRoute
+  '/files': typeof FilesRoute
+  '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
+  '/settings': typeof SettingsRoute
+  '/stations': typeof StationsRoute
+  '/storage': typeof StorageRoute
+  '/sync-jobs': typeof SyncJobsRoute
+  '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata/': typeof MetadataIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/accounts'
+    | '/audit'
+    | '/auth'
+    | '/azuracast'
+    | '/files'
+    | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
+    | '/settings'
+    | '/stations'
+    | '/storage'
+    | '/sync-jobs'
+    | '/users'
+    | '/metadata/$id'
+    | '/metadata/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/accounts'
+    | '/audit'
+    | '/auth'
+    | '/azuracast'
+    | '/files'
+    | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
+    | '/settings'
+    | '/stations'
+    | '/storage'
+    | '/sync-jobs'
+    | '/users'
+    | '/metadata/$id'
+    | '/metadata'
+  id:
+    | '__root__'
+    | '/'
+    | '/accounts'
+    | '/audit'
+    | '/auth'
+    | '/azuracast'
+    | '/files'
+    | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
+    | '/settings'
+    | '/stations'
+    | '/storage'
+    | '/sync-jobs'
+    | '/users'
+    | '/metadata/$id'
+    | '/metadata/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountsRoute: typeof AccountsRoute
+  AuditRoute: typeof AuditRoute
+  AuthRoute: typeof AuthRoute
+  AzuracastRoute: typeof AzuracastRoute
+  FilesRoute: typeof FilesRoute
+  MediaRoute: typeof MediaRoute
+  PlaylistsRoute: typeof PlaylistsRoute
+  RotationRoute: typeof RotationRoute
+  SchedulerRoute: typeof SchedulerRoute
+  SettingsRoute: typeof SettingsRoute
+  StationsRoute: typeof StationsRoute
+  StorageRoute: typeof StorageRoute
+  SyncJobsRoute: typeof SyncJobsRoute
+  UsersRoute: typeof UsersRoute
+  MetadataIdRoute: typeof MetadataIdRoute
+  MetadataIndexRoute: typeof MetadataIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sync-jobs': {
+      id: '/sync-jobs'
+      path: '/sync-jobs'
+      fullPath: '/sync-jobs'
+      preLoaderRoute: typeof SyncJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/storage': {
+      id: '/storage'
+      path: '/storage'
+      fullPath: '/storage'
+      preLoaderRoute: typeof StorageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stations': {
+      id: '/stations'
+      path: '/stations'
+      fullPath: '/stations'
+      preLoaderRoute: typeof StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scheduler': {
+      id: '/scheduler'
+      path: '/scheduler'
+      fullPath: '/scheduler'
+      preLoaderRoute: typeof SchedulerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rotation': {
+      id: '/rotation'
+      path: '/rotation'
+      fullPath: '/rotation'
+      preLoaderRoute: typeof RotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlists': {
+      id: '/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media': {
+      id: '/media'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files': {
+      id: '/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/azuracast': {
+      id: '/azuracast'
+      path: '/azuracast'
+      fullPath: '/azuracast'
+      preLoaderRoute: typeof AzuracastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audit': {
+      id: '/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +358,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metadata/': {
+      id: '/metadata/'
+      path: '/metadata'
+      fullPath: '/metadata/'
+      preLoaderRoute: typeof MetadataIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metadata/$id': {
+      id: '/metadata/$id'
+      path: '/metadata/$id'
+      fullPath: '/metadata/$id'
+      preLoaderRoute: typeof MetadataIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountsRoute: AccountsRoute,
+  AuditRoute: AuditRoute,
+  AuthRoute: AuthRoute,
+  AzuracastRoute: AzuracastRoute,
+  FilesRoute: FilesRoute,
+  MediaRoute: MediaRoute,
+  PlaylistsRoute: PlaylistsRoute,
+  RotationRoute: RotationRoute,
+  SchedulerRoute: SchedulerRoute,
+  SettingsRoute: SettingsRoute,
+  StationsRoute: StationsRoute,
+  StorageRoute: StorageRoute,
+  SyncJobsRoute: SyncJobsRoute,
+  UsersRoute: UsersRoute,
+  MetadataIdRoute: MetadataIdRoute,
+  MetadataIndexRoute: MetadataIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
