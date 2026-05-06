@@ -132,6 +132,129 @@ export type Database = {
           },
         ]
       }
+      icecast_configs: {
+        Row: {
+          admin_email: string | null
+          admin_password: string
+          admin_user: string
+          created_at: string
+          hostname: string
+          id: string
+          location: string | null
+          max_clients: number
+          max_sources: number
+          port: number
+          relay_password: string
+          source_password: string
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_email?: string | null
+          admin_password?: string
+          admin_user?: string
+          created_at?: string
+          hostname?: string
+          id?: string
+          location?: string | null
+          max_clients?: number
+          max_sources?: number
+          port?: number
+          relay_password?: string
+          source_password?: string
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string | null
+          admin_password?: string
+          admin_user?: string
+          created_at?: string
+          hostname?: string
+          id?: string
+          location?: string | null
+          max_clients?: number
+          max_sources?: number
+          port?: number
+          relay_password?: string
+          source_password?: string
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      liquidsoap_configs: {
+        Row: {
+          created_at: string
+          crossfade_seconds: number
+          custom_liq: string | null
+          fallback_track_path: string | null
+          generated_at: string | null
+          generated_liq: string | null
+          id: string
+          normalize_audio: boolean
+          station_id: string
+          telnet_host: string
+          telnet_port: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          crossfade_seconds?: number
+          custom_liq?: string | null
+          fallback_track_path?: string | null
+          generated_at?: string | null
+          generated_liq?: string | null
+          id?: string
+          normalize_audio?: boolean
+          station_id: string
+          telnet_host?: string
+          telnet_port?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          crossfade_seconds?: number
+          custom_liq?: string | null
+          fallback_track_path?: string | null
+          generated_at?: string | null
+          generated_liq?: string | null
+          id?: string
+          normalize_audio?: boolean
+          station_id?: string
+          telnet_host?: string
+          telnet_port?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      listener_stats: {
+        Row: {
+          id: string
+          listeners: number
+          mount_path: string | null
+          peak_listeners: number
+          recorded_at: string
+          station_id: string
+        }
+        Insert: {
+          id?: string
+          listeners?: number
+          mount_path?: string | null
+          peak_listeners?: number
+          recorded_at?: string
+          station_id: string
+        }
+        Update: {
+          id?: string
+          listeners?: number
+          mount_path?: string | null
+          peak_listeners?: number
+          recorded_at?: string
+          station_id?: string
+        }
+        Relationships: []
+      }
       media_files: {
         Row: {
           azuracast_media_id: string | null
@@ -200,6 +323,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      now_playing: {
+        Row: {
+          album: string | null
+          artist: string | null
+          duration_seconds: number | null
+          listeners: number
+          media_file_id: string | null
+          mount_path: string | null
+          started_at: string
+          station_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          album?: string | null
+          artist?: string | null
+          duration_seconds?: number | null
+          listeners?: number
+          media_file_id?: string | null
+          mount_path?: string | null
+          started_at?: string
+          station_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          album?: string | null
+          artist?: string | null
+          duration_seconds?: number | null
+          listeners?: number
+          media_file_id?: string | null
+          mount_path?: string | null
+          started_at?: string
+          station_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      play_history: {
+        Row: {
+          album: string | null
+          artist: string | null
+          duration_seconds: number | null
+          id: string
+          listeners: number | null
+          media_file_id: string | null
+          played_at: string
+          station_id: string
+          title: string | null
+        }
+        Insert: {
+          album?: string | null
+          artist?: string | null
+          duration_seconds?: number | null
+          id?: string
+          listeners?: number | null
+          media_file_id?: string | null
+          played_at?: string
+          station_id: string
+          title?: string | null
+        }
+        Update: {
+          album?: string | null
+          artist?: string | null
+          duration_seconds?: number | null
+          id?: string
+          listeners?: number | null
+          media_file_id?: string | null
+          played_at?: string
+          station_id?: string
+          title?: string | null
+        }
+        Relationships: []
       }
       playlist_assignments: {
         Row: {
@@ -464,6 +662,66 @@ export type Database = {
           },
         ]
       }
+      service_health: {
+        Row: {
+          details: Json | null
+          id: string
+          message: string | null
+          reported_at: string
+          service: string
+          station_id: string | null
+          status: string
+        }
+        Insert: {
+          details?: Json | null
+          id?: string
+          message?: string | null
+          reported_at?: string
+          service: string
+          station_id?: string | null
+          status?: string
+        }
+        Update: {
+          details?: Json | null
+          id?: string
+          message?: string | null
+          reported_at?: string
+          service?: string
+          station_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      stack_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_used_at: string | null
+          name: string
+          station_id: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          name: string
+          station_id?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          name?: string
+          station_id?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
       stations: {
         Row: {
           account_id: string | null
@@ -537,6 +795,45 @@ export type Database = {
           is_active?: boolean
           name?: string
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stream_mounts: {
+        Row: {
+          bitrate: number
+          created_at: string
+          format: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          mount_path: string
+          source_password: string | null
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          bitrate?: number
+          created_at?: string
+          format?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          mount_path: string
+          source_password?: string | null
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          bitrate?: number
+          created_at?: string
+          format?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          mount_path?: string
+          source_password?: string | null
+          station_id?: string
           updated_at?: string
         }
         Relationships: []
