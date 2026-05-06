@@ -4,6 +4,7 @@ import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
   type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
 } from "./streaming.server";
+import { renderOutputsLiq, type StreamingOutput } from "./streaming-adapters.server";
 
 type GenInput = { stationId: string; persist?: boolean };
 
