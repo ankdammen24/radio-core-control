@@ -51,14 +51,24 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     const apiBaseUrl = process.env.PUBLIC_APP_URL ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
     const stackToken = "REPLACE_WITH_STACK_TOKEN";
 
+    const fallbacks: FallbackEntry[] = (fbRows ?? []).map((r: any) => {
+      const rel = r.media_files?.file_path ?? r.media_files?.file_name ?? null;
+      const path = r.external_url
+        ?? (rel ? (rel.startsWith("/") ? rel : `/data/stations/${(station as StationRow).slug}/media/${rel}`) : "");
+      return { label: r.label as string, path, priority: (r.priority as number) ?? 10 };
+    }).filter((f) => !!f.path);
+
     const icecastXml = renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]);
     const liquidsoapLiq = renderLiquidsoapLiq(
-      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null,
+      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null, fallbacks,
     );
     const m3uFiles = playlists.map((p, i) => ({
       name: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
       content: renderM3u(p.files),
     }));
+    if (fallbacks.length) {
+      m3uFiles.push({ name: "fallback.m3u", content: renderM3u(fallbacks.map((f) => f.path)) });
+    }
 
     if (data.persist) {
       await supabase.from("liquidsoap_configs").update({
