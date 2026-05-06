@@ -1012,6 +1012,178 @@ export type Database = {
           },
         ]
       }
+      stereo_tool_configs: {
+        Row: {
+          active_preset_id: string | null
+          binary_path: string | null
+          bypass: boolean
+          created_at: string
+          custom_args: string | null
+          docker_volume_path: string | null
+          enabled: boolean
+          id: string
+          input_source: string | null
+          integration_mode: string
+          last_status_at: string | null
+          latency_ms: number
+          library_path: string | null
+          license_key_secret_name: string | null
+          output_target: string | null
+          sample_rate: number
+          station_id: string
+          status: string
+          status_message: string | null
+          updated_at: string
+        }
+        Insert: {
+          active_preset_id?: string | null
+          binary_path?: string | null
+          bypass?: boolean
+          created_at?: string
+          custom_args?: string | null
+          docker_volume_path?: string | null
+          enabled?: boolean
+          id?: string
+          input_source?: string | null
+          integration_mode?: string
+          last_status_at?: string | null
+          latency_ms?: number
+          library_path?: string | null
+          license_key_secret_name?: string | null
+          output_target?: string | null
+          sample_rate?: number
+          station_id: string
+          status?: string
+          status_message?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active_preset_id?: string | null
+          binary_path?: string | null
+          bypass?: boolean
+          created_at?: string
+          custom_args?: string | null
+          docker_volume_path?: string | null
+          enabled?: boolean
+          id?: string
+          input_source?: string | null
+          integration_mode?: string
+          last_status_at?: string | null
+          latency_ms?: number
+          library_path?: string | null
+          license_key_secret_name?: string | null
+          output_target?: string | null
+          sample_rate?: number
+          station_id?: string
+          status?: string
+          status_message?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stereo_tool_configs_active_preset_fk"
+            columns: ["active_preset_id"]
+            isOneToOne: false
+            referencedRelation: "stereo_tool_presets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stereo_tool_configs_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: true
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stereo_tool_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          level: string
+          message: string | null
+          station_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          level?: string
+          message?: string | null
+          station_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          level?: string
+          message?: string | null
+          station_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stereo_tool_events_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stereo_tool_presets: {
+        Row: {
+          checksum: string | null
+          created_at: string
+          description: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          is_default: boolean
+          name: string
+          station_id: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_default?: boolean
+          name: string
+          station_id: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          station_id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stereo_tool_presets_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storage_locations: {
         Row: {
           base_path: string | null
