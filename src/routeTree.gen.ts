@@ -14,6 +14,7 @@ import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
 import { Route as StreamingRouteImport } from './routes/streaming'
 import { Route as StorageRouteImport } from './routes/storage'
 import { Route as StationsRouteImport } from './routes/stations'
+import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
 import { Route as RotationRouteImport } from './routes/rotation'
@@ -21,11 +22,15 @@ import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as ListenersRouteImport } from './routes/listeners'
+import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
+import { Route as EpisodesRouteImport } from './routes/episodes'
+import { Route as CompanionRouteImport } from './routes/companion'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuditRouteImport } from './routes/audit'
+import { Route as AdsRouteImport } from './routes/ads'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
@@ -58,6 +63,11 @@ const StorageRoute = StorageRouteImport.update({
 const StationsRoute = StationsRouteImport.update({
   id: '/stations',
   path: '/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowsRoute = ShowsRouteImport.update({
+  id: '/shows',
+  path: '/shows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -95,6 +105,11 @@ const ListenersRoute = ListenersRouteImport.update({
   path: '/listeners',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
@@ -103,6 +118,16 @@ const HealthRoute = HealthRouteImport.update({
 const FilesRoute = FilesRouteImport.update({
   id: '/files',
   path: '/files',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EpisodesRoute = EpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanionRoute = CompanionRouteImport.update({
+  id: '/companion',
+  path: '/companion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AzuracastRoute = AzuracastRouteImport.update({
@@ -118,6 +143,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuditRoute = AuditRouteImport.update({
   id: '/audit',
   path: '/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdsRoute = AdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
@@ -164,11 +194,15 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/ads': typeof AdsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
+  '/companion': typeof CompanionRoute
+  '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
+  '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
@@ -176,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
+  '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
@@ -191,11 +226,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/ads': typeof AdsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
+  '/companion': typeof CompanionRoute
+  '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
+  '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
@@ -203,6 +242,7 @@ export interface FileRoutesByTo {
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
+  '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
@@ -219,11 +259,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
+  '/ads': typeof AdsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
+  '/companion': typeof CompanionRoute
+  '/episodes': typeof EpisodesRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
+  '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
@@ -231,6 +275,7 @@ export interface FileRoutesById {
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
+  '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
@@ -248,11 +293,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accounts'
+    | '/ads'
     | '/audit'
     | '/auth'
     | '/azuracast'
+    | '/companion'
+    | '/episodes'
     | '/files'
     | '/health'
+    | '/inbox'
     | '/listeners'
     | '/media'
     | '/now-playing'
@@ -260,6 +309,7 @@ export interface FileRouteTypes {
     | '/rotation'
     | '/scheduler'
     | '/settings'
+    | '/shows'
     | '/stations'
     | '/storage'
     | '/streaming'
@@ -275,11 +325,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accounts'
+    | '/ads'
     | '/audit'
     | '/auth'
     | '/azuracast'
+    | '/companion'
+    | '/episodes'
     | '/files'
     | '/health'
+    | '/inbox'
     | '/listeners'
     | '/media'
     | '/now-playing'
@@ -287,6 +341,7 @@ export interface FileRouteTypes {
     | '/rotation'
     | '/scheduler'
     | '/settings'
+    | '/shows'
     | '/stations'
     | '/storage'
     | '/streaming'
@@ -302,11 +357,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/accounts'
+    | '/ads'
     | '/audit'
     | '/auth'
     | '/azuracast'
+    | '/companion'
+    | '/episodes'
     | '/files'
     | '/health'
+    | '/inbox'
     | '/listeners'
     | '/media'
     | '/now-playing'
@@ -314,6 +373,7 @@ export interface FileRouteTypes {
     | '/rotation'
     | '/scheduler'
     | '/settings'
+    | '/shows'
     | '/stations'
     | '/storage'
     | '/streaming'
@@ -330,11 +390,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
+  AdsRoute: typeof AdsRoute
   AuditRoute: typeof AuditRoute
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
+  CompanionRoute: typeof CompanionRoute
+  EpisodesRoute: typeof EpisodesRoute
   FilesRoute: typeof FilesRoute
   HealthRoute: typeof HealthRoute
+  InboxRoute: typeof InboxRoute
   ListenersRoute: typeof ListenersRoute
   MediaRoute: typeof MediaRoute
   NowPlayingRoute: typeof NowPlayingRoute
@@ -342,6 +406,7 @@ export interface RootRouteChildren {
   RotationRoute: typeof RotationRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
+  ShowsRoute: typeof ShowsRoute
   StationsRoute: typeof StationsRoute
   StorageRoute: typeof StorageRoute
   StreamingRoute: typeof StreamingRoute
@@ -390,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/stations'
       fullPath: '/stations'
       preLoaderRoute: typeof StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shows': {
+      id: '/shows'
+      path: '/shows'
+      fullPath: '/shows'
+      preLoaderRoute: typeof ShowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -441,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListenersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/health': {
       id: '/health'
       path: '/health'
@@ -453,6 +532,20 @@ declare module '@tanstack/react-router' {
       path: '/files'
       fullPath: '/files'
       preLoaderRoute: typeof FilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/episodes': {
+      id: '/episodes'
+      path: '/episodes'
+      fullPath: '/episodes'
+      preLoaderRoute: typeof EpisodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companion': {
+      id: '/companion'
+      path: '/companion'
+      fullPath: '/companion'
+      preLoaderRoute: typeof CompanionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/azuracast': {
@@ -474,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/audit'
       fullPath: '/audit'
       preLoaderRoute: typeof AuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ads': {
+      id: '/ads'
+      path: '/ads'
+      fullPath: '/ads'
+      preLoaderRoute: typeof AdsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts': {
@@ -538,11 +638,15 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
+  AdsRoute: AdsRoute,
   AuditRoute: AuditRoute,
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
+  CompanionRoute: CompanionRoute,
+  EpisodesRoute: EpisodesRoute,
   FilesRoute: FilesRoute,
   HealthRoute: HealthRoute,
+  InboxRoute: InboxRoute,
   ListenersRoute: ListenersRoute,
   MediaRoute: MediaRoute,
   NowPlayingRoute: NowPlayingRoute,
@@ -550,6 +654,7 @@ const rootRouteChildren: RootRouteChildren = {
   RotationRoute: RotationRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
+  ShowsRoute: ShowsRoute,
   StationsRoute: StationsRoute,
   StorageRoute: StorageRoute,
   StreamingRoute: StreamingRoute,

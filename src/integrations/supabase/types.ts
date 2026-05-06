@@ -44,6 +44,72 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_campaigns: {
+        Row: {
+          advertiser: string
+          created_at: string
+          daily_target: number
+          end_date: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          start_date: string | null
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          advertiser: string
+          created_at?: string
+          daily_target?: number
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          start_date?: string | null
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          advertiser?: string
+          created_at?: string
+          daily_target?: number
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          start_date?: string | null
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_spots: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          media_file_id: string | null
+          weight: number
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          media_file_id?: string | null
+          weight?: number
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          media_file_id?: string | null
+          weight?: number
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -131,6 +197,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      episodes: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          scheduled_end: string
+          scheduled_start: string
+          show_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_end: string
+          scheduled_start: string
+          show_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_end?: string
+          scheduled_start?: string
+          show_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       icecast_configs: {
         Row: {
@@ -266,6 +365,7 @@ export type Database = {
           file_size: number | null
           file_type: string | null
           id: string
+          media_kind: string
           mime_type: string | null
           original_file_name: string | null
           station_id: string | null
@@ -283,6 +383,7 @@ export type Database = {
           file_size?: number | null
           file_type?: string | null
           id?: string
+          media_kind?: string
           mime_type?: string | null
           original_file_name?: string | null
           station_id?: string | null
@@ -300,6 +401,7 @@ export type Database = {
           file_size?: number | null
           file_type?: string | null
           id?: string
+          media_kind?: string
           mime_type?: string | null
           original_file_name?: string | null
           station_id?: string | null
@@ -488,6 +590,42 @@ export type Database = {
           },
         ]
       }
+      presenters: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          color: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -598,6 +736,45 @@ export type Database = {
           },
         ]
       }
+      rundown_items: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          episode_id: string
+          id: string
+          item_type: string
+          media_file_id: string | null
+          notes: string | null
+          position: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          episode_id: string
+          id?: string
+          item_type?: string
+          media_file_id?: string | null
+          notes?: string | null
+          position?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          episode_id?: string
+          id?: string
+          item_type?: string
+          media_file_id?: string | null
+          notes?: string | null
+          position?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       schedule_blocks: {
         Row: {
           created_at: string
@@ -689,6 +866,75 @@ export type Database = {
           service?: string
           station_id?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      shows: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          presenter_id: string | null
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          presenter_id?: string | null
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          presenter_id?: string | null
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      song_requests: {
+        Row: {
+          contact: string | null
+          created_at: string
+          id: string
+          message: string | null
+          requester_name: string | null
+          station_id: string
+          status: string
+          track_text: string
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          requester_name?: string | null
+          station_id: string
+          status?: string
+          track_text: string
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          requester_name?: string | null
+          station_id?: string
+          status?: string
+          track_text?: string
         }
         Relationships: []
       }
@@ -835,6 +1081,36 @@ export type Database = {
           source_password?: string | null
           station_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      studio_messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_name: string | null
+          handled: boolean
+          id: string
+          kind: string
+          station_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_name?: string | null
+          handled?: boolean
+          id?: string
+          kind?: string
+          station_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_name?: string | null
+          handled?: boolean
+          id?: string
+          kind?: string
+          station_id?: string
         }
         Relationships: []
       }
