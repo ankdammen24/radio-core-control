@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
-  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry,
+  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow,
 } from "@/server/streaming.server";
 
 // GET /api/public/station-config?station=<slug>  with x-stack-token header
