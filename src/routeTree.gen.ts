@@ -26,6 +26,10 @@ import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
 import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
+import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.station-config'
+import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
+import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
+import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -112,6 +116,26 @@ const MetadataIdRoute = MetadataIdRouteImport.update({
   path: '/metadata/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStationConfigRoute = ApiPublicStationConfigRouteImport.update({
+  id: '/api/public/station-config',
+  path: '/api/public/station-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicNowPlayingRoute = ApiPublicNowPlayingRouteImport.update({
+  id: '/api/public/now-playing',
+  path: '/api/public/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicListenerStatsRoute = ApiPublicListenerStatsRouteImport.update({
+  id: '/api/public/listener-stats',
+  path: '/api/public/listener-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,6 +155,10 @@ export interface FileRoutesByFullPath {
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -150,6 +178,10 @@ export interface FileRoutesByTo {
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -170,6 +202,10 @@ export interface FileRoutesById {
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,6 +227,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/metadata/$id'
     | '/metadata/'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -210,6 +250,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/metadata/$id'
     | '/metadata'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   id:
     | '__root__'
     | '/'
@@ -229,6 +273,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/metadata/$id'
     | '/metadata/'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -249,6 +297,10 @@ export interface RootRouteChildren {
   UsersRoute: typeof UsersRoute
   MetadataIdRoute: typeof MetadataIdRoute
   MetadataIndexRoute: typeof MetadataIndexRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
+  ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
+  ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -372,6 +424,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MetadataIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/station-config': {
+      id: '/api/public/station-config'
+      path: '/api/public/station-config'
+      fullPath: '/api/public/station-config'
+      preLoaderRoute: typeof ApiPublicStationConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/now-playing': {
+      id: '/api/public/now-playing'
+      path: '/api/public/now-playing'
+      fullPath: '/api/public/now-playing'
+      preLoaderRoute: typeof ApiPublicNowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/listener-stats': {
+      id: '/api/public/listener-stats'
+      path: '/api/public/listener-stats'
+      fullPath: '/api/public/listener-stats'
+      preLoaderRoute: typeof ApiPublicListenerStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -393,6 +473,10 @@ const rootRouteChildren: RootRouteChildren = {
   UsersRoute: UsersRoute,
   MetadataIdRoute: MetadataIdRoute,
   MetadataIndexRoute: MetadataIndexRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
+  ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
+  ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
