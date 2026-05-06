@@ -374,7 +374,6 @@ function VoicetracksPage() {
 function VoicetrackRow({ row, onDelete, canEdit }: { row: any; onDelete: () => void; canEdit: boolean }) {
   const [url, setUrl] = useState<string>("");
   const [open, setOpen] = useState(false);
-  const [confirm, setConfirm] = useState(false);
 
   async function load() {
     if (url) { setOpen((o) => !o); return; }
@@ -397,18 +396,18 @@ function VoicetrackRow({ row, onDelete, canEdit }: { row: any; onDelete: () => v
             {open ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
           </Button>
           {canEdit && (
-            <Button size="sm" variant="outline" onClick={() => setConfirm(true)}>
-              <Trash2 className="w-3 h-3" />
-            </Button>
+            <ConfirmDialog
+              title="Delete voicetrack?"
+              description="This permanently removes the recording and its audio file."
+              confirmText="Delete"
+              destructive
+              onConfirm={onDelete}
+              trigger={<Button size="sm" variant="outline"><Trash2 className="w-3 h-3" /></Button>}
+            />
           )}
         </div>
       </div>
       {open && url && <audio src={url} controls className="w-full mt-2" />}
-      <ConfirmDialog
-        open={confirm} onOpenChange={setConfirm}
-        title="Delete voicetrack?" description="This permanently removes the recording and its audio file."
-        confirmText="Delete" variant="destructive" onConfirm={onDelete}
-      />
     </div>
   );
 }
