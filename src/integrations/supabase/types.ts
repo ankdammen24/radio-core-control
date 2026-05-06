@@ -14,16 +14,740 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          station_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          station_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          station_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      azuracast_connections: {
+        Row: {
+          api_key_secret_name: string | null
+          azuracast_station_id: string | null
+          base_url: string | null
+          created_at: string
+          id: string
+          last_tested_at: string | null
+          station_id: string
+          status: Database["public"]["Enums"]["connection_status"]
+          updated_at: string
+        }
+        Insert: {
+          api_key_secret_name?: string | null
+          azuracast_station_id?: string | null
+          base_url?: string | null
+          created_at?: string
+          id?: string
+          last_tested_at?: string | null
+          station_id: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string
+        }
+        Update: {
+          api_key_secret_name?: string | null
+          azuracast_station_id?: string | null
+          base_url?: string | null
+          created_at?: string
+          id?: string
+          last_tested_at?: string | null
+          station_id?: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "azuracast_connections_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_files: {
+        Row: {
+          azuracast_media_id: string | null
+          checksum: string | null
+          created_at: string
+          duration_seconds: number | null
+          file_name: string
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          mime_type: string | null
+          original_file_name: string | null
+          station_id: string | null
+          status: Database["public"]["Enums"]["media_status"]
+          storage_location_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          azuracast_media_id?: string | null
+          checksum?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          file_name: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          mime_type?: string | null
+          original_file_name?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["media_status"]
+          storage_location_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          azuracast_media_id?: string | null
+          checksum?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          file_name?: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          mime_type?: string | null
+          original_file_name?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["media_status"]
+          storage_location_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_files_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_files_storage_location_id_fkey"
+            columns: ["storage_location_id"]
+            isOneToOne: false
+            referencedRelation: "storage_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          media_file_id: string
+          playlist_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          media_file_id: string
+          playlist_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          media_file_id?: string
+          playlist_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_assignments_media_file_id_fkey"
+            columns: ["media_file_id"]
+            isOneToOne: false
+            referencedRelation: "media_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_assignments_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          azuracast_playlist_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          playlist_type: Database["public"]["Enums"]["playlist_type"]
+          priority: number
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          azuracast_playlist_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          playlist_type?: Database["public"]["Enums"]["playlist_type"]
+          priority?: number
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          azuracast_playlist_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          playlist_type?: Database["public"]["Enums"]["playlist_type"]
+          priority?: number
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlists_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          permissions: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          permissions?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          permissions?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rotation_rules: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_tracks_per_hour: number
+          min_minutes_between_same_artist: number
+          min_minutes_between_same_track: number
+          name: string
+          priority: number
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_tracks_per_hour?: number
+          min_minutes_between_same_artist?: number
+          min_minutes_between_same_track?: number
+          name: string
+          priority?: number
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_tracks_per_hour?: number
+          min_minutes_between_same_artist?: number
+          min_minutes_between_same_track?: number
+          name?: string
+          priority?: number
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rotation_rules_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_blocks: {
+        Row: {
+          created_at: string
+          day_of_week: Database["public"]["Enums"]["day_of_week"]
+          end_time: string
+          id: string
+          is_active: boolean
+          name: string
+          playlist_id: string | null
+          rotation_rule_id: string | null
+          start_time: string
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: Database["public"]["Enums"]["day_of_week"]
+          end_time: string
+          id?: string
+          is_active?: boolean
+          name: string
+          playlist_id?: string | null
+          rotation_rule_id?: string | null
+          start_time: string
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: Database["public"]["Enums"]["day_of_week"]
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          playlist_id?: string | null
+          rotation_rule_id?: string | null
+          start_time?: string
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_blocks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_blocks_rotation_rule_id_fkey"
+            columns: ["rotation_rule_id"]
+            isOneToOne: false
+            referencedRelation: "rotation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_blocks_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stations: {
+        Row: {
+          account_id: string | null
+          azuracast_station_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          azuracast_station_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          azuracast_station_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stations_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      storage_locations: {
+        Row: {
+          base_path: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          base_path?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          base_path?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sync_jobs: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          job_type: string
+          message: string | null
+          payload: Json | null
+          result: Json | null
+          started_at: string | null
+          station_id: string | null
+          status: Database["public"]["Enums"]["sync_job_status"]
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          job_type: string
+          message?: string | null
+          payload?: Json | null
+          result?: Json | null
+          started_at?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["sync_job_status"]
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          job_type?: string
+          message?: string | null
+          payload?: Json | null
+          result?: Json | null
+          started_at?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["sync_job_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_jobs_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: []
+      }
+      track_metadata: {
+        Row: {
+          album: string | null
+          artist: string | null
+          created_at: string
+          explicit_content: boolean
+          genre: string | null
+          id: string
+          is_ai_generated: boolean
+          is_local_music: boolean
+          language: string | null
+          media_file_id: string
+          mood: string | null
+          notes: string | null
+          rights_status: Database["public"]["Enums"]["rights_status"]
+          stim_status: string | null
+          tempo: string | null
+          title: string | null
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          album?: string | null
+          artist?: string | null
+          created_at?: string
+          explicit_content?: boolean
+          genre?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          is_local_music?: boolean
+          language?: string | null
+          media_file_id: string
+          mood?: string | null
+          notes?: string | null
+          rights_status?: Database["public"]["Enums"]["rights_status"]
+          stim_status?: string | null
+          tempo?: string | null
+          title?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          album?: string | null
+          artist?: string | null
+          created_at?: string
+          explicit_content?: boolean
+          genre?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          is_local_music?: boolean
+          language?: string | null
+          media_file_id?: string
+          mood?: string | null
+          notes?: string | null
+          rights_status?: Database["public"]["Enums"]["rights_status"]
+          stim_status?: string | null
+          tempo?: string | null
+          title?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_metadata_media_file_id_fkey"
+            columns: ["media_file_id"]
+            isOneToOne: true
+            referencedRelation: "media_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin_or_editor: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "editor" | "viewer"
+      connection_status: "untested" | "ok" | "error"
+      day_of_week: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"
+      media_status:
+        | "imported"
+        | "missing_metadata"
+        | "ready"
+        | "synced"
+        | "error"
+        | "paused"
+      playlist_type:
+        | "rotation"
+        | "jingle"
+        | "sweeper"
+        | "promo"
+        | "special"
+        | "paused"
+      rights_status:
+        | "unknown"
+        | "cleared"
+        | "ai_generated"
+        | "local_permission"
+        | "creative_commons"
+        | "needs_review"
+        | "blocked"
+      sync_job_status: "pending" | "running" | "completed" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +874,36 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "editor", "viewer"],
+      connection_status: ["untested", "ok", "error"],
+      day_of_week: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      media_status: [
+        "imported",
+        "missing_metadata",
+        "ready",
+        "synced",
+        "error",
+        "paused",
+      ],
+      playlist_type: [
+        "rotation",
+        "jingle",
+        "sweeper",
+        "promo",
+        "special",
+        "paused",
+      ],
+      rights_status: [
+        "unknown",
+        "cleared",
+        "ai_generated",
+        "local_permission",
+        "creative_commons",
+        "needs_review",
+        "blocked",
+      ],
+      sync_job_status: ["pending", "running", "completed", "failed"],
+    },
   },
 } as const
