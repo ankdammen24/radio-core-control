@@ -12,7 +12,7 @@ import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState, ErrorState } from "@/components/data-states";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plug, Zap, Trash2, RefreshCw, ListMusic, Music } from "lucide-react";
+import { Plug, Zap, Trash2, ListMusic, Music } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -157,5 +157,3 @@ function AzuraPage() {
   );
 }
 
-// helper used elsewhere; keep import live
-void RefreshCw;
