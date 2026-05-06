@@ -23,6 +23,7 @@ import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as ListenersRouteImport } from './routes/listeners'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HealthRouteImport } from './routes/health'
@@ -111,6 +112,11 @@ const NowPlayingRoute = NowPlayingRouteImport.update({
 const MediaRoute = MediaRouteImport.update({
   id: '/media',
   path: '/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListenersRoute = ListenersRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
+  '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
+  '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
   '/listeners': typeof ListenersRoute
+  '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/inbox'
     | '/listeners'
+    | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/inbox'
     | '/listeners'
+    | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/inbox'
     | '/listeners'
+    | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
@@ -437,6 +449,7 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   InboxRoute: typeof InboxRoute
   ListenersRoute: typeof ListenersRoute
+  LiveRoute: typeof LiveRoute
   MediaRoute: typeof MediaRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/media'
       fullPath: '/media'
       preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listeners': {
@@ -709,6 +729,7 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   InboxRoute: InboxRoute,
   ListenersRoute: ListenersRoute,
+  LiveRoute: LiveRoute,
   MediaRoute: MediaRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,

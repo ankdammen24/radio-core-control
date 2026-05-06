@@ -172,7 +172,7 @@ function LiveInputPanel({ input, canEdit, onSave, onToggle }: {
 }) {
   const [draft, setDraft] = useState<LiveInput>(input);
   // Reset when input changes
-  useMemo(() => setDraft(input), [input.id, input.updated_at as any]);
+  useMemo(() => setDraft(input), [input.id, input.is_live, input.forced_takeover, input.last_state_change]);
   const live = input.forced_takeover || input.is_live;
 
   return (
