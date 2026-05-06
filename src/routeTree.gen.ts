@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as StationsRouteImport } from './routes/stations'
+import { Route as SchedulerRouteImport } from './routes/scheduler'
+import { Route as RotationRouteImport } from './routes/rotation'
+import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -27,6 +30,21 @@ const UsersRoute = UsersRouteImport.update({
 const StationsRoute = StationsRouteImport.update({
   id: '/stations',
   path: '/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchedulerRoute = SchedulerRouteImport.update({
+  id: '/scheduler',
+  path: '/scheduler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RotationRoute = RotationRouteImport.update({
+  id: '/rotation',
+  path: '/rotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistsRoute = PlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MediaRoute = MediaRouteImport.update({
@@ -71,6 +89,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/files': typeof FilesRoute
   '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -82,6 +103,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/files': typeof FilesRoute
   '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -94,6 +118,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/files': typeof FilesRoute
   '/media': typeof MediaRoute
+  '/playlists': typeof PlaylistsRoute
+  '/rotation': typeof RotationRoute
+  '/scheduler': typeof SchedulerRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -107,6 +134,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/files'
     | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
     | '/stations'
     | '/users'
     | '/metadata/$id'
@@ -118,6 +148,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/files'
     | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
     | '/stations'
     | '/users'
     | '/metadata/$id'
@@ -129,6 +162,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/files'
     | '/media'
+    | '/playlists'
+    | '/rotation'
+    | '/scheduler'
     | '/stations'
     | '/users'
     | '/metadata/$id'
@@ -141,6 +177,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   FilesRoute: typeof FilesRoute
   MediaRoute: typeof MediaRoute
+  PlaylistsRoute: typeof PlaylistsRoute
+  RotationRoute: typeof RotationRoute
+  SchedulerRoute: typeof SchedulerRoute
   StationsRoute: typeof StationsRoute
   UsersRoute: typeof UsersRoute
   MetadataIdRoute: typeof MetadataIdRoute
@@ -161,6 +200,27 @@ declare module '@tanstack/react-router' {
       path: '/stations'
       fullPath: '/stations'
       preLoaderRoute: typeof StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scheduler': {
+      id: '/scheduler'
+      path: '/scheduler'
+      fullPath: '/scheduler'
+      preLoaderRoute: typeof SchedulerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rotation': {
+      id: '/rotation'
+      path: '/rotation'
+      fullPath: '/rotation'
+      preLoaderRoute: typeof RotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlists': {
+      id: '/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof PlaylistsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/media': {
@@ -221,6 +281,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   FilesRoute: FilesRoute,
   MediaRoute: MediaRoute,
+  PlaylistsRoute: PlaylistsRoute,
+  RotationRoute: RotationRoute,
+  SchedulerRoute: SchedulerRoute,
   StationsRoute: StationsRoute,
   UsersRoute: UsersRoute,
   MetadataIdRoute: MetadataIdRoute,
