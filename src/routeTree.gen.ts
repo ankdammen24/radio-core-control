@@ -14,6 +14,7 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
 import { Route as StreamingRouteImport } from './routes/streaming'
 import { Route as StorageRouteImport } from './routes/storage'
+import { Route as StereoToolRouteImport } from './routes/stereo-tool'
 import { Route as StationsRouteImport } from './routes/stations'
 import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -64,6 +65,11 @@ const StreamingRoute = StreamingRouteImport.update({
 const StorageRoute = StorageRouteImport.update({
   id: '/storage',
   path: '/storage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StereoToolRoute = StereoToolRouteImport.update({
+  id: '/stereo-tool',
+  path: '/stereo-tool',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StationsRoute = StationsRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
+  '/stereo-tool': typeof StereoToolRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
+  '/stereo-tool': typeof StereoToolRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -285,6 +293,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
+  '/stereo-tool': typeof StereoToolRoute
   '/storage': typeof StorageRoute
   '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shows'
     | '/stations'
+    | '/stereo-tool'
     | '/storage'
     | '/streaming'
     | '/sync-jobs'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shows'
     | '/stations'
+    | '/stereo-tool'
     | '/storage'
     | '/streaming'
     | '/sync-jobs'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shows'
     | '/stations'
+    | '/stereo-tool'
     | '/storage'
     | '/streaming'
     | '/sync-jobs'
@@ -420,6 +432,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   ShowsRoute: typeof ShowsRoute
   StationsRoute: typeof StationsRoute
+  StereoToolRoute: typeof StereoToolRoute
   StorageRoute: typeof StorageRoute
   StreamingRoute: typeof StreamingRoute
   SyncJobsRoute: typeof SyncJobsRoute
@@ -468,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/storage'
       fullPath: '/storage'
       preLoaderRoute: typeof StorageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stereo-tool': {
+      id: '/stereo-tool'
+      path: '/stereo-tool'
+      fullPath: '/stereo-tool'
+      preLoaderRoute: typeof StereoToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stations': {
@@ -676,6 +696,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   ShowsRoute: ShowsRoute,
   StationsRoute: StationsRoute,
+  StereoToolRoute: StereoToolRoute,
   StorageRoute: StorageRoute,
   StreamingRoute: StreamingRoute,
   SyncJobsRoute: SyncJobsRoute,
