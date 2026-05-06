@@ -53,7 +53,7 @@ export const Route = createFileRoute("/api/public/station-config")({
         return Response.json({
           station,
           icecast_xml: renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]),
-          liquidsoap_liq: renderLiquidsoapLiq(station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, token),
+          liquidsoap_liq: renderLiquidsoapLiq(station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, token, live as LiveInputRow | null),
           playlists: playlists.map((p, i) => ({
             file: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
             content: renderM3u(p.files),
