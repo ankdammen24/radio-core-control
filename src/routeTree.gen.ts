@@ -31,6 +31,7 @@ import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as FallbackRouteImport } from './routes/fallback'
 import { Route as EpisodesRouteImport } from './routes/episodes'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ConfigsRouteImport } from './routes/configs'
 import { Route as CompanionRouteImport } from './routes/companion'
 import { Route as BackupRouteImport } from './routes/backup'
@@ -157,6 +158,11 @@ const EpisodesRoute = EpisodesRouteImport.update({
   path: '/episodes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfigsRoute = ConfigsRouteImport.update({
   id: '/configs',
   path: '/configs',
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/backup': typeof BackupRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/backup': typeof BackupRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   '/backup': typeof BackupRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/backup'
     | '/companion'
     | '/configs'
+    | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/backup'
     | '/companion'
     | '/configs'
+    | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/backup'
     | '/companion'
     | '/configs'
+    | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
@@ -481,6 +493,7 @@ export interface RootRouteChildren {
   BackupRoute: typeof BackupRoute
   CompanionRoute: typeof CompanionRoute
   ConfigsRoute: typeof ConfigsRoute
+  DemoRoute: typeof DemoRoute
   EpisodesRoute: typeof EpisodesRoute
   FallbackRoute: typeof FallbackRoute
   FilesRoute: typeof FilesRoute
@@ -667,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EpisodesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configs': {
       id: '/configs'
       path: '/configs'
@@ -785,6 +805,7 @@ const rootRouteChildren: RootRouteChildren = {
   BackupRoute: BackupRoute,
   CompanionRoute: CompanionRoute,
   ConfigsRoute: ConfigsRoute,
+  DemoRoute: DemoRoute,
   EpisodesRoute: EpisodesRoute,
   FallbackRoute: FallbackRoute,
   FilesRoute: FilesRoute,

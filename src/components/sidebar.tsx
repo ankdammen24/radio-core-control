@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Building2, Radio, Music, FolderOpen, Tag, ListMusic,
   Calendar, Repeat, Plug, HardDrive, RefreshCw, ScrollText, Settings, LogOut, Moon, Sun,
-  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert, Archive,
+  Activity, Headphones, FileCode2, Server, Mic, CalendarClock, Megaphone, MessageSquare, Sliders, ShieldAlert, Archive, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -27,6 +27,7 @@ const items = [
   { to: "/live", label: "Live / Takeover", icon: Radio },
   { to: "/fallback", label: "Fallback Audio", icon: ShieldAlert },
   { to: "/now-playing", label: "Now Playing", icon: Activity },
+  { to: "/demo", label: "Demo Mode", icon: Sparkles },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
   { to: "/streaming-outputs", label: "Streaming Outputs", icon: Radio },

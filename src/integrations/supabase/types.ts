@@ -1144,6 +1144,9 @@ export type Database = {
           account_id: string | null
           azuracast_station_id: string | null
           created_at: string
+          demo_artwork_url: string | null
+          demo_mode: boolean
+          demo_stream_url: string | null
           description: string | null
           id: string
           is_active: boolean
@@ -1155,6 +1158,9 @@ export type Database = {
           account_id?: string | null
           azuracast_station_id?: string | null
           created_at?: string
+          demo_artwork_url?: string | null
+          demo_mode?: boolean
+          demo_stream_url?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -1166,6 +1172,9 @@ export type Database = {
           account_id?: string | null
           azuracast_station_id?: string | null
           created_at?: string
+          demo_artwork_url?: string | null
+          demo_mode?: boolean
+          demo_stream_url?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
