@@ -90,7 +90,7 @@ function MetadataDetail() {
               </Select>
             </div>
             <div><Label>STIM status</Label><Input disabled={!isEditor} value={form.stim_status ?? ""} onChange={(e) => setForm({ ...form, stim_status: e.target.value })} /></div>
-            <div className="flex items-center justify-between"><Label>Local Uppsala music</Label><Switch checked={form.is_local_music} disabled={!isEditor} onCheckedChange={(v) => setForm({ ...form, is_local_music: v })} /></div>
+            <div className="flex items-center justify-between"><Label>Local music</Label><Switch checked={form.is_local_music} disabled={!isEditor} onCheckedChange={(v) => setForm({ ...form, is_local_music: v })} /></div>
             <div className="flex items-center justify-between"><Label>AI-generated</Label><Switch checked={form.is_ai_generated} disabled={!isEditor} onCheckedChange={(v) => setForm({ ...form, is_ai_generated: v })} /></div>
             <div className="flex items-center justify-between"><Label>Explicit content</Label><Switch checked={form.explicit_content} disabled={!isEditor} onCheckedChange={(v) => setForm({ ...form, explicit_content: v })} /></div>
           </Card>

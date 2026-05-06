@@ -48,7 +48,7 @@ function Dashboard() {
   });
 
   return (
-    <AppLayout title="Dashboard" description="Operational overview of Radio Uppsala broadcast systems.">
+    <AppLayout title="Dashboard" description="Operational overview of your broadcast systems.">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard icon={Radio} label="Active Stations" value={isLoading ? "—" : data!.stations} />
         <StatCard icon={Music} label="Media Files" value={isLoading ? "—" : data!.media} />

@@ -15,7 +15,7 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Radio Core — Broadcast Operations" },
-      { name: "description", content: "Radio Core: broadcast management control plane for Radio Uppsala." },
+      { name: "description", content: "Radio Core: a self-hosted broadcast operations platform for radio stations." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
