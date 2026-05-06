@@ -1,0 +1,123 @@
+# =============================================================================
+# Radio Core – Reference deployment stack
+# =============================================================================
+#
+# This is a turn-key "radio in a box" stack. A customer with Docker installed
+# can clone this folder, fill in .env, and run:
+#
+#     docker compose up -d
+#
+# What it starts:
+#   * icecast      – Icecast-KH streaming server (public on :8000)
+#   * liquidsoap   – Audio engine that plays out the schedule and encodes
+#   * runner       – Sync agent that pulls config + playlists from Radio Core
+#                    control plane, writes icecast.xml / radio.liq, reloads
+#                    services and reports health + listener stats back.
+#   * media        – Shared volume for audio files (mounted into liquidsoap
+#                    and runner so uploaded media is available to playout).
+#
+# All streaming configuration is generated from the Radio Core database.
+# Do NOT hand-edit icecast.xml or radio.liq inside the volumes – the runner
+# will overwrite them on the next sync. Change settings in the Radio Core UI
+# and click "Regenerate" (or just wait for the next poll).
+# =============================================================================
+
+name: radiocore
+
+x-common-env: &common-env
+  TZ: ${TZ:-Europe/Stockholm}
+
+services:
+  icecast:
+    image: ghcr.io/karlheyes/icecast-kh-docker:latest
+    container_name: radiocore-icecast
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+    ports:
+      - "${ICECAST_PORT:-8000}:8000"
+    volumes:
+      - icecast-config:/etc/icecast
+      - icecast-run:/var/run/icecast
+      - icecast-logs:/var/log/icecast
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/status-json.xsl"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks: [radiocore]
+
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.5
+    container_name: radiocore-liquidsoap
+    restart: unless-stopped
+    depends_on:
+      icecast:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+    volumes:
+      - liquidsoap-config:/etc/liquidsoap
+      - media:/data/stations
+      - ${STEREO_TOOL_DIR:-./stereo-tool}:/opt/stereo-tool:ro
+    # The runner writes radio.liq before liquidsoap is reloaded. On first boot
+    # we wait until the file exists so the container doesn't crash-loop.
+    command:
+      - sh
+      - -c
+      - |
+        echo "Waiting for /etc/liquidsoap/radio.liq from runner…"
+        while [ ! -s /etc/liquidsoap/radio.liq ]; do sleep 2; done
+        echo "Starting Liquidsoap"
+        exec liquidsoap /etc/liquidsoap/radio.liq
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep liquidsoap >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks: [radiocore]
+
+  runner:
+    build:
+      context: ../runner
+      dockerfile: Dockerfile
+    image: radiocore/runner:latest
+    container_name: radiocore-runner
+    restart: unless-stopped
+    depends_on:
+      icecast:
+        condition: service_started
+    environment:
+      <<: *common-env
+      RADIO_CORE_API_URL: ${RADIO_CORE_API_URL}
+      RADIO_CORE_STATION_SLUG: ${RADIO_CORE_STATION_SLUG}
+      RADIO_CORE_STACK_TOKEN: ${RADIO_CORE_STACK_TOKEN}
+      POLL_INTERVAL_SECONDS: ${POLL_INTERVAL_SECONDS:-30}
+      HEALTH_INTERVAL_SECONDS: ${HEALTH_INTERVAL_SECONDS:-60}
+      ICECAST_XML_PATH: /etc/icecast/icecast.xml
+      LIQUIDSOAP_LIQ_PATH: /etc/liquidsoap/radio.liq
+      PLAYLISTS_DIR: /etc/liquidsoap/playlists
+      MEDIA_DIR: /data/stations
+      ICECAST_PID_FILE: /var/run/icecast/icecast.pid
+      LIQUIDSOAP_TELNET_HOST: liquidsoap
+      LIQUIDSOAP_TELNET_PORT: "1234"
+      ICECAST_STATUS_URL: http://icecast:8000/status-json.xsl
+    volumes:
+      - icecast-config:/etc/icecast
+      - icecast-run:/var/run/icecast
+      - liquidsoap-config:/etc/liquidsoap
+      - media:/data/stations
+    networks: [radiocore]
+
+networks:
+  radiocore:
+    driver: bridge
+
+volumes:
+  icecast-config:
+  icecast-run:
+  icecast-logs:
+  liquidsoap-config:
+  media:
