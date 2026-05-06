@@ -25,11 +25,12 @@ export const Route = createFileRoute("/api/public/station-config")({
         const { data: station } = await supabaseAdmin.from("stations").select("id,name,slug").eq("slug", slug).maybeSingle();
         if (!station) return new Response("Not found", { status: 404 });
 
-        const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }] = await Promise.all([
+        const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }] = await Promise.all([
           supabaseAdmin.from("icecast_configs").select("*").eq("station_id", station.id).maybeSingle(),
           supabaseAdmin.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", station.id).eq("is_active", true),
           supabaseAdmin.from("liquidsoap_configs").select("*").eq("station_id", station.id).maybeSingle(),
           supabaseAdmin.from("playlists").select("id,name,priority,is_active").eq("station_id", station.id).eq("is_active", true),
+          supabaseAdmin.from("live_inputs").select("*").eq("station_id", station.id).maybeSingle(),
         ]);
         if (!ic || !liq || !mounts?.length) return Response.json({ error: "Station not fully configured" }, { status: 409 });
 
