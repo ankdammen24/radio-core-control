@@ -1,0 +1,78 @@
+# Reference docker-compose for a Radio Core station.
+#
+# This stack is driven entirely by the Radio Core control plane:
+#   - The runner pulls icecast.xml + radio.liq from /api/public/station-config
+#   - Icecast-KH and Liquidsoap consume those generated files via shared volumes
+#   - Liquidsoap reports now-playing back to /api/public/now-playing
+#   - The runner reports listener stats + service health back to /api/public/*
+#
+# Secrets you MUST provide via .env (or `docker compose --env-file`):
+#   RADIO_CORE_API_URL        https://core.your-radio.com
+#   RADIO_CORE_STATION_SLUG   my-station
+#   RADIO_CORE_STACK_TOKEN    issued from Radio Core admin
+#
+# Optional:
+#   STEREO_TOOL_DIR           host path containing licensed Stereo Tool binary + presets
+#                             (mounted read-only into liquidsoap)
+
+services:
+  icecast:
+    image: ghcr.io/karlheyes/icecast-kh-docker:latest
+    container_name: radiocore-icecast
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - icecast-config:/etc/icecast
+      - icecast-run:/var/run/icecast
+      - icecast-logs:/var/log/icecast
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/status-json.xsl"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.5
+    container_name: radiocore-liquidsoap
+    restart: unless-stopped
+    depends_on:
+      - icecast
+    volumes:
+      - liquidsoap-config:/etc/liquidsoap
+      - media:/data/stations
+      - ${STEREO_TOOL_DIR:-./stereo-tool}:/opt/stereo-tool:ro
+    command: ["liquidsoap", "/etc/liquidsoap/radio.liq"]
+
+  runner:
+    build: .
+    image: radiocore/runner:latest
+    container_name: radiocore-runner
+    restart: unless-stopped
+    depends_on:
+      - icecast
+      - liquidsoap
+    environment:
+      RADIO_CORE_API_URL: ${RADIO_CORE_API_URL}
+      RADIO_CORE_STATION_SLUG: ${RADIO_CORE_STATION_SLUG}
+      RADIO_CORE_STACK_TOKEN: ${RADIO_CORE_STACK_TOKEN}
+      POLL_INTERVAL_SECONDS: "30"
+      HEALTH_INTERVAL_SECONDS: "60"
+      ICECAST_XML_PATH: /etc/icecast/icecast.xml
+      LIQUIDSOAP_LIQ_PATH: /etc/liquidsoap/radio.liq
+      PLAYLISTS_DIR: /etc/liquidsoap/playlists
+      ICECAST_PID_FILE: /var/run/icecast/icecast.pid
+      LIQUIDSOAP_TELNET_HOST: liquidsoap
+      LIQUIDSOAP_TELNET_PORT: "1234"
+      ICECAST_STATUS_URL: http://icecast:8000/status-json.xsl
+    volumes:
+      - icecast-config:/etc/icecast
+      - icecast-run:/var/run/icecast
+      - liquidsoap-config:/etc/liquidsoap
+
+volumes:
+  icecast-config:
+  icecast-run:
+  icecast-logs:
+  liquidsoap-config:
+  media:
