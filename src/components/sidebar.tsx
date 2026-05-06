@@ -27,6 +27,7 @@ const items = [
   { to: "/live", label: "Live / Takeover", icon: Radio },
   { to: "/fallback", label: "Fallback Audio", icon: ShieldAlert },
   { to: "/now-playing", label: "Now Playing", icon: Activity },
+  { to: "/demo", label: "Demo Mode", icon: Sparkles },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
   { to: "/streaming-outputs", label: "Streaming Outputs", icon: Radio },
