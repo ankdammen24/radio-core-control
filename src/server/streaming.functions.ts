@@ -50,7 +50,7 @@ export const generateStationConfig = createServerFn({ method: "POST" })
 
     const icecastXml = renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]);
     const liquidsoapLiq = renderLiquidsoapLiq(
-      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken,
+      station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null,
     );
     const m3uFiles = playlists.map((p, i) => ({
       name: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
