@@ -354,6 +354,141 @@ export type Database = {
         }
         Relationships: []
       }
+      live_inputs: {
+        Row: {
+          auto_takeover: boolean
+          bitrate: number
+          created_at: string
+          fade_in_seconds: number
+          fade_out_seconds: number
+          forced_takeover: boolean
+          format: string
+          harbor_port: number
+          id: string
+          is_enabled: boolean
+          is_live: boolean
+          last_state_change: string | null
+          mount_path: string
+          notes: string | null
+          source_password: string
+          source_user: string
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          auto_takeover?: boolean
+          bitrate?: number
+          created_at?: string
+          fade_in_seconds?: number
+          fade_out_seconds?: number
+          forced_takeover?: boolean
+          format?: string
+          harbor_port?: number
+          id?: string
+          is_enabled?: boolean
+          is_live?: boolean
+          last_state_change?: string | null
+          mount_path?: string
+          notes?: string | null
+          source_password?: string
+          source_user?: string
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          auto_takeover?: boolean
+          bitrate?: number
+          created_at?: string
+          fade_in_seconds?: number
+          fade_out_seconds?: number
+          forced_takeover?: boolean
+          format?: string
+          harbor_port?: number
+          id?: string
+          is_enabled?: boolean
+          is_live?: boolean
+          last_state_change?: string | null
+          mount_path?: string
+          notes?: string | null
+          source_password?: string
+          source_user?: string
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_takeover_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          message: string | null
+          source: string
+          station_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          message?: string | null
+          source?: string
+          station_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          message?: string | null
+          source?: string
+          station_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      live_takeover_schedule: {
+        Row: {
+          auto_activate: boolean
+          created_at: string
+          ends_at: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          presenter_id: string | null
+          starts_at: string
+          station_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          auto_activate?: boolean
+          created_at?: string
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          presenter_id?: string | null
+          starts_at: string
+          station_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          auto_activate?: boolean
+          created_at?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          presenter_id?: string | null
+          starts_at?: string
+          station_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_files: {
         Row: {
           azuracast_media_id: string | null
