@@ -1280,6 +1280,82 @@ export type Database = {
         }
         Relationships: []
       }
+      voicetracks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          duration_seconds: number | null
+          file_size: number | null
+          id: string
+          mime_type: string
+          next_media_id: string | null
+          notes: string | null
+          prev_media_id: string | null
+          scheduled_at: string | null
+          station_id: string | null
+          status: string
+          storage_path: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string
+          next_media_id?: string | null
+          notes?: string | null
+          prev_media_id?: string | null
+          scheduled_at?: string | null
+          station_id?: string | null
+          status?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string
+          next_media_id?: string | null
+          notes?: string | null
+          prev_media_id?: string | null
+          scheduled_at?: string | null
+          station_id?: string | null
+          status?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voicetracks_next_media_id_fkey"
+            columns: ["next_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voicetracks_prev_media_id_fkey"
+            columns: ["prev_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voicetracks_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

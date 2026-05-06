@@ -23,6 +23,7 @@ const items = [
   { to: "/episodes", label: "Episodes", icon: CalendarClock },
   { to: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { to: "/inbox", label: "Studio Inbox", icon: MessageSquare },
+  { to: "/voicetracks", label: "Voicetracks", icon: Mic },
   { to: "/now-playing", label: "Now Playing", icon: Activity },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
