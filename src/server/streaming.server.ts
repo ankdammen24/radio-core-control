@@ -94,6 +94,7 @@ export function renderLiquidsoapLiq(
   apiBaseUrl: string,
   stackToken: string,
   live?: LiveInputRow | null,
+  fallbacks?: FallbackEntry[],
 ): string {
   const stationDir = `/data/stations/${station.slug}`;
   const playlistBlocks = playlists.map((p, i) => {
@@ -105,13 +106,30 @@ export function renderLiquidsoapLiq(
     ? playlists.map((_, i) => `pl_${i}_${playlists[i].name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`).join(", ")
     : "";
 
-  const fallbackTrack = liq.fallback_track_path
-    ? `single("${liq.fallback_track_path}")`
-    : `blank(duration=2.0)`;
+  // === Fallback / security source ===
+  // 1. Per-station fallback_tracks (priority order) → m3u-driven playlist
+  // 2. Legacy single fallback_track_path on liquidsoap_configs
+  // 3. blank() so the encoder never starves
+  const fallbackList = (fallbacks ?? []).slice().sort((a, b) => a.priority - b.priority);
+  const hasList = fallbackList.length > 0;
+  const fallbackPlaylistPath = `${stationDir}/playlists/fallback.m3u`;
+  const securityChain: string[] = [];
+  if (hasList) {
+    securityChain.push(`playlist(reload=120, mode="normal", "${fallbackPlaylistPath}")`);
+  }
+  if (liq.fallback_track_path) {
+    securityChain.push(`single("${liq.fallback_track_path}")`);
+  }
+  securityChain.push(`blank(duration=2.0)`);
+  const securityBlock = securityChain.length === 1
+    ? `security = mksafe(${securityChain[0]})`
+    : `security = mksafe(fallback(track_sensitive=false, [
+  ${securityChain.join(",\n  ")}
+]))`;
 
   const auto = playlists.length
     ? `auto = random(weights=[${playlists.map((p) => p.weight || 1).join(", ")}], [${sources}])`
-    : `auto = ${fallbackTrack}`;
+    : `auto = security`;
 
   const normalize = liq.normalize_audio ? `auto = normalize(auto)` : `# normalize disabled`;
 
@@ -156,7 +174,8 @@ settings.server.telnet.port.set(${liq.telnet_port})
 
 ${playlistBlocks}
 
-security = ${fallbackTrack}
+# === Security / fallback chain ===
+${securityBlock}
 
 ${auto}
 ${normalize}
@@ -165,6 +184,8 @@ auto = crossfade(duration=${liq.crossfade_seconds}, auto)
 ${liveBlock}
 
 ${program}
+
+# Final safety net: if everything else fails, security takes over instantly.
 radio = fallback(track_sensitive=false, [radio, security])
 
 # Notify Radio Core on metadata change
