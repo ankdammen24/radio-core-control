@@ -1427,6 +1427,107 @@ export type Database = {
         }
         Relationships: []
       }
+      streaming_outputs: {
+        Row: {
+          bitrate: number
+          channels: number
+          codec: string
+          config: Json
+          created_at: string
+          format: string
+          health_status: string
+          host: string
+          id: string
+          is_enabled: boolean
+          is_public: boolean
+          last_health_at: string | null
+          last_listeners: number | null
+          listener_stats_url: string | null
+          mountpoint: string | null
+          name: string
+          notes: string | null
+          password: string | null
+          password_secret_name: string | null
+          port: number
+          priority: number
+          proxy_url: string | null
+          sample_rate: number
+          station_id: string
+          type: Database["public"]["Enums"]["streaming_output_type"]
+          updated_at: string
+          use_tls: boolean
+          username: string | null
+        }
+        Insert: {
+          bitrate?: number
+          channels?: number
+          codec?: string
+          config?: Json
+          created_at?: string
+          format?: string
+          health_status?: string
+          host?: string
+          id?: string
+          is_enabled?: boolean
+          is_public?: boolean
+          last_health_at?: string | null
+          last_listeners?: number | null
+          listener_stats_url?: string | null
+          mountpoint?: string | null
+          name: string
+          notes?: string | null
+          password?: string | null
+          password_secret_name?: string | null
+          port?: number
+          priority?: number
+          proxy_url?: string | null
+          sample_rate?: number
+          station_id: string
+          type?: Database["public"]["Enums"]["streaming_output_type"]
+          updated_at?: string
+          use_tls?: boolean
+          username?: string | null
+        }
+        Update: {
+          bitrate?: number
+          channels?: number
+          codec?: string
+          config?: Json
+          created_at?: string
+          format?: string
+          health_status?: string
+          host?: string
+          id?: string
+          is_enabled?: boolean
+          is_public?: boolean
+          last_health_at?: string | null
+          last_listeners?: number | null
+          listener_stats_url?: string | null
+          mountpoint?: string | null
+          name?: string
+          notes?: string | null
+          password?: string | null
+          password_secret_name?: string | null
+          port?: number
+          priority?: number
+          proxy_url?: string | null
+          sample_rate?: number
+          station_id?: string
+          type?: Database["public"]["Enums"]["streaming_output_type"]
+          updated_at?: string
+          use_tls?: boolean
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streaming_outputs_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       studio_messages: {
         Row: {
           body: string
@@ -1739,6 +1840,15 @@ export type Database = {
         | "creative_commons"
         | "needs_review"
         | "blocked"
+      streaming_output_type:
+        | "icecast_kh"
+        | "icecast"
+        | "shoutcast"
+        | "hls"
+        | "relay"
+        | "srt"
+        | "rtmp"
+        | "webrtc"
       sync_job_status: "pending" | "running" | "completed" | "failed"
     }
     CompositeTypes: {
@@ -1894,6 +2004,16 @@ export const Constants = {
         "creative_commons",
         "needs_review",
         "blocked",
+      ],
+      streaming_output_type: [
+        "icecast_kh",
+        "icecast",
+        "shoutcast",
+        "hls",
+        "relay",
+        "srt",
+        "rtmp",
+        "webrtc",
       ],
       sync_job_status: ["pending", "running", "completed", "failed"],
     },

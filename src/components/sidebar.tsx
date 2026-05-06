@@ -29,6 +29,7 @@ const items = [
   { to: "/now-playing", label: "Now Playing", icon: Activity },
   { to: "/listeners", label: "Listener Stats", icon: Headphones },
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
+  { to: "/streaming-outputs", label: "Streaming Outputs", icon: Radio },
   { to: "/configs", label: "Config Generator", icon: RefreshCw },
   { to: "/stereo-tool", label: "Stereo Tool", icon: Sliders },
   { to: "/health", label: "Service Health", icon: Server },

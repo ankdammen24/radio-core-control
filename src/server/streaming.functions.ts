@@ -4,6 +4,7 @@ import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
   type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
 } from "./streaming.server";
+import { renderOutputsLiq, type StreamingOutput } from "./streaming-adapters.server";
 
 type GenInput = { stationId: string; persist?: boolean };
 
@@ -14,7 +15,7 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     const { supabase } = context;
     const stationId = data.stationId;
 
-    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }, { data: fbRows }] = await Promise.all([
+    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }, { data: fbRows }, { data: outs }] = await Promise.all([
       supabase.from("stations").select("id,name,slug").eq("id", stationId).maybeSingle(),
       supabase.from("icecast_configs").select("*").eq("station_id", stationId).maybeSingle(),
       supabase.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", stationId).eq("is_active", true),
@@ -24,6 +25,7 @@ export const generateStationConfig = createServerFn({ method: "POST" })
       supabase.from("fallback_tracks")
         .select("label,priority,external_url,media_files(file_path,file_name)")
         .eq("station_id", stationId).eq("is_active", true).order("priority"),
+      supabase.from("streaming_outputs").select("*").eq("station_id", stationId).order("priority"),
     ]);
 
     if (!station) throw new Error("Station not found");
@@ -59,9 +61,20 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     }).filter((f) => !!f.path);
 
     const icecastXml = renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]);
-    const liquidsoapLiq = renderLiquidsoapLiq(
+    let liquidsoapLiq = renderLiquidsoapLiq(
       station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, stackToken, live as LiveInputRow | null, fallbacks,
     );
+
+    // Append outputs from the pluggable adapter system
+    const outputs = (outs ?? []) as unknown as StreamingOutput[];
+    if (outputs.length > 0) {
+      const outputsLiq = renderOutputsLiq(outputs, {
+        station: { id: (station as StationRow).id, name: (station as StationRow).name, slug: (station as StationRow).slug },
+        sourceVar: "radio",
+      });
+      liquidsoapLiq += `\n\n# === Streaming outputs (adapters) ===\n${outputsLiq}`;
+    }
+
     const m3uFiles = playlists.map((p, i) => ({
       name: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
       content: renderM3u(p.files),
@@ -77,5 +90,5 @@ export const generateStationConfig = createServerFn({ method: "POST" })
       }).eq("station_id", stationId);
     }
 
-    return { station, icecastXml, liquidsoapLiq, m3uFiles, mounts, playlistsCount: playlists.length, fallbacksCount: fallbacks.length };
+    return { station, icecastXml, liquidsoapLiq, m3uFiles, mounts, playlistsCount: playlists.length, fallbacksCount: fallbacks.length, outputsCount: outputs.length };
   });
