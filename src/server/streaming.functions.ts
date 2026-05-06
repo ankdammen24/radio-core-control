@@ -14,12 +14,13 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     const { supabase } = context;
     const stationId = data.stationId;
 
-    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }] = await Promise.all([
+    const [{ data: station }, { data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }] = await Promise.all([
       supabase.from("stations").select("id,name,slug").eq("id", stationId).maybeSingle(),
       supabase.from("icecast_configs").select("*").eq("station_id", stationId).maybeSingle(),
       supabase.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", stationId).eq("is_active", true),
       supabase.from("liquidsoap_configs").select("*").eq("station_id", stationId).maybeSingle(),
       supabase.from("playlists").select("id,name,priority,is_active").eq("station_id", stationId).eq("is_active", true),
+      supabase.from("live_inputs").select("*").eq("station_id", stationId).maybeSingle(),
     ]);
 
     if (!station) throw new Error("Station not found");
