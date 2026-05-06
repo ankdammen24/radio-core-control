@@ -68,7 +68,7 @@ const liqEsc = (s: string) => String(s ?? "").replace(/"/g, '\\"');
 const proto = (o: StreamingOutput) => (o.use_tls ? "https" : "http");
 const mountStr = (o: StreamingOutput) => o.mountpoint ?? "/";
 
-function liqIcecastBlock(o: StreamingOutput, ctx: RenderContext, opts: { protocol: "icecast" | "shoutcast" }) {
+function liqIcecastBlock(o: StreamingOutput, ctx: RenderContext, opts: { protocol: "icecast" | "icy" | "shoutcast" }) {
   const fmt = o.codec === "ogg" || o.codec === "vorbis"
     ? `%vorbis(samplerate=${o.sample_rate}, channels=${o.channels}, quality=0.5)`
     : o.codec === "opus"
