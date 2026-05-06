@@ -53,10 +53,10 @@ function AuthPage() {
           </div>
         </div>
         <div className="space-y-3">
-          <h2 className="text-3xl font-semibold tracking-tight">Control plane for Radio Uppsala.</h2>
-          <p className="text-sidebar-foreground/70 max-w-md">Manage stations, media, metadata, playlists, scheduler and AzuraCast integration from one professional broadcast operations console.</p>
+          <h2 className="text-3xl font-semibold tracking-tight">The control plane for modern radio.</h2>
+          <p className="text-sidebar-foreground/70 max-w-md">Manage stations, media, metadata, playlists, scheduler and streaming from one professional broadcast operations console.</p>
         </div>
-        <div className="text-xs text-sidebar-foreground/50">© Radio Uppsala — Internal tool</div>
+        <div className="text-xs text-sidebar-foreground/50">© Radio Core</div>
       </div>
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8">
