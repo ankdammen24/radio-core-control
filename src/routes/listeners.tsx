@@ -25,7 +25,7 @@ function ListenersPage() {
   });
 
   return (
-    <AppLayout title="Listener Stats" subtitle="Aggregated samples reported by Icecast-KH">
+    <AppLayout title="Listener Stats" description="Aggregated samples reported by Icecast-KH">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {Object.entries(grouped).map(([k, v]) => (
           <Card key={k} className="p-4">

@@ -25,7 +25,7 @@ function HealthPage() {
   (data ?? []).forEach((r: any) => { if (!latest[r.service]) latest[r.service] = r; });
 
   return (
-    <AppLayout title="Service Health" subtitle="Heartbeats from icecast-kh, liquidsoap, worker">
+    <AppLayout title="Service Health" description="Heartbeats from icecast-kh, liquidsoap, worker">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {["icecast", "liquidsoap", "worker"].map((svc) => {
           const r = latest[svc];

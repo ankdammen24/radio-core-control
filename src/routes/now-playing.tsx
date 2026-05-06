@@ -27,7 +27,7 @@ function NowPlayingPage() {
   });
 
   return (
-    <AppLayout title="Now Playing" subtitle="Live track + recent history per station">
+    <AppLayout title="Now Playing" description="Live track + recent history per station">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="p-4">
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2"><Activity className="w-4 h-4" /> Live</h2>

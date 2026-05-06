@@ -69,7 +69,7 @@ function StreamingPage() {
   });
 
   return (
-    <AppLayout title="Streaming Config" subtitle="Generate Icecast & Liquidsoap configuration from the database">
+    <AppLayout title="Streaming Config" description="Generate Icecast & Liquidsoap configuration from the database">
       <PlaceholderNotice title="Lovable runs the control plane only">
         Liquidsoap & Icecast-KH must run on a separate Docker host. Use the generated files (or the public <code>/api/public/station-config</code> endpoint) to feed your stack.
       </PlaceholderNotice>

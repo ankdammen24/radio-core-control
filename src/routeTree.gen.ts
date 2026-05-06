@@ -11,13 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
+import { Route as StreamingRouteImport } from './routes/streaming'
 import { Route as StorageRouteImport } from './routes/storage'
 import { Route as StationsRouteImport } from './routes/stations'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
 import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
+import { Route as ListenersRouteImport } from './routes/listeners'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -39,6 +43,11 @@ const UsersRoute = UsersRouteImport.update({
 const SyncJobsRoute = SyncJobsRouteImport.update({
   id: '/sync-jobs',
   path: '/sync-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StreamingRoute = StreamingRouteImport.update({
+  id: '/streaming',
+  path: '/streaming',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StorageRoute = StorageRouteImport.update({
@@ -71,9 +80,24 @@ const PlaylistsRoute = PlaylistsRouteImport.update({
   path: '/playlists',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NowPlayingRoute = NowPlayingRouteImport.update({
+  id: '/now-playing',
+  path: '/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaRoute = MediaRouteImport.update({
   id: '/media',
   path: '/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListenersRoute = ListenersRouteImport.update({
+  id: '/listeners',
+  path: '/listeners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FilesRoute = FilesRouteImport.update({
@@ -144,13 +168,17 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -167,13 +195,17 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -191,13 +223,17 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
@@ -216,13 +252,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
@@ -239,13 +279,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
@@ -262,13 +306,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
@@ -286,13 +334,17 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
   FilesRoute: typeof FilesRoute
+  HealthRoute: typeof HealthRoute
+  ListenersRoute: typeof ListenersRoute
   MediaRoute: typeof MediaRoute
+  NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
   RotationRoute: typeof RotationRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
   StationsRoute: typeof StationsRoute
   StorageRoute: typeof StorageRoute
+  StreamingRoute: typeof StreamingRoute
   SyncJobsRoute: typeof SyncJobsRoute
   UsersRoute: typeof UsersRoute
   MetadataIdRoute: typeof MetadataIdRoute
@@ -317,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/sync-jobs'
       fullPath: '/sync-jobs'
       preLoaderRoute: typeof SyncJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/streaming': {
+      id: '/streaming'
+      path: '/streaming'
+      fullPath: '/streaming'
+      preLoaderRoute: typeof StreamingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/storage': {
@@ -361,11 +420,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaylistsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/now-playing': {
+      id: '/now-playing'
+      path: '/now-playing'
+      fullPath: '/now-playing'
+      preLoaderRoute: typeof NowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/media': {
       id: '/media'
       path: '/media'
       fullPath: '/media'
       preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listeners': {
+      id: '/listeners'
+      path: '/listeners'
+      fullPath: '/listeners'
+      preLoaderRoute: typeof ListenersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/files': {
@@ -462,13 +542,17 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
   FilesRoute: FilesRoute,
+  HealthRoute: HealthRoute,
+  ListenersRoute: ListenersRoute,
   MediaRoute: MediaRoute,
+  NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
   RotationRoute: RotationRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
   StationsRoute: StationsRoute,
   StorageRoute: StorageRoute,
+  StreamingRoute: StreamingRoute,
   SyncJobsRoute: SyncJobsRoute,
   UsersRoute: UsersRoute,
   MetadataIdRoute: MetadataIdRoute,
