@@ -16,6 +16,8 @@ import { Route as FilesRouteImport } from './routes/files'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
+import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -52,6 +54,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetadataIndexRoute = MetadataIndexRouteImport.update({
+  id: '/metadata/',
+  path: '/metadata/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetadataIdRoute = MetadataIdRouteImport.update({
+  id: '/metadata/$id',
+  path: '/metadata/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/media': typeof MediaRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata/': typeof MetadataIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +84,8 @@ export interface FileRoutesByTo {
   '/media': typeof MediaRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata': typeof MetadataIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +96,8 @@ export interface FileRoutesById {
   '/media': typeof MediaRoute
   '/stations': typeof StationsRoute
   '/users': typeof UsersRoute
+  '/metadata/$id': typeof MetadataIdRoute
+  '/metadata/': typeof MetadataIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,8 +109,19 @@ export interface FileRouteTypes {
     | '/media'
     | '/stations'
     | '/users'
+    | '/metadata/$id'
+    | '/metadata/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/accounts' | '/auth' | '/files' | '/media' | '/stations' | '/users'
+  to:
+    | '/'
+    | '/accounts'
+    | '/auth'
+    | '/files'
+    | '/media'
+    | '/stations'
+    | '/users'
+    | '/metadata/$id'
+    | '/metadata'
   id:
     | '__root__'
     | '/'
@@ -102,6 +131,8 @@ export interface FileRouteTypes {
     | '/media'
     | '/stations'
     | '/users'
+    | '/metadata/$id'
+    | '/metadata/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -112,6 +143,8 @@ export interface RootRouteChildren {
   MediaRoute: typeof MediaRoute
   StationsRoute: typeof StationsRoute
   UsersRoute: typeof UsersRoute
+  MetadataIdRoute: typeof MetadataIdRoute
+  MetadataIndexRoute: typeof MetadataIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -165,6 +198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metadata/': {
+      id: '/metadata/'
+      path: '/metadata'
+      fullPath: '/metadata/'
+      preLoaderRoute: typeof MetadataIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metadata/$id': {
+      id: '/metadata/$id'
+      path: '/metadata/$id'
+      fullPath: '/metadata/$id'
+      preLoaderRoute: typeof MetadataIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -176,6 +223,8 @@ const rootRouteChildren: RootRouteChildren = {
   MediaRoute: MediaRoute,
   StationsRoute: StationsRoute,
   UsersRoute: UsersRoute,
+  MetadataIdRoute: MetadataIdRoute,
+  MetadataIndexRoute: MetadataIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
