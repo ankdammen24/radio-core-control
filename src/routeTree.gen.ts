@@ -11,13 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
+import { Route as StreamingRouteImport } from './routes/streaming'
 import { Route as StorageRouteImport } from './routes/storage'
 import { Route as StationsRouteImport } from './routes/stations'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
 import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
+import { Route as ListenersRouteImport } from './routes/listeners'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -26,6 +30,10 @@ import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
 import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
+import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.station-config'
+import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
+import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
+import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
@@ -35,6 +43,11 @@ const UsersRoute = UsersRouteImport.update({
 const SyncJobsRoute = SyncJobsRouteImport.update({
   id: '/sync-jobs',
   path: '/sync-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StreamingRoute = StreamingRouteImport.update({
+  id: '/streaming',
+  path: '/streaming',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StorageRoute = StorageRouteImport.update({
@@ -67,9 +80,24 @@ const PlaylistsRoute = PlaylistsRouteImport.update({
   path: '/playlists',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NowPlayingRoute = NowPlayingRouteImport.update({
+  id: '/now-playing',
+  path: '/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MediaRoute = MediaRouteImport.update({
   id: '/media',
   path: '/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListenersRoute = ListenersRouteImport.update({
+  id: '/listeners',
+  path: '/listeners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FilesRoute = FilesRouteImport.update({
@@ -112,6 +140,26 @@ const MetadataIdRoute = MetadataIdRouteImport.update({
   path: '/metadata/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStationConfigRoute = ApiPublicStationConfigRouteImport.update({
+  id: '/api/public/station-config',
+  path: '/api/public/station-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicNowPlayingRoute = ApiPublicNowPlayingRouteImport.update({
+  id: '/api/public/now-playing',
+  path: '/api/public/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicListenerStatsRoute = ApiPublicListenerStatsRouteImport.update({
+  id: '/api/public/listener-stats',
+  path: '/api/public/listener-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,17 +168,25 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,17 +195,25 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,17 +223,25 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/files': typeof FilesRoute
+  '/health': typeof HealthRoute
+  '/listeners': typeof ListenersRoute
   '/media': typeof MediaRoute
+  '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/streaming': typeof StreamingRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
+  '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
+  '/api/public/station-config': typeof ApiPublicStationConfigRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,17 +252,25 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
     | '/metadata/'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,17 +279,25 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
     | '/metadata'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   id:
     | '__root__'
     | '/'
@@ -218,17 +306,25 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/files'
+    | '/health'
+    | '/listeners'
     | '/media'
+    | '/now-playing'
     | '/playlists'
     | '/rotation'
     | '/scheduler'
     | '/settings'
     | '/stations'
     | '/storage'
+    | '/streaming'
     | '/sync-jobs'
     | '/users'
     | '/metadata/$id'
     | '/metadata/'
+    | '/api/public/health'
+    | '/api/public/listener-stats'
+    | '/api/public/now-playing'
+    | '/api/public/station-config'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -238,17 +334,25 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
   FilesRoute: typeof FilesRoute
+  HealthRoute: typeof HealthRoute
+  ListenersRoute: typeof ListenersRoute
   MediaRoute: typeof MediaRoute
+  NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
   RotationRoute: typeof RotationRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
   StationsRoute: typeof StationsRoute
   StorageRoute: typeof StorageRoute
+  StreamingRoute: typeof StreamingRoute
   SyncJobsRoute: typeof SyncJobsRoute
   UsersRoute: typeof UsersRoute
   MetadataIdRoute: typeof MetadataIdRoute
   MetadataIndexRoute: typeof MetadataIndexRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
+  ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
+  ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -265,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/sync-jobs'
       fullPath: '/sync-jobs'
       preLoaderRoute: typeof SyncJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/streaming': {
+      id: '/streaming'
+      path: '/streaming'
+      fullPath: '/streaming'
+      preLoaderRoute: typeof StreamingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/storage': {
@@ -309,11 +420,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaylistsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/now-playing': {
+      id: '/now-playing'
+      path: '/now-playing'
+      fullPath: '/now-playing'
+      preLoaderRoute: typeof NowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/media': {
       id: '/media'
       path: '/media'
       fullPath: '/media'
       preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listeners': {
+      id: '/listeners'
+      path: '/listeners'
+      fullPath: '/listeners'
+      preLoaderRoute: typeof ListenersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/files': {
@@ -372,6 +504,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MetadataIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/station-config': {
+      id: '/api/public/station-config'
+      path: '/api/public/station-config'
+      fullPath: '/api/public/station-config'
+      preLoaderRoute: typeof ApiPublicStationConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/now-playing': {
+      id: '/api/public/now-playing'
+      path: '/api/public/now-playing'
+      fullPath: '/api/public/now-playing'
+      preLoaderRoute: typeof ApiPublicNowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/listener-stats': {
+      id: '/api/public/listener-stats'
+      path: '/api/public/listener-stats'
+      fullPath: '/api/public/listener-stats'
+      preLoaderRoute: typeof ApiPublicListenerStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -382,17 +542,25 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
   FilesRoute: FilesRoute,
+  HealthRoute: HealthRoute,
+  ListenersRoute: ListenersRoute,
   MediaRoute: MediaRoute,
+  NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
   RotationRoute: RotationRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
   StationsRoute: StationsRoute,
   StorageRoute: StorageRoute,
+  StreamingRoute: StreamingRoute,
   SyncJobsRoute: SyncJobsRoute,
   UsersRoute: UsersRoute,
   MetadataIdRoute: MetadataIdRoute,
   MetadataIndexRoute: MetadataIndexRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
+  ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
+  ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Building2, Radio, Music, FolderOpen, Tag, ListMusic,
   Calendar, Repeat, Plug, HardDrive, RefreshCw, ScrollText, Settings, LogOut, Moon, Sun,
+  Activity, Headphones, FileCode2, Server,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -18,6 +19,10 @@ const items = [
   { to: "/playlists", label: "Playlists", icon: ListMusic },
   { to: "/scheduler", label: "Scheduler", icon: Calendar },
   { to: "/rotation", label: "Rotation Rules", icon: Repeat },
+  { to: "/now-playing", label: "Now Playing", icon: Activity },
+  { to: "/listeners", label: "Listener Stats", icon: Headphones },
+  { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
+  { to: "/health", label: "Service Health", icon: Server },
   { to: "/azuracast", label: "AzuraCast", icon: Plug },
   { to: "/storage", label: "Storage Settings", icon: HardDrive },
   { to: "/sync-jobs", label: "Sync Jobs", icon: RefreshCw },
