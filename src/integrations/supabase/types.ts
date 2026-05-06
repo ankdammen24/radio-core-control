@@ -231,6 +231,42 @@ export type Database = {
         }
         Relationships: []
       }
+      fallback_tracks: {
+        Row: {
+          created_at: string
+          external_url: string | null
+          id: string
+          is_active: boolean
+          label: string
+          media_file_id: string | null
+          priority: number
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          external_url?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          media_file_id?: string | null
+          priority?: number
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          external_url?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          media_file_id?: string | null
+          priority?: number
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       icecast_configs: {
         Row: {
           admin_email: string | null

@@ -28,6 +28,7 @@ import { Route as ListenersRouteImport } from './routes/listeners'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
+import { Route as FallbackRouteImport } from './routes/fallback'
 import { Route as EpisodesRouteImport } from './routes/episodes'
 import { Route as ConfigsRouteImport } from './routes/configs'
 import { Route as CompanionRouteImport } from './routes/companion'
@@ -139,6 +140,11 @@ const FilesRoute = FilesRouteImport.update({
   path: '/files',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FallbackRoute = FallbackRouteImport.update({
+  id: '/fallback',
+  path: '/fallback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EpisodesRoute = EpisodesRouteImport.update({
   id: '/episodes',
   path: '/episodes',
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
+  '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByTo {
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
+  '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
@@ -298,6 +306,7 @@ export interface FileRoutesById {
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/episodes': typeof EpisodesRoute
+  '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/companion'
     | '/configs'
     | '/episodes'
+    | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/companion'
     | '/configs'
     | '/episodes'
+    | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/companion'
     | '/configs'
     | '/episodes'
+    | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
@@ -445,6 +457,7 @@ export interface RootRouteChildren {
   CompanionRoute: typeof CompanionRoute
   ConfigsRoute: typeof ConfigsRoute
   EpisodesRoute: typeof EpisodesRoute
+  FallbackRoute: typeof FallbackRoute
   FilesRoute: typeof FilesRoute
   HealthRoute: typeof HealthRoute
   InboxRoute: typeof InboxRoute
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FilesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fallback': {
+      id: '/fallback'
+      path: '/fallback'
+      fullPath: '/fallback'
+      preLoaderRoute: typeof FallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/episodes': {
       id: '/episodes'
       path: '/episodes'
@@ -725,6 +745,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanionRoute: CompanionRoute,
   ConfigsRoute: ConfigsRoute,
   EpisodesRoute: EpisodesRoute,
+  FallbackRoute: FallbackRoute,
   FilesRoute: FilesRoute,
   HealthRoute: HealthRoute,
   InboxRoute: InboxRoute,
