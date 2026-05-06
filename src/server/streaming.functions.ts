@@ -90,5 +90,5 @@ export const generateStationConfig = createServerFn({ method: "POST" })
       }).eq("station_id", stationId);
     }
 
-    return { station, icecastXml, liquidsoapLiq, m3uFiles, mounts, playlistsCount: playlists.length, fallbacksCount: fallbacks.length };
+    return { station, icecastXml, liquidsoapLiq, m3uFiles, mounts, playlistsCount: playlists.length, fallbacksCount: fallbacks.length, outputsCount: outputs.length };
   });
