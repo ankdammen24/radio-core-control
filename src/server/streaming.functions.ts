@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
-  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow,
+  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
 } from "./streaming.server";
 
 type GenInput = { stationId: string; persist?: boolean };
