@@ -1,0 +1,2 @@
+UPDATE public.azuracast_connections SET api_key_secret_name = 'AZURACAST_API_KEY';
+DELETE FROM public.azuracast_connections WHERE id IN ('1cb5f75d-e5fd-45a4-a737-f5528bd2423f','360d7538-37e8-43b0-a5ca-2cc73dfadeb5','54c0fa98-e4cd-4516-bcfd-9659fc7ff63b');
