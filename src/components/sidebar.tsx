@@ -32,7 +32,7 @@ const items = [
   { to: "/streaming", label: "Streaming Config", icon: FileCode2 },
   { to: "/streaming-outputs", label: "Streaming Outputs", icon: Radio },
   { to: "/configs", label: "Config Generator", icon: RefreshCw },
-  { to: "/stereo-tool", label: "Stereo Tool", icon: Sliders },
+  
   { to: "/health", label: "Service Health", icon: Server },
   { to: "/azuracast", label: "AzuraCast", icon: Plug },
   { to: "/storage", label: "Storage Settings", icon: HardDrive },
