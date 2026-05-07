@@ -1733,6 +1733,54 @@ export type Database = {
         }
         Relationships: []
       }
+      voicetracks: {
+        Row: {
+          azuracast_media_id: string | null
+          azuracast_path: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          error_message: string | null
+          id: string
+          presenter_id: string | null
+          recorded_by: string | null
+          station_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          azuracast_media_id?: string | null
+          azuracast_path?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          error_message?: string | null
+          id?: string
+          presenter_id?: string | null
+          recorded_by?: string | null
+          station_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          azuracast_media_id?: string | null
+          azuracast_path?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          error_message?: string | null
+          id?: string
+          presenter_id?: string | null
+          recorded_by?: string | null
+          station_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
