@@ -1,7 +1,5 @@
 // Browser audio processor: decode -> trim silence -> normalize -> MP3 encode
-// Note: lamejs ships as CommonJS without proper ESM types; cast to any.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import lamejs from "lamejs";
+import { Mp3Encoder } from "@breezystack/lamejs";
 
 const SILENCE_THRESHOLD = 0.01; // ~ -40 dBFS
 const TARGET_RMS_DBFS = -16; // approximation of -16 LUFS
@@ -94,8 +92,6 @@ export async function processRecording(blob: Blob): Promise<ProcessResult> {
 
   // Encode MP3 (mono, 128 kbps)
   const sampleRate = audioBuf.sampleRate;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Mp3Encoder = (lamejs as any).Mp3Encoder;
   const encoder = new Mp3Encoder(1, sampleRate, 128);
   const samples = floatToInt16(out);
   const blockSize = 1152;
