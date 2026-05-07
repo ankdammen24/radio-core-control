@@ -99,14 +99,14 @@ export async function processRecording(blob: Blob): Promise<ProcessResult> {
   const encoder = new Mp3Encoder(1, sampleRate, 128);
   const samples = floatToInt16(out);
   const blockSize = 1152;
-  const chunks: Uint8Array[] = [];
+  const chunks: BlobPart[] = [];
   for (let i = 0; i < samples.length; i += blockSize) {
     const chunk = samples.subarray(i, i + blockSize);
     const buf = encoder.encodeBuffer(chunk);
-    if (buf.length > 0) chunks.push(buf);
+    if (buf.length > 0) chunks.push(new Uint8Array(buf).buffer as ArrayBuffer);
   }
   const tail = encoder.flush();
-  if (tail.length > 0) chunks.push(tail);
+  if (tail.length > 0) chunks.push(new Uint8Array(tail).buffer as ArrayBuffer);
 
   const mp3Blob = new Blob(chunks, { type: "audio/mpeg" });
   ctx.close?.();

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoicetracksRouteImport } from './routes/voicetracks'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
 import { Route as StreamingOutputsRouteImport } from './routes/streaming-outputs'
@@ -47,6 +48,11 @@ import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
 
+const VoicetracksRoute = VoicetracksRouteImport.update({
+  id: '/voicetracks',
+  path: '/voicetracks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -265,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
+  '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
+  '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
+  '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/streaming-outputs'
     | '/sync-jobs'
     | '/users'
+    | '/voicetracks'
     | '/metadata/$id'
     | '/metadata/'
     | '/api/public/health'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/streaming-outputs'
     | '/sync-jobs'
     | '/users'
+    | '/voicetracks'
     | '/metadata/$id'
     | '/metadata'
     | '/api/public/health'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/streaming-outputs'
     | '/sync-jobs'
     | '/users'
+    | '/voicetracks'
     | '/metadata/$id'
     | '/metadata/'
     | '/api/public/health'
@@ -503,6 +515,7 @@ export interface RootRouteChildren {
   StreamingOutputsRoute: typeof StreamingOutputsRoute
   SyncJobsRoute: typeof SyncJobsRoute
   UsersRoute: typeof UsersRoute
+  VoicetracksRoute: typeof VoicetracksRoute
   MetadataIdRoute: typeof MetadataIdRoute
   MetadataIndexRoute: typeof MetadataIndexRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
@@ -513,6 +526,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voicetracks': {
+      id: '/voicetracks'
+      path: '/voicetracks'
+      fullPath: '/voicetracks'
+      preLoaderRoute: typeof VoicetracksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users': {
       id: '/users'
       path: '/users'
@@ -807,6 +827,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamingOutputsRoute: StreamingOutputsRoute,
   SyncJobsRoute: SyncJobsRoute,
   UsersRoute: UsersRoute,
+  VoicetracksRoute: VoicetracksRoute,
   MetadataIdRoute: MetadataIdRoute,
   MetadataIndexRoute: MetadataIndexRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
