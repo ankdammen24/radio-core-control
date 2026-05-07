@@ -8,8 +8,6 @@ const CHILD_TABLES = [
   "liquidsoap_configs",
   "stream_mounts",
   "live_inputs",
-  "stereo_tool_configs",
-  "stereo_tool_presets",
   "rotation_rules",
   "playlists",
   "schedule_blocks",
@@ -108,8 +106,6 @@ export const importStationSnapshot = createServerFn({ method: "POST" })
         "rotation_rules",
         "stream_mounts",
         "live_inputs",
-        "stereo_tool_presets",
-        "stereo_tool_configs",
         "icecast_configs",
         "liquidsoap_configs",
       ];
@@ -135,8 +131,6 @@ export const importStationSnapshot = createServerFn({ method: "POST" })
       "liquidsoap_configs",
       "stream_mounts",
       "live_inputs",
-      "stereo_tool_configs",
-      "stereo_tool_presets",
       "rotation_rules",
       "playlists",
       "schedule_blocks",
@@ -193,7 +187,7 @@ export const importStationSnapshot = createServerFn({ method: "POST" })
         continue;
       }
 
-      // singletons (icecast_configs, liquidsoap_configs, live_inputs, stereo_tool_configs)
+      // singletons (icecast_configs, liquidsoap_configs, live_inputs)
       // already wiped if replace=true; if not, may collide on unique constraint — try upsert by station_id
       const cleaned = rows.map((r) => cleanRow(r, targetStationId));
       const { data: ins, error } = await supabase.from(t as any).insert(cleaned).select("id");
