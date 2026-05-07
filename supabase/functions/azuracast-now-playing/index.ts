@@ -20,10 +20,10 @@ Deno.serve(async (req) => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const np = await res.json();
 
-    // Mirror to local now_playing
     if (conn.station_id && np?.now_playing?.song) {
       const song = np.now_playing.song;
-      await supabase.from("now_playing").upsert({
+      await supabase.from("now_playing").delete().eq("station_id", conn.station_id);
+      await supabase.from("now_playing").insert({
         station_id: conn.station_id,
         title: song.title ?? null,
         artist: song.artist ?? null,
@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
         listeners: np.listeners?.current ?? 0,
         started_at: new Date((np.now_playing.played_at ?? Date.now() / 1000) * 1000).toISOString(),
         updated_at: new Date().toISOString(),
-      }, { onConflict: "station_id" });
+      });
     }
 
     return new Response(JSON.stringify({ ok: true, now_playing: np }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
