@@ -98,7 +98,7 @@ const handlers: Record<string, Handler> = {
       listeners: h.listeners_start ?? null,
       played_at: new Date((h.played_at ?? Date.now() / 1000) * 1000).toISOString(),
     }));
-    if (rows.length) await supabaseAdmin.from("play_history").insert(rows);
+    if (rows.length) await supabaseAdmin.from("play_history").insert(rows as Array<typeof rows[number] & { station_id: string }>);
     return { ok: true, inserted: rows.length };
   },
 
@@ -161,7 +161,8 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
       await supabaseAdmin.from("sync_jobs").update({
         status: "completed",
         finished_at: new Date().toISOString(),
-        result: (out ?? { ok: true }) as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        result: (out ?? { ok: true }) as any,
         message: null,
       }).eq("id", job.id);
       result.succeeded++;

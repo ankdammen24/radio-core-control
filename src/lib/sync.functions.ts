@@ -21,7 +21,8 @@ export const enqueueSyncJob = createServerFn({ method: "POST" })
       .insert({
         job_type: data.job_type,
         station_id: data.station_id ?? null,
-        payload: data.payload ?? {},
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        payload: (data.payload ?? {}) as any,
         scheduled_for: data.scheduled_for ?? new Date().toISOString(),
         status: "pending",
       })
