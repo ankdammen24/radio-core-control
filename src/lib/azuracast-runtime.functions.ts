@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Server fns for AzuraCast runtime control (skip, queue, restart, status, listeners).
 // Client-importable. Calls AzuraCast directly (best-effort) instead of going through sync_jobs,
 // because these are interactive actions where the user wants immediate feedback.
@@ -38,7 +39,7 @@ export const azuracastGetStatus = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const status = await c.getStationStatus();
-      return { ok: true as const, status: status as Record<string, unknown> | null };
+      return { ok: true as const, status: status as any };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -51,7 +52,7 @@ export const azuracastGetQueue = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const queue = await c.getQueue();
-      return { ok: true as const, queue: (queue ?? []) as Array<Record<string, unknown>> };
+      return { ok: true as const, queue: (queue ?? []) as any[] };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -64,7 +65,7 @@ export const azuracastGetListeners = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const listeners = await c.getListeners();
-      return { ok: true as const, listeners: (listeners ?? []) as Array<Record<string, unknown>> };
+      return { ok: true as const, listeners: (listeners ?? []) as any[] };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -76,7 +77,7 @@ export const azuracastSkipSong = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: (await c.skipSong()) as Record<string, unknown> | null };
+      return { ok: true as const, result: (await c.skipSong()) as any };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -86,7 +87,7 @@ export const azuracastClearQueue = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: (await c.clearQueue()) as Record<string, unknown> | null };
+      return { ok: true as const, result: (await c.clearQueue()) as any };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -98,7 +99,7 @@ export const azuracastDeleteQueueItem = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: (await c.deleteQueueItem(data.queue_id)) as Record<string, unknown> | null };
+      return { ok: true as const, result: (await c.deleteQueueItem(data.queue_id)) as any };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -118,16 +119,16 @@ export const azuracastRuntimeAction = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      let result: Record<string, unknown> | null = null;
+      let result: any = null;
       switch (data.action) {
-        case "restart_station": result = (await c.restartStation()) as Record<string, unknown> | null; break;
-        case "frontend_start": result = (await c.startBroadcasting()) as Record<string, unknown> | null; break;
-        case "frontend_stop": result = (await c.stopBroadcasting()) as Record<string, unknown> | null; break;
-        case "frontend_restart": result = (await c.restartBroadcasting()) as Record<string, unknown> | null; break;
-        case "backend_start": result = (await c.startBackend()) as Record<string, unknown> | null; break;
-        case "backend_stop": result = (await c.stopBackend()) as Record<string, unknown> | null; break;
-        case "backend_restart": result = (await c.restartBackend()) as Record<string, unknown> | null; break;
-        case "backend_disconnect": result = (await c.backendDisconnect()) as Record<string, unknown> | null; break;
+        case "restart_station": result = (await c.restartStation()) as any; break;
+        case "frontend_start": result = (await c.startBroadcasting()) as any; break;
+        case "frontend_stop": result = (await c.stopBroadcasting()) as any; break;
+        case "frontend_restart": result = (await c.restartBroadcasting()) as any; break;
+        case "backend_start": result = (await c.startBackend()) as any; break;
+        case "backend_stop": result = (await c.stopBackend()) as any; break;
+        case "backend_restart": result = (await c.restartBackend()) as any; break;
+        case "backend_disconnect": result = (await c.backendDisconnect()) as any; break;
       }
       return { ok: true as const, result };
     } catch (e) { throw wrapErr(e); }
