@@ -46,6 +46,7 @@ import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.
 import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
+import { Route as ApiPublicCronSyncWorkerRouteImport } from './routes/api.public.cron.sync-worker'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -232,6 +233,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronSyncWorkerRoute = ApiPublicCronSyncWorkerRouteImport.update({
+  id: '/api/public/cron/sync-worker',
+  path: '/api/public/cron/sync-worker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -271,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/sync-worker'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -430,6 +440,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/sync-worker'
   id:
     | '__root__'
     | '/'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/sync-worker'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -509,6 +521,7 @@ export interface RootRouteChildren {
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
   ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
   ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
+  ApiPublicCronSyncWorkerRoute: typeof ApiPublicCronSyncWorkerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -772,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/sync-worker': {
+      id: '/api/public/cron/sync-worker'
+      path: '/api/public/cron/sync-worker'
+      fullPath: '/api/public/cron/sync-worker'
+      preLoaderRoute: typeof ApiPublicCronSyncWorkerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -813,16 +833,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
   ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
   ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
+  ApiPublicCronSyncWorkerRoute: ApiPublicCronSyncWorkerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

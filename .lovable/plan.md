@@ -1,97 +1,139 @@
-# On-demand musiktjänst kring Radio Core
 
-## Rekommendation: bygg som **separat frontend-produkt**, men på **samma backend (Lovable Cloud)**
+# Full Azuracast-paritet i Radio Core
 
-Kort svar: **både och**. Det är ett bra tillägg konceptuellt — men det ska INTE bo i Radio Core-appen. Radio Core är ett broadcast operations-verktyg för operatörer/admins. En on-demand-tjänst är en konsumentprodukt för lyssnare och artister. Olika användare, olika UX, olika säkerhetsmodell.
+Mål: allt man kan göra via Azuracast API ska gå att göra härifrån. Radio Core är master — Azuracast-UI används inte för innehåll, bara för körning av broadcast.
 
-Däremot delar de naturligt:
-- **Mediabibliotek** (`media_files`, storage, metadata)
-- **Artister/presentatörer** (`presenters` → kan utökas till `artists`)
-- **Auth-systemet** (samma `auth.users`, `user_roles`)
-- **Statistik** (play_history, listener_stats)
+## Princip
 
-Det betyder: en ny app som pratar med samma databas, men med egen frontend, egna routes, egna RLS-policies för de nya tabellerna.
+- En **typad Azuracast-klient** i `src/server/azuracast-client.server.ts` täcker hela API:et (genererad/handskriven wrapper kring REST-endpointsen).
+- All I/O går via **TanStack server functions** (`createServerFn`) — inga nya edge functions om vi inte måste. De befintliga edge functions migreras gradvis till server fns.
+- **Radio Core-databasen är källan**. Skrivningar går först till vår DB, sen pushas till Azuracast via en sync-pipeline (`sync_jobs`-tabellen finns redan).
+- **Konfliktstrategi**: vid kollision vinner Radio Core. Pull från Azuracast används bara för "discovery" (initial import) och för read-only telemetri (now playing, listeners, history).
+- **Per-station koppling**: `azuracast_connections` finns redan — varje station mappas till en Azuracast-instans + station-ID.
 
-## Varför inte i samma app?
+## Funktionsområden att bygga
 
-| Aspekt | Radio Core (idag) | On-demand-tjänst |
-|---|---|---|
-| Målgrupp | Radiooperatörer, admins | Allmänhet + artister |
-| Inloggning | Krävs alltid | Publik browsing, login för uppspelning |
-| Innehåll | Schemalagd broadcast | Användarvald uppspelning |
-| Roller | admin / editor / viewer | listener / artist / admin |
-| UX | Tät, datadriven kontrollpanel | Visuell, mediacentrerad konsument-UI |
+Varje block = egen sida i sidomenyn + server fns + sync-job-typer.
 
-Att blanda dessa i en app gör båda sämre.
+### 1. Station runtime (drift)
+- Now Playing live (har vi)
+- Skip song, queue-hantering, manuell next-track
+- Backend/frontend start/stop/restart
+- Service-status (uptime, version, hälsa)
 
-## Föreslagen arkitektur
+### 2. Media library (utbyggnad)
+- Full CRUD (upload, replace, delete, edit metadata, albumart)
+- Batch-operations (massuppdatera kategori, taggar, playlist-tillhörighet)
+- Custom fields-stöd
+- ID3-redigering med push till Azuracast
+
+### 3. Playlists (utbyggnad)
+- Full CRUD inkl. typ (default / scheduled / once-per-x-songs / once-per-x-minutes / once-per-hour / advanced)
+- Vikter, schemaläggning per dag/tid, avoid-duplicates-regler
+- Reshuffle, import från fil/M3U
+- Koppling playlist↔media som push, inte pull
+
+### 4. Streamers / DJs
+- Ny modul: CRUD streamer-konton (användarnamn, lösenord, display-namn, art)
+- Schema per streamer
+- Broadcast-historik (vem sände när, längd)
+- Live-takeover-koppling till befintlig `live_inputs`
+
+### 5. Podcasts
+- Ny modul: podcasts CRUD, episoder CRUD (redan har vi `episodes`/`shows` lokalt — koppla till Azuracast podcast-feeds)
+- Feed-URL, kategorier, språk, författare
+- Episode media + publish-status
+- Auto-publicering vid klar episod
+
+### 6. Mountpoints & remote relays
+- CRUD mountpoints (har bas i `stream_mounts`) — push till Azuracast
+- Intro-fil, fallback-mount, custom frontend config
+- Remote relays (relay från extern källa)
+- Listener-URL-generering
+
+### 7. Webhooks
+- Ny modul: lista, skapa, redigera Azuracast-webhooks (Discord, Twitter, Mastodon, generic, TuneIn, Radionomy m.fl.)
+- Trigger-config + body-templates
+
+### 8. Song Requests
+- Vi har `song_requests`-tabell. Synka tvåvägs med Azuracast request-kö, godkänn/avvisa här.
+
+### 9. Listeners & analytics
+- Live listener-count per mount
+- Historik per dag/timme/månad (befintlig `listener_stats` får mer data)
+- Geo-fördelning, klient-fördelning (om data finns från AzuraCast)
+- Export CSV
+
+### 10. Admin (super-admin scope krävs)
+- Users & roles i Azuracast (CRUD)
+- Storage locations
+- Settings (system-wide)
+- Backups (lista, trigga, ladda ner)
+- API-nycklar (lista, skapa, revokera)
+
+## Datamodellen — vad behöver utökas
+
+Lägger till `azuracast_*_id` kolumn där det saknas och nya tabeller för det vi inte har:
+
+| Behov | Lösning |
+|---|---|
+| Streamers | Ny tabell `streamers` (user, pass, display, art, schedule i child-tabell) |
+| Podcasts | Ny tabell `podcasts` + `podcast_episodes` (separat från befintliga interna `shows`/`episodes`) |
+| Webhooks | Ny tabell `azuracast_webhooks` (type, config jsonb, triggers) |
+| Remote relays | Ny tabell `remote_relays` |
+| Custom fields (media) | Ny tabell `media_custom_fields` + `media_custom_values` |
+| Mountpoint extras | Utöka `stream_mounts` (intro_path, fallback_mount, custom_listen_url) |
+| Sync-status per resurs | Lägg `last_synced_at`, `sync_dirty` på alla synkbara tabeller |
+
+Allt får RLS efter samma mönster som befintliga (select=auth, insert/update=editor, delete=admin).
+
+## Sync-arkitektur
+
+Generaliserad pipeline:
 
 ```text
-┌─────────────────────┐      ┌─────────────────────┐
-│  Radio Core         │      │  On-demand app      │
-│  (operatörspanel)   │      │  (lyssnare/artister)│
-│  /admin-tunga vyer  │      │  /publika vyer      │
-└──────────┬──────────┘      └──────────┬──────────┘
-           │                            │
-           └────────────┬───────────────┘
-                        ▼
-              ┌──────────────────┐
-              │  Lovable Cloud   │
-              │  (delad DB +     │
-              │   storage +      │
-              │   auth)          │
-              └──────────────────┘
+UI mutation
+   → server fn skriver till Radio Core DB (sync_dirty=true)
+   → enqueue sync_job { type, station_id, payload }
+   → worker (server fn anropad av pg_cron varje minut) plockar pending jobs
+   → anropar Azuracast-klient
+   → uppdaterar azuracast_*_id + sync_dirty=false, eller markerar failed
 ```
 
-Två Lovable-projekt, samma backend. Radio Core fortsätter som idag. Den nya appen blir en "Radio Core Listen" (eller eget varumärke).
+- **Pull-jobb** för read-only: now_playing, listeners, broadcasts-history. Schemaläggs via `pg_cron` mot `/api/public/cron/azuracast-pull`.
+- **Push-jobb** triggas både direkt vid mutation (best effort) OCH av cron som retry.
+- `sync_jobs`-sidan finns redan och visar status — får bredare job-typer.
 
-## Datamodell — nya tabeller
+## UI-struktur (sidomenyn efter)
 
-Utöka istället för att ändra befintliga:
+Befintligt grupperas, nya markerade `(ny)`:
 
-- **artists** — artistprofil (kopplad till `auth.users`, ärver/utökar `presenters`)
-- **tracks** — publik vy/tabell ovanpå `media_files` (titel, artist_id, genre, artwork, duration, is_published)
-- **track_likes** — `(user_id, track_id)`, unik
-- **track_comments** — `(user_id, track_id, body, created_at)`
-- **user_playlists** — lyssnarens egna spellistor (skild från broadcast `playlists`)
-- **user_playlist_tracks** — `(playlist_id, track_id, position)`
-- **play_events** — on-demand uppspelningar (skilt från broadcast `play_history`)
+```text
+Drift           Now Playing · Live · Listeners · Health
+Innehåll        Media · Playlists · Voicetracks · Ads · Inbox
+Sändning        Schemaläggning · Rotation · Fallback · Streaming · Streaming Outputs · Mountpoints (ny)
+Program         Shows · Episoder · Streamers (ny) · Podcasts (ny)
+Integrationer   Azuracast · Webhooks (ny) · Sync Jobs
+Admin           Stationer · Konton · Användare · Roller · Storage · Konfig · Backup · Audit · Inställningar
+```
 
-## Roller
+## Bygg i etapper (förslag på ordning)
 
-Lägg till i `app_role` enum:
-- `listener` — default vid signup på lyssnar-appen
-- `artist` — kan CRUD egna tracks, se egen statistik
+Hela paritet är stort. Föreslår 6 etapper, varje är en självständig leverans:
 
-Behåll `admin` / `editor` / `viewer` för Radio Core-sidan. Roller är inte exklusiva — en användare kan ha flera.
+1. **Klient-fundament** — typad Azuracast-klient, generaliserat sync-pipeline, pg_cron, cron-endpoint
+2. **Drift** — runtime-kontroll (skip/queue/restart), service-status, listeners live
+3. **Media + Playlists fullt** — CRUD med push, batch, custom fields, intro/fallback
+4. **Streamers + Podcasts** — nya tabeller, sidor, sync båda håll
+5. **Mountpoints + Remote relays + Webhooks**
+6. **Admin** — users/roles/storage/settings/backups/api-keys i Azuracast, song-request-sync
 
-## RLS-mönster (kritiskt)
+Vi börjar med etapp 1 efter ditt godkännande, levererar, går vidare till 2 osv. Säg till om du vill ändra ordning eller skippa något.
 
-- **tracks SELECT**: publik (`anon` + `authenticated`) om `is_published = true` — listor syns för alla
-- **track audio (storage)**: signerade URL:er, krävs `authenticated` — uppspelning kräver login
-- **track INSERT/UPDATE/DELETE**: endast om `artist_id` matchar inloggad användare via `has_role('artist')`, eller `admin`
-- **likes/comments**: `authenticated` skapar egna, alla ser aggregat
-- **artist statistics**: bara egen artist eller admin
+## Tekniskt (för dig som vill veta)
 
-## Affärs-/scope-frågor att lösa innan bygge
-
-1. Vem laddar upp musiken — artisten själv eller admin-godkännande först?
-2. Behövs rättigheter/avtal-flöde (PRO/STIM-rapportering)?
-3. Vilken ljudkvalitet/format ska levereras till lyssnare (mp3 128/192, eller HLS)?
-4. Ska on-demand-tjänsten kunna spela radions livestream också, eller bara on-demand?
-5. Monetisering på sikt (gratis/premium, annonser)?
-
-## Förslag på nästa steg
-
-Två alternativ — välj ett:
-
-**A. Skapa nytt Lovable-projekt** (rekommenderas)
-- Jag kan inte skapa det åt dig, du gör det från Lovable-startsidan.
-- När det är skapat kopplar vi det till samma Lovable Cloud (samma DB).
-- Vi börjar med: artist-/lyssnar-signup, publik track-katalog, uppspelning bakom login, likes.
-
-**B. Prototypa inuti Radio Core under `/listen/*`**
-- Snabbare att se något fungera, men kommer behöva flyttas senare.
-- Risk: blandar konsument-UI i operatörsappen.
-
-Säg vilket spår du vill köra, så detaljplanerar jag fas 1 (auth + roller + tracks-tabell + publik katalog + uppspelning).
+- Klienten lever i `src/server/azuracast-client.server.ts`, anropas bara från server fns i `src/server/*.functions.ts`.
+- Befintliga edge functions (`azuracast-*`) migreras till server fns och tas bort. Edge function behålls bara om något kräver längre timeout eller står utanför TanStack-kontexten (t.ex. långa media-uppladdningar).
+- Cron via `pg_net` mot `/api/public/cron/azuracast-pull` med apikey-header.
+- API-nyckeln ligger redan som `AZURACAST_API_KEY`. Vid multi-instans flyttar vi till per-connection secret name (`api_key_secret_name` finns på `azuracast_connections`).
+- Ingen ny extern dependency krävs.
