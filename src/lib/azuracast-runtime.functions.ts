@@ -38,7 +38,7 @@ export const azuracastGetStatus = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const status = await c.getStationStatus();
-      return { ok: true as const, status };
+      return { ok: true as const, status: status as Record<string, unknown> | null };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -51,7 +51,7 @@ export const azuracastGetQueue = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const queue = await c.getQueue();
-      return { ok: true as const, queue };
+      return { ok: true as const, queue: (queue ?? []) as Array<Record<string, unknown>> };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -64,7 +64,7 @@ export const azuracastGetListeners = createServerFn({ method: "GET" })
     try {
       const c = await clientFor(data.station_id);
       const listeners = await c.getListeners();
-      return { ok: true as const, listeners };
+      return { ok: true as const, listeners: (listeners ?? []) as Array<Record<string, unknown>> };
     } catch (e) {
       throw wrapErr(e);
     }
@@ -76,7 +76,7 @@ export const azuracastSkipSong = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: await c.skipSong() };
+      return { ok: true as const, result: (await c.skipSong()) as Record<string, unknown> | null };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -86,7 +86,7 @@ export const azuracastClearQueue = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: await c.clearQueue() };
+      return { ok: true as const, result: (await c.clearQueue()) as Record<string, unknown> | null };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -98,7 +98,7 @@ export const azuracastDeleteQueueItem = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      return { ok: true as const, result: await c.deleteQueueItem(data.queue_id) };
+      return { ok: true as const, result: (await c.deleteQueueItem(data.queue_id)) as Record<string, unknown> | null };
     } catch (e) { throw wrapErr(e); }
   });
 
@@ -120,14 +120,14 @@ export const azuracastRuntimeAction = createServerFn({ method: "POST" })
       const c = await clientFor(data.station_id);
       let result: unknown;
       switch (data.action) {
-        case "restart_station":   result = await c.restartStation(); break;
-        case "frontend_start":    result = await c.startBroadcasting(); break;
-        case "frontend_stop":     result = await c.stopBroadcasting(); break;
-        case "frontend_restart":  result = await c.restartBroadcasting(); break;
-        case "backend_start":     result = await c.startBackend(); break;
-        case "backend_stop":      result = await c.stopBackend(); break;
-        case "backend_restart":   result = await c.restartBackend(); break;
-        case "backend_disconnect":result = await c.backendDisconnect(); break;
+        case "restart_station": result = (await c.restartStation()) as Record<string, unknown> | null; break;
+        case "frontend_start": result = (await c.startBroadcasting()) as Record<string, unknown> | null; break;
+        case "frontend_stop": result = (await c.stopBroadcasting()) as Record<string, unknown> | null; break;
+        case "frontend_restart": result = (await c.restartBroadcasting()) as Record<string, unknown> | null; break;
+        case "backend_start": result = (await c.startBackend()) as Record<string, unknown> | null; break;
+        case "backend_stop": result = (await c.stopBackend()) as Record<string, unknown> | null; break;
+        case "backend_restart": result = (await c.restartBackend()) as Record<string, unknown> | null; break;
+        case "backend_disconnect": result = (await c.backendDisconnect()) as Record<string, unknown> | null; break;
       }
       return { ok: true as const, result };
     } catch (e) { throw wrapErr(e); }
