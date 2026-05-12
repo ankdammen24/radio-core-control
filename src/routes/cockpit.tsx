@@ -117,9 +117,9 @@ function CockpitForStation() {
     queryFn: async () => {
       const { data } = await supabase
         .from("sync_jobs")
-        .select("id,job_type,status,updated_at")
+        .select("id,job_type,status,created_at,finished_at")
         .eq("station_id", station.id)
-        .order("updated_at", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(6);
       return data ?? [];
     },
@@ -166,7 +166,7 @@ function CockpitForStation() {
     id: j.id,
     jobType: j.job_type,
     status: mapSyncJobStatus(j.status),
-    updatedAt: j.updated_at,
+    updatedAt: j.finished_at ?? j.created_at,
   }));
 
   return (
