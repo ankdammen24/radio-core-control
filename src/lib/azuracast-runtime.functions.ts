@@ -118,7 +118,7 @@ export const azuracastRuntimeAction = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const c = await clientFor(data.station_id);
-      let result: unknown;
+      let result: Record<string, unknown> | null = null;
       switch (data.action) {
         case "restart_station": result = (await c.restartStation()) as Record<string, unknown> | null; break;
         case "frontend_start": result = (await c.startBroadcasting()) as Record<string, unknown> | null; break;
