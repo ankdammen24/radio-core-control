@@ -207,7 +207,7 @@ function NavLink({ path, item }: { path: string; item: Item }) {
   const active = path === item.to || (item.to !== "/" && path.startsWith(item.to));
   return (
     <Link
-      to={item.to}
+      to={item.to as "/"}
       className={cn(
         "flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors",
         active
