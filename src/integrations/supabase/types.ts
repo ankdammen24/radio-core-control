@@ -1397,37 +1397,52 @@ export type Database = {
       }
       sync_jobs: {
         Row: {
+          attempts: number
           created_at: string
           finished_at: string | null
           id: string
           job_type: string
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
           message: string | null
           payload: Json | null
           result: Json | null
+          scheduled_for: string
           started_at: string | null
           station_id: string | null
           status: Database["public"]["Enums"]["sync_job_status"]
         }
         Insert: {
+          attempts?: number
           created_at?: string
           finished_at?: string | null
           id?: string
           job_type: string
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
           message?: string | null
           payload?: Json | null
           result?: Json | null
+          scheduled_for?: string
           started_at?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["sync_job_status"]
         }
         Update: {
+          attempts?: number
           created_at?: string
           finished_at?: string | null
           id?: string
           job_type?: string
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
           message?: string | null
           payload?: Json | null
           result?: Json | null
+          scheduled_for?: string
           started_at?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["sync_job_status"]
@@ -1614,6 +1629,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_sync_jobs: {
+        Args: { _limit?: number; _worker?: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          finished_at: string | null
+          id: string
+          job_type: string
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          message: string | null
+          payload: Json | null
+          result: Json | null
+          scheduled_for: string
+          started_at: string | null
+          station_id: string | null
+          status: Database["public"]["Enums"]["sync_job_status"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "sync_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       delete_station_cascade: { Args: { sid: string }; Returns: undefined }
       has_role: {
         Args: {
