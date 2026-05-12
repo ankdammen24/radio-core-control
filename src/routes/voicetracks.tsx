@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppLayout } from "@/components/app-layout";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Mic, Square, Trash2, Upload, Play, Loader2 } from "lucide-react";
+import { SyncStatusBadge, type SyncStatus } from "@/components/sync-status-badge";
+import { Mic, Square, Trash2, Upload, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { useStationScope } from "@/lib/station-context";
 import { toast } from "sonner";
 import { processRecording, blobToBase64 } from "@/lib/audio-processor";
 
@@ -19,9 +21,18 @@ export const Route = createFileRoute("/voicetracks")({ component: VoicetracksPag
 
 type Phase = "idle" | "recording" | "processing" | "uploading";
 
+function vtSync(v: { status?: string | null; azuracast_media_id?: string | null }): SyncStatus {
+  if (v.status === "ready" && v.azuracast_media_id) return "synced";
+  if (v.status === "error") return "failed";
+  if (v.status === "processing") return "pushing";
+  if (v.azuracast_media_id) return "synced";
+  return "local_only";
+}
+
 function VoicetracksPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const { scope } = useStationScope();
 
   const { data: stations } = useQuery({
     queryKey: ["vt-stations"],
@@ -59,9 +70,12 @@ function VoicetracksPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<number | null>(null);
 
+  // Default to active station from scope.
   useEffect(() => {
-    if (!stationId && stations?.[0]?.id) setStationId(stations[0].id);
-  }, [stations, stationId]);
+    if (stationId) return;
+    if (scope.kind === "station") setStationId(scope.station.id);
+    else if (stations?.[0]?.id) setStationId(stations[0].id);
+  }, [stations, stationId, scope]);
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -150,7 +164,7 @@ function VoicetracksPage() {
       return vt;
     },
     onSuccess: () => {
-      toast.success("Voicetrack uppladdad till AzuraCast");
+      toast.success("Voicetrack uppladdad");
       reset();
       setTitle("");
       setDescription("");
@@ -172,73 +186,94 @@ function VoicetracksPage() {
   const isBusy = phase !== "idle";
   const mm = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
+  const visible = (list.data ?? []).filter((v: any) => scope.kind === "station" ? v.station_id === scope.station.id : true);
+
+  const state =
+    list.isLoading ? { kind: "loading" as const } :
+    list.error ? { kind: "error" as const, message: (list.error as Error).message, retry: () => list.refetch() } :
+    visible.length === 0 ? { kind: "empty" as const, title: "No voicetracks yet", hint: "Record the first voicetrack on the left." } :
+    { kind: "ready" as const };
+
   return (
-    <AppLayout title="Voicetracks" description="Spela in voicetracks i webbläsaren. Bearbetas och pushas till AzuraCast.">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-6 space-y-4">
-          <h2 className="font-semibold text-lg">Ny inspelning</h2>
+    <ResourcePageShell
+      title="Voicetracks"
+      description="Record voicetracks in the browser, process and push to runtime."
+      state={{ kind: "ready" }}
+      wrapContent={false}
+      hideStationScope={false}
+    >
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-sm">New recording</h2>
+            <Mic className="w-4 h-4 text-muted-foreground" />
+          </div>
 
           <div className="grid gap-3">
             <div>
               <Label>Station *</Label>
               <Select value={stationId} onValueChange={setStationId} disabled={isBusy}>
-                <SelectTrigger><SelectValue placeholder="Välj station" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select station" /></SelectTrigger>
                 <SelectContent>
                   {stations?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Presentatör</Label>
+              <Label>Presenter</Label>
               <Select value={presenterId} onValueChange={setPresenterId} disabled={isBusy}>
-                <SelectTrigger><SelectValue placeholder="(valfri)" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="(optional)" /></SelectTrigger>
                 <SelectContent>
                   {presenters?.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Titel *</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="t.ex. Veckans tip" disabled={isBusy} />
+              <Label>Title *</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Veckans tip" disabled={isBusy} />
             </div>
             <div>
-              <Label>Beskrivning</Label>
+              <Label>Description</Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} disabled={isBusy} />
             </div>
           </div>
 
           <div className="flex items-center gap-3 pt-2">
             {phase === "recording" ? (
-              <Button onClick={stopRecording} variant="destructive"><Square className="h-4 w-4 mr-2" />Stoppa ({mm(elapsed)})</Button>
+              <Button onClick={stopRecording} variant="destructive"><Square className="h-4 w-4 mr-2" />Stop ({mm(elapsed)})</Button>
             ) : (
               <Button onClick={startRecording} disabled={isBusy || !stationId}>
-                <Mic className="h-4 w-4 mr-2" />Spela in
+                <Mic className="h-4 w-4 mr-2" />Record
               </Button>
             )}
-            {phase === "processing" && <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Bearbetar…</Badge>}
-            {phase === "uploading" && <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Laddar upp…</Badge>}
+            {phase === "processing" && <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Processing…</Badge>}
+            {phase === "uploading" && <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Uploading…</Badge>}
           </div>
 
           {previewUrl && (
-            <div className="space-y-2 pt-2 border-t">
-              <Label>Förhandsgranskning {duration && `(${duration.toFixed(1)}s)`}</Label>
+            <div className="space-y-2 pt-2 border-t border-border">
+              <Label>Preview {duration && `(${duration.toFixed(1)}s)`}</Label>
               <audio src={previewUrl} controls className="w-full" />
               <div className="flex gap-2">
                 <Button onClick={() => upload.mutate()} disabled={isBusy || !title.trim()}>
-                  <Upload className="h-4 w-4 mr-2" />Ladda upp till AzuraCast
+                  <Upload className="h-4 w-4 mr-2" />Upload
                 </Button>
-                <Button variant="ghost" onClick={reset} disabled={isBusy}><Trash2 className="h-4 w-4 mr-2" />Kasta</Button>
+                <Button variant="ghost" onClick={reset} disabled={isBusy}><Trash2 className="h-4 w-4 mr-2" />Discard</Button>
               </div>
             </div>
           )}
         </Card>
 
-        <Card className="p-6 space-y-3">
-          <h2 className="font-semibold text-lg">Senaste voicetracks</h2>
-          {list.isLoading && <div className="text-sm text-muted-foreground">Laddar…</div>}
-          {list.data?.length === 0 && <div className="text-sm text-muted-foreground">Inga inspelningar ännu.</div>}
-          <div className="divide-y">
-            {list.data?.map((v: any) => (
+        <Card className="p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-sm">Recent voicetracks</h2>
+            <Badge variant="outline" className="text-[10px]">{visible.length}</Badge>
+          </div>
+          {state.kind === "loading" && <div className="text-sm text-muted-foreground">Loading…</div>}
+          {state.kind === "error" && <div className="text-sm text-destructive">{state.message}</div>}
+          {state.kind === "empty" && <div className="text-sm text-muted-foreground py-4">No recordings yet.</div>}
+          <div className="divide-y divide-border">
+            {visible.map((v: any) => (
               <div key={v.id} className="py-3 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-medium truncate">{v.title}</div>
@@ -248,7 +283,7 @@ function VoicetracksPage() {
                   {v.error_message && <div className="text-xs text-destructive mt-1">{v.error_message}</div>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant={v.status === "ready" ? "default" : v.status === "error" ? "destructive" : "secondary"}>{v.status}</Badge>
+                  <SyncStatusBadge status={vtSync(v)} compact />
                   <Button size="icon" variant="ghost" onClick={() => remove.mutate(v.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               </div>
@@ -256,6 +291,6 @@ function VoicetracksPage() {
           </div>
         </Card>
       </div>
-    </AppLayout>
+    </ResourcePageShell>
   );
 }

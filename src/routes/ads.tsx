@@ -1,28 +1,46 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppLayout } from "@/components/app-layout";
-import { Card } from "@/components/ui/card";
+import { ResourcePageShell } from "@/components/resource-page-shell";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { EmptyState } from "@/components/data-states";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Megaphone, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useStationScope } from "@/lib/station-context";
 
 export const Route = createFileRoute("/ads")({ component: AdsPage });
 
 function AdsPage() {
   const qc = useQueryClient();
+  const { scope } = useStationScope();
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
   const [form, setForm] = useState({ advertiser: "", name: "", station_id: "", start_date: "", end_date: "", daily_target: 6 });
 
   const stations = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name").order("name")).data ?? [] });
   const camps = useQuery({
     queryKey: ["ad-campaigns"],
-    queryFn: async () => (await supabase.from("ad_campaigns").select("*, stations(name)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ad_campaigns").select("*, stations(name)").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
   });
+
+  const filtered = useMemo(() => (camps.data ?? []).filter((c: any) => {
+    if (scope.kind === "station" && c.station_id !== scope.station.id) return false;
+    if (activeFilter === "active" && !c.is_active) return false;
+    if (activeFilter === "paused" && c.is_active) return false;
+    if (q && !`${c.name} ${c.advertiser}`.toLowerCase().includes(q.toLowerCase())) return false;
+    return true;
+  }), [camps.data, q, activeFilter, scope]);
 
   const create = useMutation({
     mutationFn: async () => {
@@ -34,43 +52,90 @@ function AdsPage() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Campaign created"); setForm({ advertiser: "", name: "", station_id: "", start_date: "", end_date: "", daily_target: 6 }); qc.invalidateQueries({ queryKey: ["ad-campaigns"] }); },
+    onSuccess: () => {
+      toast.success("Campaign created");
+      setOpen(false);
+      setForm({ advertiser: "", name: "", station_id: "", start_date: "", end_date: "", daily_target: 6 });
+      qc.invalidateQueries({ queryKey: ["ad-campaigns"] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
 
-  return (
-    <AppLayout title="Ad Campaigns" description="Reklamkampanjer, jinglar och spots">
-      <Card className="p-4 mb-4">
-        <h2 className="text-sm font-semibold mb-3 flex items-center gap-2"><Megaphone className="w-4 h-4" /> New campaign</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
-          <Input placeholder="Advertiser" value={form.advertiser} onChange={(e) => setForm({ ...form, advertiser: e.target.value })} />
-          <Input placeholder="Campaign name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
-            <SelectTrigger><SelectValue placeholder="Station" /></SelectTrigger>
-            <SelectContent>{(stations.data ?? []).map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-          </Select>
-          <Input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
-          <Input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
-          <Input type="number" min={0} placeholder="Daily target spots" value={form.daily_target} onChange={(e) => setForm({ ...form, daily_target: Number(e.target.value) })} />
-        </div>
-        <Button onClick={() => create.mutate()}><Plus className="w-4 h-4 mr-2" /> Create</Button>
-      </Card>
+  const state =
+    camps.isLoading ? { kind: "loading" as const } :
+    camps.error ? { kind: "error" as const, message: (camps.error as Error).message, retry: () => camps.refetch() } :
+    filtered.length === 0 ? { kind: "empty" as const, title: "No ad campaigns", hint: "Create your first campaign to schedule spots." } :
+    { kind: "ready" as const };
 
-      <Card className="p-4">
-        <h2 className="text-sm font-semibold mb-3">Campaigns</h2>
-        <div className="divide-y divide-border">
-          {(camps.data ?? []).length === 0 && <EmptyState title="No campaigns yet" />}
-          {(camps.data ?? []).map((c: any) => (
-            <div key={c.id} className="py-3 flex items-center justify-between">
-              <div>
-                <div className="font-medium">{c.name} <span className="text-muted-foreground">— {c.advertiser}</span></div>
-                <div className="text-xs text-muted-foreground">{c.stations?.name} · {c.start_date ?? "—"} → {c.end_date ?? "—"} · {c.daily_target}/day</div>
-              </div>
-              <Badge variant={c.is_active ? "default" : "secondary"}>{c.is_active ? "active" : "paused"}</Badge>
-            </div>
-          ))}
+  const primaryAction = (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild><Button size="sm"><Plus className="w-4 h-4 mr-1" /> New campaign</Button></DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>New ad campaign</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>Advertiser *</Label><Input value={form.advertiser} onChange={(e) => setForm({ ...form, advertiser: e.target.value })} /></div>
+          <div><Label>Campaign name *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+          <div><Label>Station *</Label>
+            <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Station" /></SelectTrigger>
+              <SelectContent>{(stations.data ?? []).map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Start</Label><Input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} /></div>
+            <div><Label>End</Label><Input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} /></div>
+          </div>
+          <div><Label>Daily target spots</Label><Input type="number" min={0} value={form.daily_target} onChange={(e) => setForm({ ...form, daily_target: Number(e.target.value) })} /></div>
         </div>
-      </Card>
-    </AppLayout>
+        <DialogFooter><Button onClick={() => create.mutate()} disabled={create.isPending}>{create.isPending ? "Creating…" : "Create"}</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  return (
+    <ResourcePageShell
+      title="Ad Campaigns"
+      description="Advertiser campaigns and daily spot targets."
+      primaryAction={primaryAction}
+      searchValue={q}
+      onSearchChange={setQ}
+      searchPlaceholder="Search campaigns or advertisers…"
+      filters={
+        <Select value={activeFilter} onValueChange={setActiveFilter}>
+          <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+          </SelectContent>
+        </Select>
+      }
+      state={state}
+    >
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Campaign</TableHead>
+            <TableHead>Advertiser</TableHead>
+            <TableHead>Station</TableHead>
+            <TableHead>Schedule</TableHead>
+            <TableHead className="text-right">Daily</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filtered.map((c: any) => (
+            <TableRow key={c.id}>
+              <TableCell className="font-medium">{c.name}</TableCell>
+              <TableCell>{c.advertiser}</TableCell>
+              <TableCell className="text-muted-foreground">{c.stations?.name ?? "—"}</TableCell>
+              <TableCell className="text-muted-foreground text-xs">{c.start_date ?? "—"} → {c.end_date ?? "—"}</TableCell>
+              <TableCell className="tabular-nums text-right">{c.daily_target}</TableCell>
+              <TableCell><Badge variant={c.is_active ? "default" : "secondary"} className="uppercase text-[10px]">{c.is_active ? "active" : "paused"}</Badge></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </ResourcePageShell>
   );
 }
