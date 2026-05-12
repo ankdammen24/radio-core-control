@@ -124,8 +124,10 @@ function DriftPanel({ stationId }: { stationId: string }) {
     onSuccess: () => { toast.success("Skipped current song"); qc.invalidateQueries({ queryKey: ["az-queue", stationId] }); },
     onError: (e: any) => toast.error(e.message ?? "Skip failed"),
   });
+  type RuntimeAction = "restart_station" | "frontend_start" | "frontend_stop" | "frontend_restart"
+    | "backend_start" | "backend_stop" | "backend_restart" | "backend_disconnect";
   const actionM = useMutation({
-    mutationFn: (a: Parameters<typeof action>[0]["data"]["action"]) => action({ data: { station_id: stationId, action: a } }),
+    mutationFn: (a: RuntimeAction) => action({ data: { station_id: stationId, action: a } }),
     onSuccess: (_, a) => { toast.success(`Action "${a}" sent`); refetch(); },
     onError: (e: any) => toast.error(e.message ?? "Action failed"),
   });
