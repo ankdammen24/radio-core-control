@@ -33,6 +33,7 @@ import { Route as EpisodesRouteImport } from './routes/episodes'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ConfigsRouteImport } from './routes/configs'
 import { Route as CompanionRouteImport } from './routes/companion'
+import { Route as CockpitRouteImport } from './routes/cockpit'
 import { Route as BackupRouteImport } from './routes/backup'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -168,6 +169,11 @@ const CompanionRoute = CompanionRouteImport.update({
   path: '/companion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CockpitRoute = CockpitRouteImport.update({
+  id: '/cockpit',
+  path: '/cockpit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BackupRoute = BackupRouteImport.update({
   id: '/backup',
   path: '/backup',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/backup': typeof BackupRoute
+  '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/demo': typeof DemoRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/backup': typeof BackupRoute
+  '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/demo': typeof DemoRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
   '/backup': typeof BackupRoute
+  '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
   '/demo': typeof DemoRoute
@@ -370,6 +379,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/backup'
+    | '/cockpit'
     | '/companion'
     | '/configs'
     | '/demo'
@@ -410,6 +420,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/backup'
+    | '/cockpit'
     | '/companion'
     | '/configs'
     | '/demo'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/azuracast'
     | '/backup'
+    | '/cockpit'
     | '/companion'
     | '/configs'
     | '/demo'
@@ -491,6 +503,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
   BackupRoute: typeof BackupRoute
+  CockpitRoute: typeof CockpitRoute
   CompanionRoute: typeof CompanionRoute
   ConfigsRoute: typeof ConfigsRoute
   DemoRoute: typeof DemoRoute
@@ -694,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cockpit': {
+      id: '/cockpit'
+      path: '/cockpit'
+      fullPath: '/cockpit'
+      preLoaderRoute: typeof CockpitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/backup': {
       id: '/backup'
       path: '/backup'
@@ -803,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
   BackupRoute: BackupRoute,
+  CockpitRoute: CockpitRoute,
   CompanionRoute: CompanionRoute,
   ConfigsRoute: ConfigsRoute,
   DemoRoute: DemoRoute,
@@ -838,12 +859,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
