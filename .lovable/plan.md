@@ -1,139 +1,103 @@
 
-# Full Azuracast-paritet i Radio Core
+# Radio Core — Full översikt
 
-Mål: allt man kan göra via Azuracast API ska gå att göra härifrån. Radio Core är master — Azuracast-UI används inte för innehåll, bara för körning av broadcast.
+Status snapshot inför att du ska designa och planera vidare. Inga kodändringar i detta läge.
 
-## Princip
+## Vad Radio Core är
 
-- En **typad Azuracast-klient** i `src/server/azuracast-client.server.ts` täcker hela API:et (genererad/handskriven wrapper kring REST-endpointsen).
-- All I/O går via **TanStack server functions** (`createServerFn`) — inga nya edge functions om vi inte måste. De befintliga edge functions migreras gradvis till server fns.
-- **Radio Core-databasen är källan**. Skrivningar går först till vår DB, sen pushas till Azuracast via en sync-pipeline (`sync_jobs`-tabellen finns redan).
-- **Konfliktstrategi**: vid kollision vinner Radio Core. Pull från Azuracast används bara för "discovery" (initial import) och för read-only telemetri (now playing, listeners, history).
-- **Per-station koppling**: `azuracast_connections` finns redan — varje station mappas till en Azuracast-instans + station-ID.
+Ett white-label, fristående **radio-automationsprodukt** (potentiellt återförsäljbart). Master-system för en eller flera stationer. AzuraCast används som broadcast-runtime, men allt innehåll, schemaläggning och drift styrs härifrån. Ingen Radio Uppsala-specifik branding i kod — allt stationsdata kommer från DB.
 
-## Funktionsområden att bygga
-
-Varje block = egen sida i sidomenyn + server fns + sync-job-typer.
-
-### 1. Station runtime (drift)
-- Now Playing live (har vi)
-- Skip song, queue-hantering, manuell next-track
-- Backend/frontend start/stop/restart
-- Service-status (uptime, version, hälsa)
-
-### 2. Media library (utbyggnad)
-- Full CRUD (upload, replace, delete, edit metadata, albumart)
-- Batch-operations (massuppdatera kategori, taggar, playlist-tillhörighet)
-- Custom fields-stöd
-- ID3-redigering med push till Azuracast
-
-### 3. Playlists (utbyggnad)
-- Full CRUD inkl. typ (default / scheduled / once-per-x-songs / once-per-x-minutes / once-per-hour / advanced)
-- Vikter, schemaläggning per dag/tid, avoid-duplicates-regler
-- Reshuffle, import från fil/M3U
-- Koppling playlist↔media som push, inte pull
-
-### 4. Streamers / DJs
-- Ny modul: CRUD streamer-konton (användarnamn, lösenord, display-namn, art)
-- Schema per streamer
-- Broadcast-historik (vem sände när, längd)
-- Live-takeover-koppling till befintlig `live_inputs`
-
-### 5. Podcasts
-- Ny modul: podcasts CRUD, episoder CRUD (redan har vi `episodes`/`shows` lokalt — koppla till Azuracast podcast-feeds)
-- Feed-URL, kategorier, språk, författare
-- Episode media + publish-status
-- Auto-publicering vid klar episod
-
-### 6. Mountpoints & remote relays
-- CRUD mountpoints (har bas i `stream_mounts`) — push till Azuracast
-- Intro-fil, fallback-mount, custom frontend config
-- Remote relays (relay från extern källa)
-- Listener-URL-generering
-
-### 7. Webhooks
-- Ny modul: lista, skapa, redigera Azuracast-webhooks (Discord, Twitter, Mastodon, generic, TuneIn, Radionomy m.fl.)
-- Trigger-config + body-templates
-
-### 8. Song Requests
-- Vi har `song_requests`-tabell. Synka tvåvägs med Azuracast request-kö, godkänn/avvisa här.
-
-### 9. Listeners & analytics
-- Live listener-count per mount
-- Historik per dag/timme/månad (befintlig `listener_stats` får mer data)
-- Geo-fördelning, klient-fördelning (om data finns från AzuraCast)
-- Export CSV
-
-### 10. Admin (super-admin scope krävs)
-- Users & roles i Azuracast (CRUD)
-- Storage locations
-- Settings (system-wide)
-- Backups (lista, trigga, ladda ner)
-- API-nycklar (lista, skapa, revokera)
-
-## Datamodellen — vad behöver utökas
-
-Lägger till `azuracast_*_id` kolumn där det saknas och nya tabeller för det vi inte har:
-
-| Behov | Lösning |
-|---|---|
-| Streamers | Ny tabell `streamers` (user, pass, display, art, schedule i child-tabell) |
-| Podcasts | Ny tabell `podcasts` + `podcast_episodes` (separat från befintliga interna `shows`/`episodes`) |
-| Webhooks | Ny tabell `azuracast_webhooks` (type, config jsonb, triggers) |
-| Remote relays | Ny tabell `remote_relays` |
-| Custom fields (media) | Ny tabell `media_custom_fields` + `media_custom_values` |
-| Mountpoint extras | Utöka `stream_mounts` (intro_path, fallback_mount, custom_listen_url) |
-| Sync-status per resurs | Lägg `last_synced_at`, `sync_dirty` på alla synkbara tabeller |
-
-Allt får RLS efter samma mönster som befintliga (select=auth, insert/update=editor, delete=admin).
-
-## Sync-arkitektur
-
-Generaliserad pipeline:
+## Arkitektur i dag
 
 ```text
-UI mutation
-   → server fn skriver till Radio Core DB (sync_dirty=true)
-   → enqueue sync_job { type, station_id, payload }
-   → worker (server fn anropad av pg_cron varje minut) plockar pending jobs
-   → anropar Azuracast-klient
-   → uppdaterar azuracast_*_id + sync_dirty=false, eller markerar failed
+Browser (React 19 + TanStack Start + shadcn/ui + Tailwind v4)
+   │
+   ├── Server functions (createServerFn) ── src/lib/*.functions.ts
+   │      ↳ kör i Cloudflare Worker (nodejs_compat)
+   │
+   ├── Server-only helpers ─────────────── src/server/*.server.ts
+   │      ↳ AzuraCast-klient, sync-worker, streaming-adaptrar
+   │
+   ├── Public API routes ───────────────── src/routes/api.public.*.ts
+   │      ↳ now-playing, listener-stats, station-config, health, cron
+   │
+   └── Lovable Cloud (Postgres + Auth + Storage + Edge functions)
+          ↳ pg_cron + pg_net schemalägger pull/push mot AzuraCast
+          ↳ sync_jobs-kö med claim_sync_jobs() (FOR UPDATE SKIP LOCKED)
+          ↳ legacy edge functions migreras gradvis till server fns
+
+Runner (separat) ── runner/runner.py
+   ↳ Liquidsoap/Icecast/Stereo Tool drivs av config från DB
 ```
 
-- **Pull-jobb** för read-only: now_playing, listeners, broadcasts-history. Schemaläggs via `pg_cron` mot `/api/public/cron/azuracast-pull`.
-- **Push-jobb** triggas både direkt vid mutation (best effort) OCH av cron som retry.
-- `sync_jobs`-sidan finns redan och visar status — får bredare job-typer.
+## Datamodell — vad som finns
 
-## UI-struktur (sidomenyn efter)
+Stations & accounts: `accounts`, `stations`, `azuracast_connections`
+Innehåll: `media_files`, `playlists`, `playlist_assignments`, `ad_campaigns`, `ad_spots`, `storage_locations`
+Program: `shows`, `episodes`, `presenters`, `rundown_items`
+Schemaläggning: `schedule_blocks`, `rotation_rules`
+Drift: `now_playing`, `play_history`, `listener_stats`, `service_health`, `sync_jobs`
+Streaming: `icecast_configs`, `liquidsoap_configs`, `stream_mounts`, `streaming_outputs`, `live_inputs`, `live_takeover_*`, `fallback_tracks`
+Publik input: `song_requests`, `studio_messages`
+Auth/admin: `profiles`, `roles`, `audit_logs`, `stack_tokens`
 
-Befintligt grupperas, nya markerade `(ny)`:
+Allt har RLS efter mönstret select=auth, insert/update=editor, delete=admin.
+
+## Etapper — leveransstatus
+
+| Etapp | Innehåll | Status |
+|---|---|---|
+| 1 | AzuraCast-klient, sync-pipeline, pg_cron, cron-endpoint | Klar |
+| 2 | Drift: skip/queue/restart, service-status, live listeners | Klar |
+| 3 | Media + Playlists fullt CRUD med push, batch, custom fields, intro/fallback | Inte påbörjad |
+| 4 | Streamers + Podcasts (nya tabeller, sidor, två-vägs sync) | Inte påbörjad |
+| 5 | Mountpoints + Remote relays + Webhooks | Inte påbörjad |
+| 6 | Admin (users/roles/storage/settings/backups/api-keys i AzuraCast) + song-request-sync | Inte påbörjad |
+
+Övrigt klart utanför etapp-listan: Voicetrack-uppladdning, audio-processor (utan lamejs), grundsidor för Stations/Accounts/Users/Audit/Backup/Configs/Storage, Streaming Outputs, Fallback, Live, Inbox, Health.
+
+## Sidomeny — nuläge vs. mål
 
 ```text
 Drift           Now Playing · Live · Listeners · Health
 Innehåll        Media · Playlists · Voicetracks · Ads · Inbox
-Sändning        Schemaläggning · Rotation · Fallback · Streaming · Streaming Outputs · Mountpoints (ny)
-Program         Shows · Episoder · Streamers (ny) · Podcasts (ny)
-Integrationer   Azuracast · Webhooks (ny) · Sync Jobs
+Sändning        Schemaläggning · Rotation · Fallback · Streaming · Streaming Outputs
+                + Mountpoints (kommer)
+Program         Shows · Episoder
+                + Streamers (kommer) · Podcasts (kommer)
+Integrationer   AzuraCast · Sync Jobs
+                + Webhooks (kommer)
 Admin           Stationer · Konton · Användare · Roller · Storage · Konfig · Backup · Audit · Inställningar
 ```
 
-## Bygg i etapper (förslag på ordning)
+## Tekniska invarianter att respektera i ny design
 
-Hela paritet är stort. Föreslår 6 etapper, varje är en självständig leverans:
+- Alla streaming-konfigar (Icecast/Liquidsoap/Stereo Tool/mounts/fallback/live) **genereras från DB** — appen är källan, ingen manuell .liq/.xml-redigering.
+- Inga hårdkodade stationsdata, färger, logos, copy. Allt från `stations`-raden.
+- Skrivningar: DB först → enqueue `sync_job` → worker pushar till AzuraCast → uppdaterar `azuracast_*_id` + `sync_dirty=false`.
+- Read-only telemetri pullas (now_playing 1 min, listeners 5 min) via pg_cron.
+- Konflikt: Radio Core vinner. AzuraCast är read-only för innehåll efter initial discovery.
+- Server fns för all I/O. Edge functions bara kvar tills migrerade. Ingen direkt Worker-användning av child_process/sharp/etc.
+- Design tokens i `src/styles.css` (oklch). Inga råa färger i komponenter.
 
-1. **Klient-fundament** — typad Azuracast-klient, generaliserat sync-pipeline, pg_cron, cron-endpoint
-2. **Drift** — runtime-kontroll (skip/queue/restart), service-status, listeners live
-3. **Media + Playlists fullt** — CRUD med push, batch, custom fields, intro/fallback
-4. **Streamers + Podcasts** — nya tabeller, sidor, sync båda håll
-5. **Mountpoints + Remote relays + Webhooks**
-6. **Admin** — users/roles/storage/settings/backups/api-keys i Azuracast, song-request-sync
+## Designspår att fundera på inför nästa steg
 
-Vi börjar med etapp 1 efter ditt godkännande, levererar, går vidare till 2 osv. Säg till om du vill ändra ordning eller skippa något.
+Områden där en sammanhållen visuell + UX-riktning skulle lyfta produkten mest:
 
-## Tekniskt (för dig som vill veta)
+1. **Drift-vy (Now Playing + Health + Listeners)** — operatörens hem-skärm. Idag separata sidor; kan bli en "studio cockpit" med live-status, queue, skip, takeover, listenercount sida vid sida. Hög densitet, snabba actions, tydliga felstater.
+2. **Sidomenyns gruppering** — växer snabbt med etapp 3-6. Behöver beslutas om: kollapsbara grupper, ikoner per grupp, station-switcher i toppen, sök över entiteter.
+3. **Resurssidor (Media/Playlists/Streamers/Podcasts/Webhooks/Mountpoints)** — alla har samma mönster: lista + filter + bulk-actions + detalj-drawer/route + sync-status-badge. En gemensam "resource page"-mall sparar mycket tid.
+4. **Sync-status överallt** — varje synkbar rad bör visa `synced / dirty / failed / pending` enhetligt. Idag bara på Sync Jobs-sidan.
+5. **Multi-station** — station-switcher, scoped queries, "alla stationer"-vy för super-admin.
+6. **Onboarding/empty states** — viktigt om produkten ska säljas: tom databas → guidad setup (skapa station → koppla AzuraCast → testa stream).
+7. **White-label-yta** — var i UI:t ska kund-branding visas (logo, färg, namn)? Behöver tokens kopplade till `stations`-raden vid runtime.
+8. **Publik yta** — `/now-playing`, `/song-requests`, `/studio-messages` är publika endpoints men har ingen publik UI. Vill du leverera en widget/embed-modul?
 
-- Klienten lever i `src/server/azuracast-client.server.ts`, anropas bara från server fns i `src/server/*.functions.ts`.
-- Befintliga edge functions (`azuracast-*`) migreras till server fns och tas bort. Edge function behålls bara om något kräver längre timeout eller står utanför TanStack-kontexten (t.ex. långa media-uppladdningar).
-- Cron via `pg_net` mot `/api/public/cron/azuracast-pull` med apikey-header.
-- API-nyckeln ligger redan som `AZURACAST_API_KEY`. Vid multi-instans flyttar vi till per-connection secret name (`api_key_secret_name` finns på `azuracast_connections`).
-- Ingen ny extern dependency krävs.
+## Rekommenderad ordning härifrån
+
+A. **Designspår först** — välj riktning för punkt 1-4 ovan (cockpit, sidomeny, resurssida-mall, sync-badge). Det styr hur etapp 3-6 ser ut.
+B. **Etapp 3 (Media + Playlists fullt)** — största innehållsytan, sätter mallen för resterande resurssidor.
+C. **Etapp 4-6** parallellt eller i ordning beroende på vad du säljer först.
+D. **Multi-station + white-label** när minst en kund till är på väg in.
+
+Säg till hur du vill gå vidare: vill du att jag gör design-direktioner (HTML-prototyper) för cockpit eller resurssida-mallen först, eller börjar bygga etapp 3 direkt på befintlig design?
