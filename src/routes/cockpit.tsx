@@ -134,7 +134,7 @@ function CockpitForStation() {
         .from("service_health")
         .select("*")
         .eq("station_id", station.id)
-        .order("checked_at", { ascending: false })
+        .order("reported_at", { ascending: false })
         .limit(20);
       return data ?? [];
     },
