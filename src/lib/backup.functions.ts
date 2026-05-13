@@ -1,7 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const SNAPSHOT_VERSION = 1;
+
+const uuidSchema = z.string().uuid();
+
+async function requireRole(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context: { supabase: any; userId: string | null },
+  allowed: ("admin" | "editor")[],
+) {
+  const { data: roles } = await context.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId);
+  const ok = (roles ?? []).some((r: { role: string }) =>
+    (allowed as string[]).includes(r.role),
+  );
+  if (!ok) throw new Response("Forbidden", { status: 403 });
+}
 
 const CHILD_TABLES = [
   "icecast_configs",
