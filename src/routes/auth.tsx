@@ -42,21 +42,25 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded bg-sidebar-primary flex items-center justify-center">
-            <Radio className="w-5 h-5 text-sidebar-primary-foreground" />
-          </div>
-          <div>
-            <div className="font-semibold tracking-tight">RADIO CORE</div>
-            <div className="text-[10px] uppercase tracking-widest text-sidebar-foreground/60">Broadcast Operations</div>
-          </div>
+      <div className="hidden lg:flex flex-col justify-between p-12 bg-sidebar text-sidebar-foreground relative overflow-hidden">
+        <div className="grid-overlay absolute inset-0 opacity-50 pointer-events-none" />
+        <div className="relative">
+          <RadioCoreLogo size="lg" tone="brand" />
         </div>
-        <div className="space-y-3">
-          <h2 className="text-3xl font-semibold tracking-tight">The control plane for modern radio.</h2>
-          <p className="text-sidebar-foreground/70 max-w-md">Manage stations, media, metadata, playlists, scheduler and streaming from one professional broadcast operations console.</p>
+        <div className="relative space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/40 px-3 py-1 text-[10px] uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 rounded-full bg-onair onair-pulse" />
+            Broadcast Control Plane
+          </div>
+          <h2 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
+            The control plane for modern radio.
+          </h2>
+          <p className="text-sidebar-foreground/70 max-w-md">
+            Manage stations, media, metadata, playlists, scheduler and streaming from one
+            professional broadcast operations console.
+          </p>
         </div>
-        <div className="text-xs text-sidebar-foreground/50">© Radio Core</div>
+        <div className="relative text-xs text-sidebar-foreground/50">© Radio Core · White-label runtime</div>
       </div>
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8">
