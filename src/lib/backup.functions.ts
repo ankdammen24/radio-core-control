@@ -43,8 +43,9 @@ type SnapshotPayload = {
 
 export const exportStationSnapshot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { stationId: string }) => d)
+  .inputValidator((d: { stationId: string }) => ({ stationId: uuidSchema.parse(d.stationId) }))
   .handler(async ({ data, context }) => {
+    await requireRole(context, ["admin", "editor"]);
     const { supabase } = context;
     const { data: station, error: sErr } = await supabase
       .from("stations").select("*").eq("id", data.stationId).maybeSingle();
