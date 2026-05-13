@@ -75,6 +75,19 @@ function HealthPage() {
     },
   });
 
+  const storageQuery = useQuery({
+    queryKey: ["storage-targets-health"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("storage_targets")
+        .select("*, stations(name)")
+        .order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const testFn = useServerFn(testRuntimeTarget);
   const test = useMutation({
     mutationFn: (id: string) => testFn({ data: { id } }),
