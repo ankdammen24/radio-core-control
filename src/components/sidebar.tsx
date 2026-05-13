@@ -17,6 +17,7 @@ import {
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
   Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
+  Cpu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
@@ -85,6 +86,7 @@ const GROUPS: Group[] = [
     items: [
       { label: "Runtime Targets", icon: Plug, to: "/runtime-targets" },
       { label: "AzuraCast", icon: Plug,    to: "/azuracast" },
+      { label: "Agents",    icon: Cpu,     to: "/agents" },
       { label: "Webhooks",  icon: Webhook, disabled: true },
       { label: "Sync Jobs", icon: RefreshCw, to: "/sync-jobs" },
       { label: "Podcasts",  icon: Podcast, disabled: true },
