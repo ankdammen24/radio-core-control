@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createHash } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-async function authorize(request: Request): Promise<boolean> {
+async function authorizeStackToken(request: Request): Promise<boolean> {
   const token = request.headers.get("x-stack-token") ?? "";
   if (!token) return false;
   const hash = createHash("sha256").update(token).digest("hex");
@@ -12,6 +12,28 @@ async function authorize(request: Request): Promise<boolean> {
     .eq("token_hash", hash)
     .maybeSingle();
   return Boolean(tok && tok.is_active);
+}
+
+async function authorizeSupabaseUser(request: Request): Promise<boolean> {
+  const authHeader = request.headers.get("authorization") ?? "";
+  const bearer = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!bearer) return false;
+  const { data, error } = await supabaseAdmin.auth.getUser(bearer);
+  if (error || !data.user) return false;
+  const { data: roles } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", data.user.id);
+  return (roles ?? []).some((r) => r.role === "admin" || r.role === "editor");
+}
+
+async function authorize(request: Request): Promise<boolean> {
+  // Prefer Supabase auth when an Authorization header is present, otherwise
+  // fall back to the x-stack-token used by non-authenticated infrastructure clients.
+  if (request.headers.get("authorization")) {
+    if (await authorizeSupabaseUser(request)) return true;
+  }
+  return authorizeStackToken(request);
 }
 
 export const Route = createFileRoute("/api/public/health")({
