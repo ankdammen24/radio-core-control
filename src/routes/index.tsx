@@ -19,6 +19,7 @@ import {
   HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
