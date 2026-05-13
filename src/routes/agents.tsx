@@ -27,6 +27,7 @@ import { useAuth } from "@/lib/auth";
 import { useStationScope } from "@/lib/station-context";
 import { toast } from "sonner";
 import { Plus, Cpu, Activity, Trash2, Pencil, ShieldOff } from "lucide-react";
+// Note: icon import for visual reference; ResourcePageShell does not accept it as a prop.
 import {
   listAgents, upsertAgent, deleteAgent, pingAgentNow, revokeAgentNow,
 } from "@/lib/agents.functions";
@@ -131,7 +132,6 @@ function AgentsPage() {
     <ResourcePageShell
       title="Agents"
       description="Node.js Radio Core Agents that run alongside Icecast, Liquidsoap, Stereo Tool and other broadcast services."
-      icon={Cpu}
       actions={isAdmin && (
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setForm(EMPTY_FORM(stationId ?? "")); }}>
           <DialogTrigger asChild>
