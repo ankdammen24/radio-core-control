@@ -11,7 +11,7 @@ import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { generateStationConfig } from "@/server/streaming.functions";
+import { generateStationConfig } from "@/lib/streaming.functions";
 import { FileCode2, Download, Wand2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 

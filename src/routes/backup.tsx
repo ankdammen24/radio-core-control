@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { exportStationSnapshot, importStationSnapshot } from "@/server/backup.functions";
+import { exportStationSnapshot, importStationSnapshot } from "@/lib/backup.functions";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
