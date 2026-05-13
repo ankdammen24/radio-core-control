@@ -151,6 +151,18 @@ export class AzuracastClient {
   async getMediaArt(id: number | string) { return this.request<unknown>("GET", this.s(`art/${id}`)); }
   async setMediaArt(id: number | string, body: { art: string /* base64 */ }) { return this.request<unknown>("POST", this.s(`art/${id}`), { body }); }
 
+  /** Download the raw audio bytes for a media file by its AzuraCast path. */
+  async downloadFileByPath(path: string): Promise<{ bytes: Uint8Array; contentType: string }> {
+    const url = buildUrl(this.baseUrl, this.s("files/download"), { file: path });
+    const res = await fetch(url, { method: "GET", headers: { "X-API-Key": this.apiKey } });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new AzuracastError(`Azuracast GET files/download -> ${res.status}`, res.status, text);
+    }
+    const buf = new Uint8Array(await res.arrayBuffer());
+    return { bytes: buf, contentType: res.headers.get("content-type") ?? "application/octet-stream" };
+  }
+
   // ============================================================
   // Playlists
   // ============================================================
