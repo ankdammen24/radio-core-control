@@ -12,6 +12,18 @@ import {
   AzuracastError,
 } from "@/server/azuracast-client.server";
 
+async function requireRole(
+  context: { supabase: any; userId: string | null },
+  allowed: ("admin" | "editor")[],
+) {
+  const { data: roles } = await context.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId);
+  const ok = (roles ?? []).some((r: { role: string }) => (allowed as string[]).includes(r.role));
+  if (!ok) throw new Response("Forbidden", { status: 403 });
+}
+
 async function clientFor(stationId: string) {
   const { data, error } = await supabaseAdmin
     .from("azuracast_connections")
