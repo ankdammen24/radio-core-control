@@ -82,7 +82,7 @@ export function ResourcePageShell({
                 </Badge>
               )}
               {onSearchChange && (
-                <div className="relative flex-1 min-w-[220px] max-w-md">
+                <div className="relative flex-1 min-w-[160px] sm:min-w-[220px] max-w-md">
                   <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={searchValue ?? ""}
