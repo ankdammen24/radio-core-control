@@ -117,7 +117,7 @@ export function ResourcePageShell({
             </Card>
           )}
         </div>
-        {drawer && <aside className="w-[380px] shrink-0">{drawer}</aside>}
+        {drawer && <aside className="w-full xl:w-[380px] xl:shrink-0">{drawer}</aside>}
       </div>
     </AppLayout>
   );
