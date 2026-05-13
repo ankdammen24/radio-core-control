@@ -147,6 +147,73 @@ function HealthPage() {
         })}
       </div>
 
+      <Card className="p-5 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-sm font-semibold">Runtime targets</h2>
+            <p className="text-xs text-muted-foreground">External services connected to this control plane.</p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/runtime-targets">Manage targets</Link>
+          </Button>
+        </div>
+        {targetsQuery.isLoading && <div className="text-sm text-muted-foreground py-4">Loading runtime targets…</div>}
+        {targetsQuery.error && <div className="text-sm text-destructive py-4">{(targetsQuery.error as Error).message}</div>}
+        {!targetsQuery.isLoading && targetsByStation.length === 0 && (
+          <div className="text-sm text-muted-foreground py-4">
+            No runtime targets registered.{" "}
+            <Link to="/runtime-targets" className="underline">Add one</Link>.
+          </div>
+        )}
+        <div className="space-y-4">
+          {targetsByStation.map(([sid, group]) => (
+            <div key={sid}>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{group.name}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {group.rows.map((t: any) => {
+                  const lastCheck = (checksQuery.data ?? []).find((c: any) => c.target_id === t.id);
+                  const np = lastCheck?.details?.nowPlaying;
+                  return (
+                    <Card key={t.id} className="p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Plug className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span className="font-medium text-sm truncate">{t.name}</span>
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                            <Badge variant="outline" className="text-[9px] uppercase">{t.type}</Badge>
+                            <Badge variant="outline" className={cn("text-[9px] uppercase", targetStatusClass(t.status))}>
+                              {t.status}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button size="sm" variant="ghost" disabled={test.isPending} onClick={() => test.mutate(t.id)} title="Test connection">
+                          <Activity className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      {np && (np.title || np.artist) && (
+                        <div className="mt-2 text-xs">
+                          <div className="text-muted-foreground text-[10px] uppercase tracking-wider">Now playing</div>
+                          <div className="font-medium truncate">{np.title ?? "Unknown"}</div>
+                          <div className="text-muted-foreground truncate">{np.artist ?? ""}</div>
+                        </div>
+                      )}
+                      {t.last_error && t.status !== "ok" && (
+                        <div className="mt-2 text-[11px] text-destructive truncate" title={t.last_error}>{t.last_error}</div>
+                      )}
+                      <div className="mt-2 text-[10px] text-muted-foreground">
+                        {t.last_checked_at ? `Checked ${new Date(t.last_checked_at).toLocaleString()}` : "Never checked"}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       <Card className="p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">Recent heartbeats</h2>
