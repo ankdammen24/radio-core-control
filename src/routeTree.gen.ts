@@ -14,6 +14,7 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
 import { Route as StreamingOutputsRouteImport } from './routes/streaming-outputs'
 import { Route as StreamingRouteImport } from './routes/streaming'
+import { Route as StorageTargetsRouteImport } from './routes/storage-targets'
 import { Route as StorageRouteImport } from './routes/storage'
 import { Route as StationsRouteImport } from './routes/stations'
 import { Route as ShowsRouteImport } from './routes/shows'
@@ -74,6 +75,11 @@ const StreamingOutputsRoute = StreamingOutputsRouteImport.update({
 const StreamingRoute = StreamingRouteImport.update({
   id: '/streaming',
   path: '/streaming',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StorageTargetsRoute = StorageTargetsRouteImport.update({
+  id: '/storage-targets',
+  path: '/storage-targets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StorageRoute = StorageRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/storage-targets': typeof StorageTargetsRoute
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/storage-targets': typeof StorageTargetsRoute
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -374,6 +382,7 @@ export interface FileRoutesById {
   '/shows': typeof ShowsRoute
   '/stations': typeof StationsRoute
   '/storage': typeof StorageRoute
+  '/storage-targets': typeof StorageTargetsRoute
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
@@ -419,6 +428,7 @@ export interface FileRouteTypes {
     | '/shows'
     | '/stations'
     | '/storage'
+    | '/storage-targets'
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/shows'
     | '/stations'
     | '/storage'
+    | '/storage-targets'
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
@@ -505,6 +516,7 @@ export interface FileRouteTypes {
     | '/shows'
     | '/stations'
     | '/storage'
+    | '/storage-targets'
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
@@ -549,6 +561,7 @@ export interface RootRouteChildren {
   ShowsRoute: typeof ShowsRoute
   StationsRoute: typeof StationsRoute
   StorageRoute: typeof StorageRoute
+  StorageTargetsRoute: typeof StorageTargetsRoute
   StreamingRoute: typeof StreamingRoute
   StreamingOutputsRoute: typeof StreamingOutputsRoute
   SyncJobsRoute: typeof SyncJobsRoute
@@ -598,6 +611,13 @@ declare module '@tanstack/react-router' {
       path: '/streaming'
       fullPath: '/streaming'
       preLoaderRoute: typeof StreamingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/storage-targets': {
+      id: '/storage-targets'
+      path: '/storage-targets'
+      fullPath: '/storage-targets'
+      preLoaderRoute: typeof StorageTargetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/storage': {
@@ -885,6 +905,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShowsRoute: ShowsRoute,
   StationsRoute: StationsRoute,
   StorageRoute: StorageRoute,
+  StorageTargetsRoute: StorageTargetsRoute,
   StreamingRoute: StreamingRoute,
   StreamingOutputsRoute: StreamingOutputsRoute,
   SyncJobsRoute: SyncJobsRoute,

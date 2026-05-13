@@ -75,6 +75,19 @@ function HealthPage() {
     },
   });
 
+  const storageQuery = useQuery({
+    queryKey: ["storage-targets-health"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("storage_targets")
+        .select("*, stations(name)")
+        .order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const testFn = useServerFn(testRuntimeTarget);
   const test = useMutation({
     mutationFn: (id: string) => testFn({ data: { id } }),
@@ -211,6 +224,51 @@ function HealthPage() {
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="p-5 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-sm font-semibold">Storage targets</h2>
+            <p className="text-xs text-muted-foreground">Object storage & CDN endpoints (R2, S3, external URLs).</p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to={"/storage-targets" as "/"}>Manage storage</Link>
+          </Button>
+        </div>
+        {storageQuery.isLoading && <div className="text-sm text-muted-foreground py-4">Loading storage targets…</div>}
+        {!storageQuery.isLoading && (storageQuery.data ?? []).length === 0 && (
+          <div className="text-sm text-muted-foreground py-4">No storage targets registered.</div>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {(storageQuery.data ?? [])
+            .filter((t: any) => scope.kind !== "station" || t.station_id === scope.station.id)
+            .map((t: any) => (
+              <Card key={t.id} className="p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-medium text-sm truncate">{t.name}</div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1">
+                      <Badge variant="outline" className="text-[9px] uppercase">{t.provider}</Badge>
+                      <Badge variant="outline" className="text-[9px] uppercase">{t.purpose}</Badge>
+                      <Badge variant="outline" className={cn("text-[9px] uppercase", targetStatusClass(t.status === "online" ? "ok" : t.status === "warning" ? "degraded" : t.status === "offline" ? "down" : "unknown"))}>
+                        {t.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                {t.public_base_url && (
+                  <div className="mt-2 text-[11px] font-mono text-muted-foreground truncate" title={t.public_base_url}>{t.public_base_url}</div>
+                )}
+                {t.last_error && t.status !== "online" && (
+                  <div className="mt-1 text-[11px] text-destructive truncate" title={t.last_error}>{t.last_error}</div>
+                )}
+                <div className="mt-2 text-[10px] text-muted-foreground">
+                  {t.last_checked_at ? `Checked ${new Date(t.last_checked_at).toLocaleString()}` : "Never checked"}
+                </div>
+              </Card>
+            ))}
         </div>
       </Card>
 

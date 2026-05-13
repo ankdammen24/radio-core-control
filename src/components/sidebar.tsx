@@ -15,7 +15,7 @@ import {
   LayoutDashboard, Radio, Music, ListMusic, Mic, Megaphone, MessageSquare,
   Calendar, Repeat, ShieldAlert, CalendarClock, Activity, Headphones, Server,
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
-  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast,
+  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -100,6 +100,7 @@ const GROUPS: Group[] = [
       { label: "Roles",     icon: ShieldCheck, disabled: true },
       { label: "Storage",   icon: HardDrive,   to: "/storage" },
       { label: "R2 Files",  icon: HardDrive,   to: "/r2-storage" },
+      { label: "Storage Targets", icon: Cloud, to: "/storage-targets" },
       { label: "Config",    icon: Sliders,     to: "/configs" },
       { label: "Backup",    icon: Archive,     to: "/backup" },
       { label: "Audit",     icon: ScrollText,  to: "/audit" },
