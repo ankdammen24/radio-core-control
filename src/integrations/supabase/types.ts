@@ -1293,6 +1293,56 @@ export type Database = {
           },
         ]
       }
+      storage_health_checks: {
+        Row: {
+          created_at: string
+          details: Json
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          started_at: string
+          station_id: string
+          status: Database["public"]["Enums"]["storage_status"]
+          target_id: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          station_id: string
+          status?: Database["public"]["Enums"]["storage_status"]
+          target_id: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          station_id?: string
+          status?: Database["public"]["Enums"]["storage_status"]
+          target_id?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storage_health_checks_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "storage_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storage_locations: {
         Row: {
           base_path: string | null
@@ -1378,6 +1428,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      storage_targets: {
+        Row: {
+          access_key_ref: string | null
+          bucket: string | null
+          created_at: string
+          endpoint_url: string | null
+          id: string
+          is_active: boolean
+          last_checked_at: string | null
+          last_error: string | null
+          metadata: Json
+          name: string
+          provider: Database["public"]["Enums"]["storage_provider"]
+          public_base_url: string | null
+          purpose: Database["public"]["Enums"]["storage_purpose"]
+          region: string | null
+          secret_key_ref: string | null
+          station_id: string
+          status: Database["public"]["Enums"]["storage_status"]
+          updated_at: string
+        }
+        Insert: {
+          access_key_ref?: string | null
+          bucket?: string | null
+          created_at?: string
+          endpoint_url?: string | null
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_error?: string | null
+          metadata?: Json
+          name: string
+          provider: Database["public"]["Enums"]["storage_provider"]
+          public_base_url?: string | null
+          purpose?: Database["public"]["Enums"]["storage_purpose"]
+          region?: string | null
+          secret_key_ref?: string | null
+          station_id: string
+          status?: Database["public"]["Enums"]["storage_status"]
+          updated_at?: string
+        }
+        Update: {
+          access_key_ref?: string | null
+          bucket?: string | null
+          created_at?: string
+          endpoint_url?: string | null
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_error?: string | null
+          metadata?: Json
+          name?: string
+          provider?: Database["public"]["Enums"]["storage_provider"]
+          public_base_url?: string | null
+          purpose?: Database["public"]["Enums"]["storage_purpose"]
+          region?: string | null
+          secret_key_ref?: string | null
+          station_id?: string
+          status?: Database["public"]["Enums"]["storage_status"]
+          updated_at?: string
+        }
+        Relationships: []
       }
       stream_mounts: {
         Row: {
@@ -1852,6 +1965,9 @@ export type Database = {
         | "liquidsoap"
         | "stereo_tool"
         | "custom"
+      storage_provider: "r2" | "s3" | "local" | "azure_blob" | "external_url"
+      storage_purpose: "media" | "artwork" | "cdn" | "backup" | "exports"
+      storage_status: "unknown" | "online" | "warning" | "offline"
       streaming_output_type:
         | "icecast_kh"
         | "icecast"
@@ -2025,6 +2141,9 @@ export const Constants = {
         "stereo_tool",
         "custom",
       ],
+      storage_provider: ["r2", "s3", "local", "azure_blob", "external_url"],
+      storage_purpose: ["media", "artwork", "cdn", "backup", "exports"],
+      storage_status: ["unknown", "online", "warning", "offline"],
       streaming_output_type: [
         "icecast_kh",
         "icecast",
