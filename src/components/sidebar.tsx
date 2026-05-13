@@ -85,6 +85,7 @@ const GROUPS: Group[] = [
     id: "integrations",
     label: "Integrations",
     items: [
+      { label: "Runtime Targets", icon: Plug, to: "/runtime-targets" },
       { label: "AzuraCast", icon: Plug,    to: "/azuracast" },
       { label: "Webhooks",  icon: Webhook, disabled: true },
       { label: "Sync Jobs", icon: RefreshCw, to: "/sync-jobs" },
