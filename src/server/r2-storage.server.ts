@@ -148,6 +148,20 @@ export async function putObject(
   return { key: cleanKey, url: getPublicUrl(type, cleanKey) };
 }
 
+/** Convenience wrappers matching the public storage API. */
+export async function uploadMedia(body: Buffer | Uint8Array, key: string, contentType: string) {
+  return putObject("media", key, body, contentType);
+}
+export async function uploadArtwork(body: Buffer | Uint8Array, key: string, contentType: string) {
+  return putObject("artwork", key, body, contentType);
+}
+export async function uploadPublic(body: Buffer | Uint8Array, key: string, contentType: string) {
+  return putObject("public", key, body, contentType);
+}
+export async function deleteObject(bucket: BucketType, key: string) {
+  return deleteObjectByType(bucket, key);
+}
+
 export async function deleteObjectByType(type: BucketType, key: string) {
   await getS3Client().send(
     new DeleteObjectCommand({ Bucket: bucketName(type), Key: key.replace(/^\/+/, "") }),
