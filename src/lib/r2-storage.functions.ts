@@ -33,6 +33,12 @@ export const uploadObject = createServerFn({ method: "POST" })
   .inputValidator((d) => UploadSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Role check BEFORE touching S3 — viewers must not be able to write objects to R2.
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const allowed = (roles ?? []).some((r) => r.role === "admin" || r.role === "editor");
+    if (!allowed) throw new Response("Forbidden", { status: 403 });
+
     const buf = Buffer.from(data.base64, "base64");
 
     validateUpload(data.type, data.filename, data.contentType, buf.byteLength);
