@@ -12,6 +12,7 @@ import {
   deleteObjectByType,
   validateUpload,
   getPublicUrl,
+  bucketName,
 } from "@/server/r2-storage.server";
 
 const BucketTypeEnum = z.enum(["media", "artwork", "public"]);
