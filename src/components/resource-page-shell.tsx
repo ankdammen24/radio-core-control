@@ -68,7 +68,7 @@ export function ResourcePageShell({
 
   return (
     <AppLayout title={title} description={description} actions={actions}>
-      <div className="flex gap-6 animate-[fade-in_0.25s_ease-out]">
+      <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 animate-[fade-in_0.25s_ease-out]">
         <div className="flex-1 min-w-0 space-y-4">
           {showToolbar && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/40 backdrop-blur-sm px-3 py-2 panel-glow">
@@ -82,7 +82,7 @@ export function ResourcePageShell({
                 </Badge>
               )}
               {onSearchChange && (
-                <div className="relative flex-1 min-w-[220px] max-w-md">
+                <div className="relative flex-1 min-w-[160px] sm:min-w-[220px] max-w-md">
                   <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={searchValue ?? ""}
@@ -117,7 +117,7 @@ export function ResourcePageShell({
             </Card>
           )}
         </div>
-        {drawer && <aside className="w-[380px] shrink-0">{drawer}</aside>}
+        {drawer && <aside className="w-full xl:w-[380px] xl:shrink-0">{drawer}</aside>}
       </div>
     </AppLayout>
   );
