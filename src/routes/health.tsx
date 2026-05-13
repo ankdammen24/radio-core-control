@@ -35,6 +35,7 @@ function classify(s: string | null | undefined): Health {
 
 function HealthPage() {
   const { scope } = useStationScope();
+  const qc = useQueryClient();
   const query = useQuery({
     queryKey: ["service-health"],
     refetchInterval: 10_000,
@@ -44,6 +45,61 @@ function HealthPage() {
       return data ?? [];
     },
   });
+
+  const targetsQuery = useQuery({
+    queryKey: ["runtime-targets-health"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("runtime_targets")
+        .select("*, stations(name)")
+        .order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const checksQuery = useQuery({
+    queryKey: ["runtime-health-checks"],
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("runtime_health_checks")
+        .select("*")
+        .order("started_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const testFn = useServerFn(testRuntimeTarget);
+  const test = useMutation({
+    mutationFn: (id: string) => testFn({ data: { id } }),
+    onSuccess: (r: { ok: boolean; message: string; duration_ms: number }) => {
+      if (r.ok) toast.success(`OK (${r.duration_ms}ms): ${r.message}`);
+      else toast.error(`Failed: ${r.message}`);
+      qc.invalidateQueries({ queryKey: ["runtime-targets-health"] });
+      qc.invalidateQueries({ queryKey: ["runtime-health-checks"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const visibleTargets = useMemo(() => {
+    const rows = targetsQuery.data ?? [];
+    return scope.kind === "station" ? rows.filter((r: any) => r.station_id === scope.station.id) : rows;
+  }, [targetsQuery.data, scope]);
+
+  const targetsByStation = useMemo(() => {
+    const map = new Map<string, { name: string; rows: any[] }>();
+    for (const t of visibleTargets) {
+      const sid = t.station_id ?? "—";
+      const sname = t.stations?.name ?? "Unassigned";
+      if (!map.has(sid)) map.set(sid, { name: sname, rows: [] });
+      map.get(sid)!.rows.push(t);
+    }
+    return Array.from(map.entries());
+  }, [visibleTargets]);
 
   const visible = useMemo(() => (query.data ?? []).filter((r: any) =>
     scope.kind === "station" ? r.station_id === scope.station.id || r.station_id === null : true
