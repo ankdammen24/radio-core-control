@@ -91,7 +91,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     payload: { target_id: cfg.id, target_name: cfg.name, target_type: cfg.type } as never,
-    last_error: status === "ok" ? null : message,
+    message: status === "ok" ? null : message,
   });
 
   return { status, message, duration_ms: duration, log_id: log.id };
