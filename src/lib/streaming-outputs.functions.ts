@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   getAdapter, listAdapters, type StreamingOutput, type StreamingOutputType,
-} from "./streaming-adapters.server";
+} from "@/server/streaming-adapters.server";
 
 export const listStreamingAdapters = createServerFn({ method: "GET" })
   .handler(async () => {
