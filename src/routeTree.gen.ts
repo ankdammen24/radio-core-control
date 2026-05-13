@@ -19,6 +19,7 @@ import { Route as StationsRouteImport } from './routes/stations'
 import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
+import { Route as RuntimeTargetsRouteImport } from './routes/runtime-targets'
 import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as R2StorageRouteImport } from './routes/r2-storage'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
@@ -98,6 +99,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SchedulerRoute = SchedulerRouteImport.update({
   id: '/scheduler',
   path: '/scheduler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuntimeTargetsRoute = RuntimeTargetsRouteImport.update({
+  id: '/runtime-targets',
+  path: '/runtime-targets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RotationRoute = RotationRouteImport.update({
@@ -275,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/playlists': typeof PlaylistsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
+  '/runtime-targets': typeof RuntimeTargetsRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/playlists': typeof PlaylistsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
+  '/runtime-targets': typeof RuntimeTargetsRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -360,6 +368,7 @@ export interface FileRoutesById {
   '/playlists': typeof PlaylistsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
+  '/runtime-targets': typeof RuntimeTargetsRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/playlists'
     | '/r2-storage'
     | '/rotation'
+    | '/runtime-targets'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/playlists'
     | '/r2-storage'
     | '/rotation'
+    | '/runtime-targets'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '/playlists'
     | '/r2-storage'
     | '/rotation'
+    | '/runtime-targets'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   PlaylistsRoute: typeof PlaylistsRoute
   R2StorageRoute: typeof R2StorageRoute
   RotationRoute: typeof RotationRoute
+  RuntimeTargetsRoute: typeof RuntimeTargetsRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
   ShowsRoute: typeof ShowsRoute
@@ -620,6 +633,13 @@ declare module '@tanstack/react-router' {
       path: '/scheduler'
       fullPath: '/scheduler'
       preLoaderRoute: typeof SchedulerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/runtime-targets': {
+      id: '/runtime-targets'
+      path: '/runtime-targets'
+      fullPath: '/runtime-targets'
+      preLoaderRoute: typeof RuntimeTargetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rotation': {
@@ -859,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlaylistsRoute: PlaylistsRoute,
   R2StorageRoute: R2StorageRoute,
   RotationRoute: RotationRoute,
+  RuntimeTargetsRoute: RuntimeTargetsRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
   ShowsRoute: ShowsRoute,

@@ -946,6 +946,107 @@ export type Database = {
         }
         Relationships: []
       }
+      runtime_health_checks: {
+        Row: {
+          created_at: string
+          details: Json
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          started_at: string
+          station_id: string
+          status: Database["public"]["Enums"]["runtime_target_status"]
+          target_id: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          station_id: string
+          status?: Database["public"]["Enums"]["runtime_target_status"]
+          target_id: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string
+          station_id?: string
+          status?: Database["public"]["Enums"]["runtime_target_status"]
+          target_id?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "runtime_health_checks_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "runtime_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      runtime_targets: {
+        Row: {
+          api_key_secret_name: string | null
+          base_url: string | null
+          created_at: string
+          external_station_id: string | null
+          id: string
+          is_active: boolean
+          last_checked_at: string | null
+          last_error: string | null
+          metadata: Json
+          name: string
+          station_id: string
+          status: Database["public"]["Enums"]["runtime_target_status"]
+          type: Database["public"]["Enums"]["runtime_target_type"]
+          updated_at: string
+        }
+        Insert: {
+          api_key_secret_name?: string | null
+          base_url?: string | null
+          created_at?: string
+          external_station_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_error?: string | null
+          metadata?: Json
+          name: string
+          station_id: string
+          status?: Database["public"]["Enums"]["runtime_target_status"]
+          type: Database["public"]["Enums"]["runtime_target_type"]
+          updated_at?: string
+        }
+        Update: {
+          api_key_secret_name?: string | null
+          base_url?: string | null
+          created_at?: string
+          external_station_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_error?: string | null
+          metadata?: Json
+          name?: string
+          station_id?: string
+          status?: Database["public"]["Enums"]["runtime_target_status"]
+          type?: Database["public"]["Enums"]["runtime_target_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       schedule_blocks: {
         Row: {
           created_at: string
@@ -1744,6 +1845,13 @@ export type Database = {
         | "creative_commons"
         | "needs_review"
         | "blocked"
+      runtime_target_status: "unknown" | "ok" | "degraded" | "down" | "error"
+      runtime_target_type:
+        | "azuracast"
+        | "icecast"
+        | "liquidsoap"
+        | "stereo_tool"
+        | "custom"
       streaming_output_type:
         | "icecast_kh"
         | "icecast"
@@ -1908,6 +2016,14 @@ export const Constants = {
         "creative_commons",
         "needs_review",
         "blocked",
+      ],
+      runtime_target_status: ["unknown", "ok", "degraded", "down", "error"],
+      runtime_target_type: [
+        "azuracast",
+        "icecast",
+        "liquidsoap",
+        "stereo_tool",
+        "custom",
       ],
       streaming_output_type: [
         "icecast_kh",
