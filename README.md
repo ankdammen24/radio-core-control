@@ -40,6 +40,8 @@ Radio Core handles:
 
 ## Runtime Plane
 
+Runtime targets (AzuraCast, Icecast, Liquidsoap, Stereo Tool, custom Docker/Kubernetes services) are registered per station in **Integrations → Runtime Targets** and exercised through pluggable adapters in `src/server/runtime-adapters/`. Every manual "Test connection" writes a row to `runtime_health_checks` and mirrors a `runtime_health_check` job into `sync_jobs` for unified ops history. The Health page groups targets by station and surfaces reachability + now-playing.
+
 Runtime services execute the actual broadcast chain:
 
 - AzuraCast
