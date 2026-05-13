@@ -3,6 +3,7 @@
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
+import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 
 interface SyncJob {
   id: string;
