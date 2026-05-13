@@ -143,11 +143,12 @@ function RuntimeStatusPill() {
       const { data, error } = await q;
       if (error) return { total: 0, online: 0, degraded: 0, offline: 0 };
       const active = (data ?? []).filter((r) => r.is_active);
+      const s = (r: { status: string }) => r.status as string;
       return {
         total: active.length,
-        online: active.filter((r) => r.status === "online" || r.status === "healthy").length,
-        degraded: active.filter((r) => r.status === "degraded" || r.status === "warning").length,
-        offline: active.filter((r) => r.status === "offline" || r.status === "error" || r.status === "down").length,
+        online: active.filter((r) => s(r) === "ok").length,
+        degraded: active.filter((r) => s(r) === "degraded").length,
+        offline: active.filter((r) => s(r) === "down" || s(r) === "error").length,
       };
     },
     refetchInterval: 30_000,
