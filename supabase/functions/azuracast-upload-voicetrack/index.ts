@@ -1,9 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { requireEditorOrAdmin } from "../_shared/auth.ts";
 
 // Body: { voicetrack_id: string, filename: string, mime: string, base64: string, playlist_id?: string|number }
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const _auth = await requireEditorOrAdmin(req);
+  if (!_auth.ok) return _auth.response;
   try {
     const { voicetrack_id, filename, mime, base64, playlist_id } = await req.json();
     if (!voicetrack_id || !base64 || !filename) throw new Error("voicetrack_id, filename, base64 required");
