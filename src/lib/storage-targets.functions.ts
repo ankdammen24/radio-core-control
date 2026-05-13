@@ -78,7 +78,13 @@ export const testStorageTarget = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const result = await runStorageHealthCheck(data.id, context.userId ?? null);
-    return { ok: result.status === "online", ...result };
+    return {
+      ok: result.status === "online",
+      status: result.status,
+      message: result.message,
+      duration_ms: result.duration_ms,
+      target_id: result.target_id,
+    };
   });
 
 export const getStorageTargetInfo = createServerFn({ method: "GET" })
