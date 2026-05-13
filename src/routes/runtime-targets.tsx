@@ -286,12 +286,12 @@ function RuntimeTargetsPage() {
 
       <ConfirmDialog
         open={!!confirmDel}
-        onOpenChange={(o) => !o && setConfirmDel(null)}
+        onOpenChange={(o: boolean) => { if (!o) setConfirmDel(null); }}
         title="Delete runtime target?"
         description="This permanently removes the registration. Health-check history will also be cleared."
         confirmText="Delete"
         destructive
-        onConfirm={() => confirmDel && del.mutate(confirmDel)}
+        onConfirm={() => { if (confirmDel) del.mutate(confirmDel); }}
       />
     </ResourcePageShell>
   );
