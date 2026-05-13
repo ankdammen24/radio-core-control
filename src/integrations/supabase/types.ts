@@ -110,6 +110,62 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_instances: {
+        Row: {
+          capabilities: Json
+          created_at: string
+          hostname: string | null
+          id: string
+          last_error: string | null
+          last_seen_at: string | null
+          metadata: Json
+          name: string
+          stack_token_id: string | null
+          station_id: string | null
+          status: Database["public"]["Enums"]["agent_status"]
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          capabilities?: Json
+          created_at?: string
+          hostname?: string | null
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          metadata?: Json
+          name: string
+          stack_token_id?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["agent_status"]
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          capabilities?: Json
+          created_at?: string
+          hostname?: string | null
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          metadata?: Json
+          name?: string
+          stack_token_id?: string | null
+          station_id?: string | null
+          status?: Database["public"]["Enums"]["agent_status"]
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_instances_stack_token_id_fkey"
+            columns: ["stack_token_id"]
+            isOneToOne: false
+            referencedRelation: "stack_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1217,6 +1273,7 @@ export type Database = {
           is_active: boolean
           last_used_at: string | null
           name: string
+          purpose: string
           station_id: string | null
           token_hash: string
         }
@@ -1226,6 +1283,7 @@ export type Database = {
           is_active?: boolean
           last_used_at?: string | null
           name: string
+          purpose?: string
           station_id?: string | null
           token_hash: string
         }
@@ -1235,6 +1293,7 @@ export type Database = {
           is_active?: boolean
           last_used_at?: string | null
           name?: string
+          purpose?: string
           station_id?: string | null
           token_hash?: string
         }
@@ -1724,6 +1783,42 @@ export type Database = {
           },
         ]
       }
+      system_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          details: Json
+          event_type: string
+          id: string
+          level: Database["public"]["Enums"]["system_event_level"]
+          message: string | null
+          source: string
+          station_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          event_type: string
+          id?: string
+          level?: Database["public"]["Enums"]["system_event_level"]
+          message?: string | null
+          source?: string
+          station_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          event_type?: string
+          id?: string
+          level?: Database["public"]["Enums"]["system_event_level"]
+          message?: string | null
+          source?: string
+          station_id?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string
@@ -1933,6 +2028,7 @@ export type Database = {
       is_admin_or_editor: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      agent_status: "unknown" | "online" | "degraded" | "offline"
       app_role: "admin" | "editor" | "viewer"
       connection_status: "untested" | "ok" | "error"
       day_of_week: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"
@@ -1978,6 +2074,7 @@ export type Database = {
         | "rtmp"
         | "webrtc"
       sync_job_status: "pending" | "running" | "completed" | "failed"
+      system_event_level: "info" | "warning" | "error" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2105,6 +2202,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_status: ["unknown", "online", "degraded", "offline"],
       app_role: ["admin", "editor", "viewer"],
       connection_status: ["untested", "ok", "error"],
       day_of_week: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
@@ -2155,6 +2253,7 @@ export const Constants = {
         "webrtc",
       ],
       sync_job_status: ["pending", "running", "completed", "failed"],
+      system_event_level: ["info", "warning", "error", "critical"],
     },
   },
 } as const

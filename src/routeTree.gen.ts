@@ -41,6 +41,7 @@ import { Route as BackupRouteImport } from './routes/backup'
 import { Route as AzuracastRouteImport } from './routes/azuracast'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuditRouteImport } from './routes/audit'
+import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AdsRouteImport } from './routes/ads'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -212,6 +213,11 @@ const AuditRoute = AuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdsRoute = AdsRouteImport.update({
   id: '/ads',
   path: '/ads',
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
+  '/agents': typeof AgentsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
@@ -311,6 +318,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
+  '/agents': typeof AgentsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
@@ -356,6 +364,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
+  '/agents': typeof AgentsRoute
   '/audit': typeof AuditRoute
   '/auth': typeof AuthRoute
   '/azuracast': typeof AzuracastRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/ads'
+    | '/agents'
     | '/audit'
     | '/auth'
     | '/azuracast'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/ads'
+    | '/agents'
     | '/audit'
     | '/auth'
     | '/azuracast'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/ads'
+    | '/agents'
     | '/audit'
     | '/auth'
     | '/azuracast'
@@ -535,6 +547,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AdsRoute: typeof AdsRoute
+  AgentsRoute: typeof AgentsRoute
   AuditRoute: typeof AuditRoute
   AuthRoute: typeof AuthRoute
   AzuracastRoute: typeof AzuracastRoute
@@ -802,6 +815,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ads': {
       id: '/ads'
       path: '/ads'
@@ -879,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AdsRoute: AdsRoute,
+  AgentsRoute: AgentsRoute,
   AuditRoute: AuditRoute,
   AuthRoute: AuthRoute,
   AzuracastRoute: AzuracastRoute,
@@ -922,12 +943,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

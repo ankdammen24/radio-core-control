@@ -1,131 +1,103 @@
 # Radio Core
 
-Radio Core is a white-label radio automation control plane designed for modern broadcast operations.
+**Broadcast Operations Console** — a generic, white-label control plane for radio automation.
 
-It manages radio stations, media libraries, playlists, scheduling, runtime configuration, streaming infrastructure and operational workflows — while using external runtime components such as AzuraCast, Liquidsoap, Icecast and Stereo Tool for actual broadcasting.
+Radio Core is the source of truth for stations, media, runtime targets (AzuraCast, Icecast, Liquidsoap, Stereo Tool), object storage (Cloudflare R2 / S3 / local / Azure Blob), agent processes, sync jobs and operational events. The web app does not push audio itself — a paired Node.js Radio Core Agent runs on the broadcast host and executes real operational tasks against the local services.
 
-Radio Core is built to support:
+## Architecture
 
-- Single-station and multi-station deployments
-- White-label operation
-- Self-hosted environments
-- Docker and future Kubernetes deployments
-- Professional broadcast workflows
-- Modern web-based operations
-- API-driven integrations
-- Runtime orchestration through sync jobs and runners
+```
+                ┌─────────────────────────────┐
+                │   Radio Core Web (this app) │
+                │   TanStack Start + React    │
+                └──────────────┬──────────────┘
+                               │ server functions / REST
+                               ▼
+                ┌─────────────────────────────┐
+                │   Lovable Cloud (Supabase)  │
+                │   Postgres · Auth · RLS     │
+                └──────┬──────────────┬───────┘
+                       │              │
+              REST / x-stack-token    │ object storage
+                       │              ▼
+                       ▼      ┌──────────────────┐
+            ┌──────────────┐  │  Cloudflare R2   │
+            │  Node.js     │  │  media · artwork │
+            │  Radio Core  │  │  cdn · backups   │
+            │  Agent       │  └──────────────────┘
+            │  (VPS/Docker)│
+            └──────┬───────┘
+                   ▼
+       AzuraCast · Icecast · Liquidsoap · Stereo Tool
+```
 
----
+## Tech stack
 
-# Vision
+- **Frontend**: TanStack Start v1, React 19, Vite 7, Tailwind v4, shadcn/ui
+- **Backend**: TanStack `createServerFn` + server routes (no Supabase Edge Functions for app logic)
+- **Database / Auth**: Supabase (via Lovable Cloud) with strict RLS
+- **Storage**: Cloudflare R2 (S3-compatible adapter), pluggable via `src/server/storage-adapters/`
+- **Runtime adapters**: AzuraCast (full), Icecast (status-json probe), Liquidsoap & Stereo Tool (stubs — paired with the Agent for real control)
 
-Radio Core separates the **Control Plane** from the **Runtime Plane**.
+## Folder map
 
-## Control Plane
+```
+src/
+├─ routes/                  # TanStack file-based routes (pages + /api/public/*)
+├─ components/              # UI shell, sidebar, station switcher, shared cards
+├─ lib/
+│  ├─ *.functions.ts        # createServerFn modules (client-importable)
+│  └─ ...
+├─ server/                  # Server-only modules (.server.ts, adapter packs)
+│  ├─ runtime-adapters/     # azuracast | icecast | liquidsoap | stereo-tool
+│  ├─ storage-adapters/     # r2 | external-url | local stub | azure stub
+│  └─ agent-client.server.ts
+├─ integrations/supabase/   # Generated — never edit
+└─ styles.css               # Design tokens (oklch)
+docs/
+├─ agents.md                # Radio Core Agent contract
+├─ adapters.md              # How to add a runtime/storage adapter
+└─ architecture.md
+supabase/migrations/        # Versioned SQL migrations
+```
 
-Radio Core handles:
+## Quickstart
 
-- Stations
-- Users and roles
-- Media library
-- Playlists
-- Rotation rules
-- Scheduling
-- Shows and episodes
-- Streaming configuration
-- Mountpoints and relays
-- Sync orchestration
-- Audit logs
-- Operational monitoring
+This project is built and previewed in Lovable. Backend (Postgres, Auth, secrets) is provisioned via **Lovable Cloud** — no local Supabase setup is required.
 
-## Runtime Plane
+For local development against the cloned repo:
 
-Runtime targets (AzuraCast, Icecast, Liquidsoap, Stereo Tool, custom Docker/Kubernetes services) are registered per station in **Integrations → Runtime Targets** and exercised through pluggable adapters in `src/server/runtime-adapters/`. Every manual "Test connection" writes a row to `runtime_health_checks` and mirrors a `runtime_health_check` job into `sync_jobs` for unified ops history. The Health page groups targets by station and surfaces reachability + now-playing.
+```bash
+bun install
+bun run dev
+```
 
-Runtime services execute the actual broadcast chain:
+Required runtime secrets (managed via Lovable Cloud → Secrets, never committed):
 
-- AzuraCast
-- Liquidsoap
-- Icecast / Icecast-KH
-- Stereo Tool
-- Audio processing pipelines
+| Variable | Purpose |
+| --- | --- |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION` | Cloudflare R2 / S3 credentials |
+| `S3_BUCKET_MEDIA`, `S3_BUCKET_ARTWORK`, `S3_BUCKET_PUBLIC` | R2 bucket names |
+| `MEDIA_PUBLIC_URL`, `ARTWORK_PUBLIC_URL`, `PUBLIC_CDN_URL` | Public CDN domains |
+| `AZURACAST_API_KEY` | AzuraCast bearer key (per-target via `api_key_secret_name`) |
+| `LOVABLE_API_KEY` | Lovable AI Gateway (managed) |
 
-Radio Core treats runtime systems as deployable execution layers, while the database remains the source of truth.
+The web app never reads R2 credentials — they are resolved server-side inside `createServerFn` handlers.
 
----
+## Deployment
 
-# Core Principles
+- **Web app**: published from Lovable to `*.lovable.app` (and optional custom domain). Frontend changes require clicking *Update* in the publish dialog; backend changes deploy immediately.
+- **Agent**: see [`runner/`](./runner) and [`docs/agents.md`](./docs/agents.md) for the Docker-based Radio Core Agent that runs on the broadcast host.
+- **GitHub**: connect the project via Lovable → GitHub. Two-way sync keeps the repo in lockstep with the editor.
 
-## Radio Core DB is the source of truth
+## Documentation
 
-All content, scheduling and configuration originates from the Radio Core database.
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — platform overview (Radio Core / Listen / Radio Uppsala)
+- [`STORAGE-DESIGN.md`](./STORAGE-DESIGN.md) — storage architecture and migration path
+- [`docs/agents.md`](./docs/agents.md) — Radio Core Agent contract
+- [`docs/adapters.md`](./docs/adapters.md) — adding runtime / storage adapters
+- [`docs/architecture.md`](./docs/architecture.md) — pointers and conventions
 
-Runtime systems are synchronized from Radio Core.
+## License
 
----
-
-## White-label first
-
-No station-specific branding should be hardcoded.
-
-All branding comes from station/account configuration:
-
-- Name
-- Logo
-- Accent color
-- Public URLs
-- Slogans
-- Public descriptions
-
----
-
-## Runtime abstraction
-
-Radio Core should not depend on a single runtime forever.
-
-Current runtime target:
-
-- AzuraCast
-
-Future runtime adapters may include:
-
-- standalone Liquidsoap
-- custom Icecast setups
-- Kubernetes-native broadcast runners
-- cloud-native stream orchestration
-
----
-
-## Server-driven architecture
-
-All I/O should go through server functions or runtime runners.
-
-The frontend should never communicate directly with runtime systems.
-
----
-
-# Architecture
-
-```text
-Browser
-  └── React 19 + TanStack Start + shadcn/ui + Tailwind v4
-
-Control Plane
-  ├── Server Functions
-  ├── Public API routes
-  ├── Sync orchestration
-  ├── Auth + RLS
-  └── Operational UI
-
-Database
-  └── Postgres (Supabase/Lovable)
-
-Runtime Plane
-  ├── AzuraCast
-  ├── Liquidsoap
-  ├── Icecast / Icecast-KH
-  ├── Stereo Tool
-  └── Audio processing
-
-Runner
-  └── radio-core-runner
+Proprietary — Radio Core. All rights reserved.

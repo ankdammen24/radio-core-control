@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { useStationScope } from "@/lib/station-context";
 import {
   Radio, Music, ListMusic, RefreshCw, Activity, ScrollText, AlertTriangle,
-  HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones,
+  HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones, Cpu, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
@@ -37,7 +37,7 @@ function Dashboard() {
       const [
         stations, media, missing, playlists, voicetracks, ads,
         runtimeTargets, syncFailed, syncSucceeded, syncQueued,
-        storage, audit,
+        storage, audit, agents, events,
       ] = await Promise.all([
         supabase.from("stations").select("*", { count: "exact", head: true }).eq("is_active", true),
         sFilter(supabase.from("media_files").select("*", { count: "exact", head: true })),
@@ -51,6 +51,8 @@ function Dashboard() {
         sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
         sFilter(supabase.from("storage_objects").select("size_bytes,bucket_type")),
         supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
+        sFilter(supabase.from("agent_instances").select("id,name,status,hostname,station_id,last_seen_at")),
+        sFilter(supabase.from("system_events").select("id,level,event_type,message,source,created_at,station_id").order("created_at", { ascending: false }).limit(10)),
       ]);
 
       const targets = (runtimeTargets.data ?? []).filter((r) => r.is_active);
@@ -62,6 +64,9 @@ function Dashboard() {
         acc[o.bucket_type] = (acc[o.bucket_type] ?? 0) + (o.size_bytes ?? 0);
         return acc;
       }, {});
+
+      const agentRows = agents.data ?? [];
+      const agentStat = (s: string) => agentRows.filter((a) => a.status === s).length;
 
       return {
         stations: stations.count ?? 0,
@@ -82,6 +87,10 @@ function Dashboard() {
         storageByBucket: byBucket,
         objectCount: objs.length,
         audit: audit.data ?? [],
+        agents: agentRows,
+        agentsOnline: agentStat("online"),
+        agentsOffline: agentStat("offline") + agentStat("degraded"),
+        events: events.data ?? [],
       };
     },
     refetchInterval: 30_000,
@@ -93,8 +102,8 @@ function Dashboard() {
 
   return (
     <AppLayout
-      title="Operations"
-      description={`Live overview · ${stationName}`}
+      title="Radio Core"
+      description={`Broadcast Operations Console · ${stationName}`}
       actions={
         <Button asChild size="sm" variant="outline">
           <Link to={"/runtime-targets" as "/"}>
@@ -174,13 +183,43 @@ function Dashboard() {
       </div>
 
       {/* KPI strip */}
-      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         <Kpi icon={Radio}    label="Stations"    value={isLoading ? "—" : data!.stations} />
         <Kpi icon={Music}    label="Media"       value={isLoading ? "—" : data!.media} />
         <Kpi icon={ListMusic} label="Playlists"  value={isLoading ? "—" : data!.playlists} />
         <Kpi icon={Mic}      label="Voicetracks" value={isLoading ? "—" : data!.voicetracks} />
+        <Kpi icon={Cpu}      label="Agents online" value={isLoading ? "—" : `${data!.agentsOnline}/${data!.agents.length}`} tone={data?.agentsOffline ? "warn" : "ok"} />
         <Kpi icon={AlertTriangle} label="Missing meta" value={isLoading ? "—" : data!.missing} tone={data?.missing ? "warn" : "ok"} />
         <Kpi icon={RefreshCw} label="Failed jobs" value={isLoading ? "—" : data!.syncFailed} tone={data?.syncFailed ? "error" : "ok"} />
+      </div>
+
+      {/* System Events feed */}
+      <div className="mt-4">
+        <Card className="p-5">
+          <SectionHeader icon={Bell} title="System Events" linkTo="/audit" />
+          {isLoading ? <Skel rows={3} /> : data!.events.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No system events recorded.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {data!.events.map((e) => {
+                const tone =
+                  e.level === "critical" || e.level === "error" ? "bg-destructive" :
+                  e.level === "warning" ? "bg-warning" : "bg-info";
+                return (
+                  <li key={e.id} className="flex items-start gap-3 py-2">
+                    <span className={cn("mt-1.5 w-1.5 h-1.5 rounded-full shrink-0", tone)} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm truncate">{e.message ?? e.event_type}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">
+                        {e.source} · {e.event_type} · {new Date(e.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
       </div>
 
       {/* Runtime + Sync + Storage */}

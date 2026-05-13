@@ -1,6 +1,9 @@
 // Runtime adapter registry. Server-only.
 // Add new runtime types here (Icecast, Liquidsoap, Stereo Tool, custom).
 import { AzuracastAdapter } from "./azuracast";
+import { IcecastAdapter } from "./icecast";
+import { LiquidsoapAdapter } from "./liquidsoap";
+import { StereoToolAdapter } from "./stereo-tool";
 import type { RuntimeAdapter, RuntimeTargetConfig, NormalizedStatus } from "./types";
 
 export type { RuntimeAdapter, RuntimeTargetConfig, NormalizedStatus };
@@ -11,8 +14,11 @@ export function buildAdapter(cfg: RuntimeTargetConfig, apiKey: string | null): R
       if (!apiKey) throw new Error(`AzuraCast target ${cfg.name} requires api_key_secret_name with a configured secret`);
       return new AzuracastAdapter(cfg, apiKey);
     case "icecast":
+      return new IcecastAdapter(cfg);
     case "liquidsoap":
+      return new LiquidsoapAdapter(cfg);
     case "stereo_tool":
+      return new StereoToolAdapter(cfg);
     case "custom":
       return new GenericReachabilityAdapter(cfg);
   }
