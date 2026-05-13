@@ -132,8 +132,8 @@ function AzuraPage() {
                 </Button>
                 {isAdmin && (
                   <>
-                    <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "media_sync" })}>
-                      <Music className="w-4 h-4 mr-1" />Sync media
+                    <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "azuracast.sync.playlist_to_storage", payload: { playlist_name: "Default" } })}>
+                      <Music className="w-4 h-4 mr-1" />Sync Default → R2
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "playlist_sync" })}>
                       <ListMusic className="w-4 h-4 mr-1" />Sync playlists
