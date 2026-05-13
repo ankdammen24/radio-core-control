@@ -87,7 +87,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
   await supabaseAdmin.from("sync_jobs").insert({
     job_type: "runtime_health_check",
     station_id: cfg.station_id,
-    status: status === "ok" ? "succeeded" : "failed",
+    status: status === "ok" ? "completed" : "failed",
     started_at: startedAt.toISOString(),
     finished_at: finishedAt.toISOString(),
     payload: { target_id: cfg.id, target_name: cfg.name, target_type: cfg.type } as never,
