@@ -80,6 +80,7 @@ export const Route = createFileRoute("/api/public/health")({
       },
       POST: async ({ request }) => {
         const token = request.headers.get("x-stack-token") ?? "";
+        if (!token) return new Response("Unauthorized", { status: 401 });
         const hash = createHash("sha256").update(token).digest("hex");
         const { data: tok } = await supabaseAdmin
           .from("stack_tokens")
@@ -88,12 +89,20 @@ export const Route = createFileRoute("/api/public/health")({
           .maybeSingle();
         if (!tok || !tok.is_active) return new Response("Unauthorized", { status: 401 });
         const body = await request.json().catch(() => ({} as any));
+        const allowedStatus = ["healthy", "degraded", "down", "unknown"];
+        const service = String(body?.service ?? "unknown").slice(0, 100);
+        const status = allowedStatus.includes(body?.status) ? body.status : "unknown";
+        const message = body?.message != null ? String(body.message).slice(0, 1000) : null;
+        const details =
+          body?.details && typeof body.details === "object" && !Array.isArray(body.details)
+            ? body.details
+            : null;
         await supabaseAdmin.from("service_health").insert({
           station_id: tok.station_id,
-          service: body.service ?? "unknown",
-          status: body.status ?? "unknown",
-          message: body.message ?? null,
-          details: body.details ?? null,
+          service,
+          status,
+          message,
+          details,
         });
         return Response.json({ ok: true });
       },
