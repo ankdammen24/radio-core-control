@@ -50,12 +50,14 @@ function HealthPage() {
     queryKey: ["runtime-targets-health"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("runtime_targets")
-        .select("*, stations(name)")
-        .order("name");
-      if (error) throw error;
-      return data ?? [];
+      const [t, s] = await Promise.all([
+        supabase.from("runtime_targets").select("*").order("name"),
+        supabase.from("stations").select("id,name"),
+      ]);
+      if (t.error) throw t.error;
+      if (s.error) throw s.error;
+      const map = new Map((s.data ?? []).map((x) => [x.id, x.name]));
+      return (t.data ?? []).map((row) => ({ ...row, station_name: map.get(row.station_id) ?? null }));
     },
   });
 
