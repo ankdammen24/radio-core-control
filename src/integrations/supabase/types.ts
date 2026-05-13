@@ -1225,6 +1225,59 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_objects: {
+        Row: {
+          bucket: string
+          bucket_type: string
+          content_type: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          object_key: string
+          public_url: string | null
+          size_bytes: number | null
+          station_id: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          bucket: string
+          bucket_type: string
+          content_type?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          object_key: string
+          public_url?: string | null
+          size_bytes?: number | null
+          station_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          bucket?: string
+          bucket_type?: string
+          content_type?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          object_key?: string
+          public_url?: string | null
+          size_bytes?: number | null
+          station_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storage_objects_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_mounts: {
         Row: {
           bitrate: number
