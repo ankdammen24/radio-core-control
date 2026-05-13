@@ -3,6 +3,7 @@
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
+import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 
 interface SyncJob {
   id: string;
@@ -121,6 +122,122 @@ const handlers: Record<string, Handler> = {
     const conn = await loadConnection(payloadConnId(job));
     const client = buildAzuracastClient(conn);
     return { ok: true, result: await client.clearQueue() };
+  },
+
+  // ---- sync: mirror an AzuraCast playlist into a Storage Target (R2 media bucket) ----
+  "azuracast.sync.playlist_to_storage": async (job) => {
+    const conn = await loadConnection(payloadConnId(job));
+    const client = buildAzuracastClient(conn);
+    const p = (job.payload ?? {}) as Record<string, unknown>;
+    const playlistName = (typeof p.playlist_name === "string" && p.playlist_name) || "Default";
+    const limit = typeof p.limit === "number" ? Math.min(p.limit, 5000) : 1000;
+    const dryRun = p.dry_run === true;
+
+    // Resolve target storage bucket: explicit target_id OR the active media target for the station
+    let targetQuery = supabaseAdmin
+      .from("storage_targets")
+      .select("id,bucket,endpoint_url,region,access_key_ref,secret_key_ref")
+      .eq("is_active", true)
+      .limit(1);
+    if (typeof p.target_id === "string") targetQuery = targetQuery.eq("id", p.target_id);
+    else targetQuery = targetQuery.eq("station_id", conn.station_id!).eq("purpose", "media");
+    const { data: target, error: tErr } = await targetQuery.maybeSingle();
+    if (tErr) throw tErr;
+    if (!target?.bucket) throw new Error("No active media storage target found for this station");
+
+    const endpoint = target.endpoint_url ?? process.env.S3_ENDPOINT;
+    const region = target.region ?? process.env.S3_REGION ?? "auto";
+    const accessKeyId = (target.access_key_ref ? process.env[target.access_key_ref] : undefined) ?? process.env.S3_ACCESS_KEY_ID;
+    const secretAccessKey = (target.secret_key_ref ? process.env[target.secret_key_ref] : undefined) ?? process.env.S3_SECRET_ACCESS_KEY;
+    if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Storage target credentials missing");
+
+    const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
+
+    // Fetch media filtered by playlist via AzuraCast search syntax
+    const listed = await client.listMedia({
+      searchPhrase: `playlist:${playlistName}`,
+      currentPage: 1,
+      rowCount: limit,
+    });
+    const rows = (Array.isArray(listed) ? listed : (listed as { rows?: unknown[] })?.rows ?? []) as Array<{
+      id?: number | string;
+      unique_id?: string;
+      path?: string;
+      title?: string;
+      artist?: string;
+      album?: string;
+      length?: number;
+      mtime?: number;
+      size?: number;
+      mime_type?: string;
+    }>;
+
+    let uploaded = 0;
+    let skipped = 0;
+    let failed = 0;
+    const errors: Array<{ path?: string; message: string }> = [];
+
+    for (const row of rows) {
+      const path = row.path;
+      if (!path) { skipped++; continue; }
+      const key = path.replace(/^\/+/, "");
+      try {
+        // Skip if already in bucket
+        try {
+          await s3.send(new HeadObjectCommand({ Bucket: target.bucket, Key: key }));
+          skipped++;
+          continue;
+        } catch { /* not present, continue to upload */ }
+
+        if (dryRun) { uploaded++; continue; }
+
+        const { bytes, contentType } = await client.downloadFileByPath(path);
+        await s3.send(new PutObjectCommand({
+          Bucket: target.bucket,
+          Key: key,
+          Body: bytes,
+          ContentType: row.mime_type ?? contentType,
+          Metadata: {
+            azuracast_id: String(row.id ?? row.unique_id ?? ""),
+            title: (row.title ?? "").slice(0, 200),
+            artist: (row.artist ?? "").slice(0, 200),
+          },
+        }));
+
+        // Upsert media_files row keyed by azuracast_media_id
+        if (conn.station_id) {
+          const azId = String(row.id ?? row.unique_id ?? "");
+          await supabaseAdmin.from("media_files").upsert({
+            station_id: conn.station_id,
+            azuracast_media_id: azId,
+            file_name: path.split("/").pop() ?? path,
+            original_file_name: path.split("/").pop() ?? path,
+            file_path: key,
+            mime_type: row.mime_type ?? contentType,
+            file_size: row.size ?? bytes.byteLength,
+            duration_seconds: row.length ?? null,
+            media_kind: "music",
+            status: "imported",
+          }, { onConflict: "azuracast_media_id" });
+        }
+        uploaded++;
+      } catch (e) {
+        failed++;
+        errors.push({ path, message: (e as Error).message });
+      }
+    }
+
+    return {
+      ok: true,
+      playlist: playlistName,
+      total_listed: rows.length,
+      uploaded,
+      skipped,
+      failed,
+      errors: errors.slice(0, 20),
+      target_bucket: target.bucket,
+      dry_run: dryRun,
+    };
   },
 };
 

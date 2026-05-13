@@ -71,8 +71,8 @@ function AzuraPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const queueSync = useMutation({
-    mutationFn: async ({ station_id, job_type }: { station_id: string; job_type: string }) => {
-      const { error } = await supabase.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: {} });
+    mutationFn: async ({ station_id, job_type, payload }: { station_id: string; job_type: string; payload?: Record<string, unknown> }) => {
+      const { error } = await supabase.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: (payload ?? {}) as any });
       if (error) throw error;
       await logAudit(`sync.queue.${job_type}`, "stations", station_id);
     },
@@ -132,8 +132,8 @@ function AzuraPage() {
                 </Button>
                 {isAdmin && (
                   <>
-                    <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "media_sync" })}>
-                      <Music className="w-4 h-4 mr-1" />Sync media
+                    <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "azuracast.sync.playlist_to_storage", payload: { playlist_name: "Default" } })}>
+                      <Music className="w-4 h-4 mr-1" />Sync Default → R2
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => queueSync.mutate({ station_id: c.station_id, job_type: "playlist_sync" })}>
                       <ListMusic className="w-4 h-4 mr-1" />Sync playlists
