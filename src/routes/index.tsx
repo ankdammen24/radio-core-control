@@ -199,7 +199,7 @@ function Dashboard() {
                     <div className="text-sm font-medium truncate">{t.name}</div>
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.type}</div>
                   </div>
-                  <StatusDot status={String(t.status ?? "")} />
+                  <RuntimeBadge state={toRuntimeState(String(t.status ?? ""))} />
                 </li>
               ))}
             </ul>
