@@ -172,7 +172,7 @@ function HealthPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {group.rows.map((t: any) => {
                   const lastCheck = (checksQuery.data ?? []).find((c: any) => c.target_id === t.id);
-                  const np = lastCheck?.details?.nowPlaying;
+                  const np = (lastCheck?.details as { nowPlaying?: { title?: string|null; artist?: string|null } } | null | undefined)?.nowPlaying ?? null;
                   return (
                     <Card key={t.id} className="p-3">
                       <div className="flex items-start justify-between gap-2">
