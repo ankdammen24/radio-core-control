@@ -20,6 +20,7 @@ import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
 import { Route as RotationRouteImport } from './routes/rotation'
+import { Route as R2StorageRouteImport } from './routes/r2-storage'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
@@ -102,6 +103,11 @@ const SchedulerRoute = SchedulerRouteImport.update({
 const RotationRoute = RotationRouteImport.update({
   id: '/rotation',
   path: '/rotation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R2StorageRoute = R2StorageRouteImport.update({
+  id: '/r2-storage',
+  path: '/r2-storage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaylistsRoute = PlaylistsRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByTo {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
@@ -393,6 +402,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/r2-storage'
     | '/rotation'
     | '/scheduler'
     | '/settings'
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/r2-storage'
     | '/rotation'
     | '/scheduler'
     | '/settings'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/r2-storage'
     | '/rotation'
     | '/scheduler'
     | '/settings'
@@ -517,6 +529,7 @@ export interface RootRouteChildren {
   MediaRoute: typeof MediaRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
+  R2StorageRoute: typeof R2StorageRoute
   RotationRoute: typeof RotationRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       path: '/rotation'
       fullPath: '/rotation'
       preLoaderRoute: typeof RotationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r2-storage': {
+      id: '/r2-storage'
+      path: '/r2-storage'
+      fullPath: '/r2-storage'
+      preLoaderRoute: typeof R2StorageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playlists': {
@@ -837,6 +857,7 @@ const rootRouteChildren: RootRouteChildren = {
   MediaRoute: MediaRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
+  R2StorageRoute: R2StorageRoute,
   RotationRoute: RotationRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
@@ -859,12 +880,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

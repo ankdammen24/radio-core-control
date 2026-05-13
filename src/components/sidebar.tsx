@@ -100,6 +100,7 @@ const GROUPS: Group[] = [
       { label: "Users",     icon: Users,       to: "/users" },
       { label: "Roles",     icon: ShieldCheck, disabled: true },
       { label: "Storage",   icon: HardDrive,   to: "/storage" },
+      { label: "R2 Files",  icon: HardDrive,   to: "/r2-storage" },
       { label: "Config",    icon: Sliders,     to: "/configs" },
       { label: "Backup",    icon: Archive,     to: "/backup" },
       { label: "Audit",     icon: ScrollText,  to: "/audit" },
