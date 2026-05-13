@@ -15,7 +15,7 @@ import {
   LayoutDashboard, Radio, Music, ListMusic, Mic, Megaphone, MessageSquare,
   Calendar, Repeat, ShieldAlert, CalendarClock, Activity, Headphones, Server,
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
-  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast,
+  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
