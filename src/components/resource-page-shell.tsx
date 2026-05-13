@@ -68,7 +68,7 @@ export function ResourcePageShell({
 
   return (
     <AppLayout title={title} description={description} actions={actions}>
-      <div className="flex gap-6 animate-[fade-in_0.25s_ease-out]">
+      <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 animate-[fade-in_0.25s_ease-out]">
         <div className="flex-1 min-w-0 space-y-4">
           {showToolbar && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/40 backdrop-blur-sm px-3 py-2 panel-glow">
