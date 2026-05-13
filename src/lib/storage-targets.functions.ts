@@ -73,10 +73,17 @@ export const deleteStorageTarget = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+async function requireAdmin(context: { supabase: any; userId: string | null }) {
+  const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+  if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+}
+
 export const testStorageTarget = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
+    await requireAdmin(context);
     const result = await runStorageHealthCheck(data.id, context.userId ?? null);
     return {
       ok: result.status === "online",
@@ -90,7 +97,8 @@ export const testStorageTarget = createServerFn({ method: "POST" })
 export const getStorageTargetInfo = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
     const cfg = await loadStorageTarget(data.id);
     try {
       const adapter = buildStorageAdapter(cfg);
