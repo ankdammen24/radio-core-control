@@ -71,8 +71,8 @@ function AzuraPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const queueSync = useMutation({
-    mutationFn: async ({ station_id, job_type }: { station_id: string; job_type: string }) => {
-      const { error } = await supabase.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: {} });
+    mutationFn: async ({ station_id, job_type, payload }: { station_id: string; job_type: string; payload?: Record<string, unknown> }) => {
+      const { error } = await supabase.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: payload ?? {} });
       if (error) throw error;
       await logAudit(`sync.queue.${job_type}`, "stations", station_id);
     },
