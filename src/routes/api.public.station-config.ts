@@ -25,6 +25,12 @@ export const Route = createFileRoute("/api/public/station-config")({
         const { data: station } = await supabaseAdmin.from("stations").select("id,name,slug").eq("slug", slug).maybeSingle();
         if (!station) return new Response("Not found", { status: 404 });
 
+        // Cross-tenant guard: station-scoped tokens may only read their own station's config.
+        // Tokens with NULL station_id are treated as global/admin-issued and may read any station.
+        if (tok.station_id && tok.station_id !== station.id) {
+          return new Response("Forbidden", { status: 403 });
+        }
+
         const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }, { data: fbRows }] = await Promise.all([
           supabaseAdmin.from("icecast_configs").select("*").eq("station_id", station.id).maybeSingle(),
           supabaseAdmin.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", station.id).eq("is_active", true),
