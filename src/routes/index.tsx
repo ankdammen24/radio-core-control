@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { useStationScope } from "@/lib/station-context";
 import {
   Radio, Music, ListMusic, RefreshCw, Activity, ScrollText, AlertTriangle,
-  HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones,
+  HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones, Cpu, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
@@ -37,7 +37,7 @@ function Dashboard() {
       const [
         stations, media, missing, playlists, voicetracks, ads,
         runtimeTargets, syncFailed, syncSucceeded, syncQueued,
-        storage, audit,
+        storage, audit, agents, events,
       ] = await Promise.all([
         supabase.from("stations").select("*", { count: "exact", head: true }).eq("is_active", true),
         sFilter(supabase.from("media_files").select("*", { count: "exact", head: true })),
@@ -51,6 +51,8 @@ function Dashboard() {
         sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
         sFilter(supabase.from("storage_objects").select("size_bytes,bucket_type")),
         supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
+        sFilter(supabase.from("agent_instances").select("id,name,status,hostname,station_id,last_seen_at")),
+        sFilter(supabase.from("system_events").select("id,level,event_type,message,source,created_at,station_id").order("created_at", { ascending: false }).limit(10)),
       ]);
 
       const targets = (runtimeTargets.data ?? []).filter((r) => r.is_active);
@@ -62,6 +64,9 @@ function Dashboard() {
         acc[o.bucket_type] = (acc[o.bucket_type] ?? 0) + (o.size_bytes ?? 0);
         return acc;
       }, {});
+
+      const agentRows = agents.data ?? [];
+      const agentStat = (s: string) => agentRows.filter((a) => a.status === s).length;
 
       return {
         stations: stations.count ?? 0,
@@ -82,6 +87,10 @@ function Dashboard() {
         storageByBucket: byBucket,
         objectCount: objs.length,
         audit: audit.data ?? [],
+        agents: agentRows,
+        agentsOnline: agentStat("online"),
+        agentsOffline: agentStat("offline") + agentStat("degraded"),
+        events: events.data ?? [],
       };
     },
     refetchInterval: 30_000,
@@ -93,8 +102,8 @@ function Dashboard() {
 
   return (
     <AppLayout
-      title="Operations"
-      description={`Live overview · ${stationName}`}
+      title="Radio Core"
+      description={`Broadcast Operations Console · ${stationName}`}
       actions={
         <Button asChild size="sm" variant="outline">
           <Link to={"/runtime-targets" as "/"}>
