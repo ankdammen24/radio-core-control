@@ -23,10 +23,38 @@ export const Route = createFileRoute("/api/public/health")({
         }
         const { data } = await supabaseAdmin
           .from("service_health")
-          .select("*")
+          .select("service,status,reported_at")
           .order("reported_at", { ascending: false })
-          .limit(50);
-        return Response.json({ ok: true, recent: data ?? [] });
+          .limit(500);
+        const rows = data ?? [];
+        // Aggregate: latest status per service + counts
+        const latestByService = new Map<string, { status: string; reported_at: string }>();
+        const statusCounts: Record<string, number> = {};
+        for (const r of rows) {
+          if (!latestByService.has(r.service)) {
+            latestByService.set(r.service, { status: r.status, reported_at: r.reported_at });
+          }
+          statusCounts[r.status] = (statusCounts[r.status] ?? 0) + 1;
+        }
+        const services = Array.from(latestByService.entries()).map(([service, v]) => ({
+          service,
+          status: v.status,
+          last_reported_at: v.reported_at,
+        }));
+        const overall = services.every((s) => s.status === "healthy")
+          ? "healthy"
+          : services.some((s) => s.status === "down")
+            ? "down"
+            : services.some((s) => s.status === "degraded")
+              ? "degraded"
+              : "unknown";
+        return Response.json({
+          ok: true,
+          overall,
+          services_count: services.length,
+          status_counts: statusCounts,
+          services,
+        });
       },
       POST: async ({ request }) => {
         const token = request.headers.get("x-stack-token") ?? "";
