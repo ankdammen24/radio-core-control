@@ -45,8 +45,6 @@ export const uploadObject = createServerFn({ method: "POST" })
 
     const { url } = await putObject(data.type, key, buf, data.contentType);
 
-    const bucketName = (await import("@/server/r2-storage.server")).bucketName(data.type);
-
     const { data: row, error } = await supabase
       .from("storage_objects")
       .insert({
