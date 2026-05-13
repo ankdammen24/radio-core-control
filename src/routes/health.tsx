@@ -254,3 +254,13 @@ function healthDot(h: Health) {
     : h === "down" ? "bg-destructive"
     : "bg-muted-foreground/40";
 }
+
+function targetStatusClass(s: string | null | undefined) {
+  switch (s) {
+    case "ok":       return "bg-success/15 text-success border-success/30";
+    case "degraded": return "bg-warning/15 text-warning border-warning/30";
+    case "down":
+    case "error":    return "bg-destructive/15 text-destructive border-destructive/30";
+    default:         return "bg-muted text-muted-foreground border-border";
+  }
+}
