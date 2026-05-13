@@ -47,8 +47,9 @@ function wrapErr(e: unknown) {
 export const azuracastGetStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => stationInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin", "editor"]);
       const c = await clientFor(data.station_id);
       const status = await c.getStationStatus();
       return { ok: true as const, status: status as any };
@@ -60,8 +61,9 @@ export const azuracastGetStatus = createServerFn({ method: "GET" })
 export const azuracastGetQueue = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => stationInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin", "editor"]);
       const c = await clientFor(data.station_id);
       const queue = await c.getQueue();
       return { ok: true as const, queue: (queue ?? []) as any[] };
@@ -73,8 +75,9 @@ export const azuracastGetQueue = createServerFn({ method: "GET" })
 export const azuracastGetListeners = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => stationInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin", "editor"]);
       const c = await clientFor(data.station_id);
       const listeners = await c.getListeners();
       return { ok: true as const, listeners: (listeners ?? []) as any[] };
@@ -86,8 +89,9 @@ export const azuracastGetListeners = createServerFn({ method: "GET" })
 export const azuracastSkipSong = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => stationInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin"]);
       const c = await clientFor(data.station_id);
       return { ok: true as const, result: (await c.skipSong()) as any };
     } catch (e) { throw wrapErr(e); }
@@ -96,8 +100,9 @@ export const azuracastSkipSong = createServerFn({ method: "POST" })
 export const azuracastClearQueue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => stationInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin"]);
       const c = await clientFor(data.station_id);
       return { ok: true as const, result: (await c.clearQueue()) as any };
     } catch (e) { throw wrapErr(e); }
@@ -108,8 +113,9 @@ export const azuracastDeleteQueueItem = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) =>
     z.object({ station_id: z.string().uuid(), queue_id: z.union([z.string(), z.number()]) }).parse(i),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin"]);
       const c = await clientFor(data.station_id);
       return { ok: true as const, result: (await c.deleteQueueItem(data.queue_id)) as any };
     } catch (e) { throw wrapErr(e); }
@@ -128,8 +134,9 @@ const actionInput = z.object({
 export const azuracastRuntimeAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => actionInput.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
+      await requireRole(context, ["admin"]);
       const c = await clientFor(data.station_id);
       let result: any = null;
       switch (data.action) {
