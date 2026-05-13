@@ -49,7 +49,7 @@ export const uploadObject = createServerFn({ method: "POST" })
       .from("storage_objects")
       .insert({
         bucket_type: data.type,
-        bucket: bucketName,
+        bucket: bucketName(data.type),
         object_key: key,
         content_type: data.contentType,
         size_bytes: buf.byteLength,
