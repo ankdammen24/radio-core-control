@@ -27,11 +27,19 @@ export const Route = createFileRoute("/api/public/listener-stats")({
         if (a.station_id && targetStationId && a.station_id !== targetStationId) {
           return new Response("Forbidden", { status: 403 });
         }
+        const clampInt = (v: unknown) => {
+          const n = Number(v ?? 0);
+          if (!Number.isFinite(n)) return 0;
+          return Math.max(0, Math.min(1_000_000, Math.trunc(n)));
+        };
+        const listeners = clampInt(body.listeners);
+        const peak = clampInt(body.peak ?? body.listeners);
+        const mount = body.mount == null ? null : String(body.mount).slice(0, 200);
         await supabaseAdmin.from("listener_stats").insert({
           station_id: targetStationId,
-          mount_path: body.mount ?? null,
-          listeners: body.listeners ?? 0,
-          peak_listeners: body.peak ?? body.listeners ?? 0,
+          mount_path: mount,
+          listeners,
+          peak_listeners: peak,
         });
         return Response.json({ ok: true });
       },

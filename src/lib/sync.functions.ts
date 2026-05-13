@@ -11,18 +11,48 @@ const enqueueSchema = z.object({
   scheduled_for: z.string().datetime().optional(),
 });
 
+// Job-type prefixes that perform privileged/destructive runtime actions.
+// Editors may NOT enqueue these — admin only.
+const ADMIN_ONLY_JOB_PREFIXES = [
+  "azuracast.runtime.",
+  "icecast.runtime.",
+  "liquidsoap.runtime.",
+  "stereo_tool.runtime.",
+  "agent.dispatch.",
+];
+
+function isAdminOnlyJobType(jobType: string): boolean {
+  return ADMIN_ONLY_JOB_PREFIXES.some((p) => jobType.startsWith(p));
+}
+
 export const enqueueSyncJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => enqueueSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+
+    // Server-side role gate: destructive job types require admin, regardless of RLS.
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    const roleSet = new Set((roles ?? []).map((r: { role: string }) => r.role));
+    const isAdmin = roleSet.has("admin");
+    const isEditor = roleSet.has("editor");
+    if (!isAdmin && !isEditor) {
+      throw new Response("Forbidden", { status: 403 });
+    }
+    if (isAdminOnlyJobType(data.job_type) && !isAdmin) {
+      throw new Response("Forbidden: admin role required for this job type", { status: 403 });
+    }
+
     const { data: row, error } = await supabase
       .from("sync_jobs")
       .insert({
         job_type: data.job_type,
         station_id: data.station_id ?? null,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        payload: (data.payload ?? {}) as any,
+        payload: { ...(data.payload ?? {}), enqueued_by: context.userId } as any,
         scheduled_for: data.scheduled_for ?? new Date().toISOString(),
         status: "pending",
       })

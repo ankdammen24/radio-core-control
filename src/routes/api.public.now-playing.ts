@@ -37,13 +37,19 @@ export const Route = createFileRoute("/api/public/now-playing")({
         if (auth.stationId && auth.stationId !== station.id) {
           return new Response("Forbidden", { status: 403 });
         }
+        const cap = (v: unknown, n: number) =>
+          v == null ? null : String(v).slice(0, n);
+        const listenersRaw = Number(body.listeners ?? 0);
+        const listeners = Number.isFinite(listenersRaw)
+          ? Math.max(0, Math.min(1_000_000, Math.trunc(listenersRaw)))
+          : 0;
         const row = {
           station_id: station.id,
-          title: body.title ?? null,
-          artist: body.artist ?? null,
-          album: body.album ?? null,
-          mount_path: body.mount ?? null,
-          listeners: body.listeners ?? 0,
+          title: cap(body.title, 500),
+          artist: cap(body.artist, 500),
+          album: cap(body.album, 500),
+          mount_path: cap(body.mount, 200),
+          listeners,
           started_at: new Date().toISOString(),
         };
         await supabaseAdmin.from("now_playing").upsert(row, { onConflict: "station_id" });

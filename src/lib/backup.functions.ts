@@ -1,7 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const SNAPSHOT_VERSION = 1;
+
+const uuidSchema = z.string().uuid();
+
+async function requireRole(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context: { supabase: any; userId: string | null },
+  allowed: ("admin" | "editor")[],
+) {
+  const { data: roles } = await context.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId);
+  const ok = (roles ?? []).some((r: { role: string }) =>
+    (allowed as string[]).includes(r.role),
+  );
+  if (!ok) throw new Response("Forbidden", { status: 403 });
+}
 
 const CHILD_TABLES = [
   "icecast_configs",
@@ -25,8 +43,9 @@ type SnapshotPayload = {
 
 export const exportStationSnapshot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { stationId: string }) => d)
+  .inputValidator((d: { stationId: string }) => ({ stationId: uuidSchema.parse(d.stationId) }))
   .handler(async ({ data, context }) => {
+    await requireRole(context, ["admin", "editor"]);
     const { supabase } = context;
     const { data: station, error: sErr } = await supabase
       .from("stations").select("*").eq("id", data.stationId).maybeSingle();
@@ -81,8 +100,14 @@ function cleanRow(row: any, newStationId: string) {
 
 export const importStationSnapshot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { targetStationId: string; snapshot: SnapshotPayload; replace: boolean }) => d)
+  .inputValidator((d: { targetStationId: string; snapshot: SnapshotPayload; replace: boolean }) => ({
+    ...d,
+    targetStationId: uuidSchema.parse(d.targetStationId),
+  }))
   .handler(async ({ data, context }) => {
+    // Destructive replace requires admin; non-replace bulk-insert requires admin too
+    // (bypasses normal per-record UI validation, so editor-level is too broad).
+    await requireRole(context, ["admin"]);
     const { supabase } = context;
     const { targetStationId, snapshot, replace } = data;
 
