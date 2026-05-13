@@ -56,10 +56,17 @@ export const deleteRuntimeTarget = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+async function requireAdmin(context: { supabase: any; userId: string | null }) {
+  const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+  if (!isAdmin) throw new Response("Forbidden", { status: 403 });
+}
+
 export const testRuntimeTarget = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
+    await requireAdmin(context);
     const result = await runHealthCheck(data.id, context.userId ?? null);
     return { ok: result.status === "ok", ...result };
   });
@@ -67,7 +74,8 @@ export const testRuntimeTarget = createServerFn({ method: "POST" })
 export const fetchRuntimeNowPlaying = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
     const cfg = await loadRuntimeTarget(data.id);
     const apiKey = resolveSecret(cfg.api_key_secret_name);
     try {

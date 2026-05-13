@@ -33,6 +33,10 @@ export const Route = createFileRoute("/api/public/now-playing")({
         if (!slug) return Response.json({ error: "station_slug required" }, { status: 400 });
         const { data: station } = await supabaseAdmin.from("stations").select("id").eq("slug", slug).maybeSingle();
         if (!station) return Response.json({ error: "Unknown station" }, { status: 404 });
+        // Cross-tenant guard: scoped tokens may only write to their own station.
+        if (auth.stationId && auth.stationId !== station.id) {
+          return new Response("Forbidden", { status: 403 });
+        }
         const row = {
           station_id: station.id,
           title: body.title ?? null,
