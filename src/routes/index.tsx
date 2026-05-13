@@ -183,13 +183,43 @@ function Dashboard() {
       </div>
 
       {/* KPI strip */}
-      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         <Kpi icon={Radio}    label="Stations"    value={isLoading ? "—" : data!.stations} />
         <Kpi icon={Music}    label="Media"       value={isLoading ? "—" : data!.media} />
         <Kpi icon={ListMusic} label="Playlists"  value={isLoading ? "—" : data!.playlists} />
         <Kpi icon={Mic}      label="Voicetracks" value={isLoading ? "—" : data!.voicetracks} />
+        <Kpi icon={Cpu}      label="Agents online" value={isLoading ? "—" : `${data!.agentsOnline}/${data!.agents.length}`} tone={data?.agentsOffline ? "warn" : "ok"} />
         <Kpi icon={AlertTriangle} label="Missing meta" value={isLoading ? "—" : data!.missing} tone={data?.missing ? "warn" : "ok"} />
         <Kpi icon={RefreshCw} label="Failed jobs" value={isLoading ? "—" : data!.syncFailed} tone={data?.syncFailed ? "error" : "ok"} />
+      </div>
+
+      {/* System Events feed */}
+      <div className="mt-4">
+        <Card className="p-5">
+          <SectionHeader icon={Bell} title="System Events" linkTo="/audit" />
+          {isLoading ? <Skel rows={3} /> : data!.events.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No system events recorded.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {data!.events.map((e) => {
+                const tone =
+                  e.level === "critical" || e.level === "error" ? "bg-destructive" :
+                  e.level === "warning" ? "bg-warning" : "bg-info";
+                return (
+                  <li key={e.id} className="flex items-start gap-3 py-2">
+                    <span className={cn("mt-1.5 w-1.5 h-1.5 rounded-full shrink-0", tone)} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm truncate">{e.message ?? e.event_type}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">
+                        {e.source} · {e.event_type} · {new Date(e.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
       </div>
 
       {/* Runtime + Sync + Storage */}
