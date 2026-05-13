@@ -19,6 +19,7 @@ import {
   HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
@@ -103,14 +104,15 @@ function Dashboard() {
       }
     >
       {/* Hero / On-air */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 p-0 overflow-hidden relative">
-          <div className="grid-overlay absolute inset-0 pointer-events-none opacity-60" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-[fade-in_0.3s_ease-out]">
+        <Card className="lg:col-span-2 p-0 overflow-hidden relative panel-glow border-border/80">
+          <div className="grid-overlay absolute inset-0 pointer-events-none opacity-50" />
+          <div className="scanline absolute inset-0 pointer-events-none opacity-30" />
           <div className="relative p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
             <div className="flex items-center gap-4">
               <div
                 className={cn(
-                  "w-14 h-14 rounded-xl flex items-center justify-center",
+                  "w-14 h-14 rounded-xl flex items-center justify-center shrink-0",
                   onAir   ? "bg-onair text-onair-foreground onair-pulse" :
                   degraded ? "bg-warning text-warning-foreground" :
                   offAir  ? "bg-destructive text-destructive-foreground" :
@@ -119,14 +121,17 @@ function Dashboard() {
               >
                 <Radio className="w-7 h-7" />
               </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Status</div>
-                <div className="text-2xl font-semibold tracking-tight">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Broadcast</div>
+                  <SignalBars active={onAir} tone={onAir ? "success" : "signal"} />
+                </div>
+                <div className="text-2xl font-semibold tracking-tight mt-0.5">
                   {isLoading ? "Checking…" :
                     data!.targetsTotal === 0 ? "No runtime targets" :
-                    onAir   ? "On Air" :
+                    onAir   ? "ON AIR" :
                     degraded ? "Degraded broadcast" :
-                    offAir  ? "Off Air" : "Unknown"}
+                    offAir  ? "OFF AIR" : "Unknown"}
                 </div>
                 <div className="text-sm text-muted-foreground mt-0.5">
                   {data
@@ -194,7 +199,7 @@ function Dashboard() {
                     <div className="text-sm font-medium truncate">{t.name}</div>
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.type}</div>
                   </div>
-                  <StatusDot status={String(t.status ?? "")} />
+                  <RuntimeBadge state={toRuntimeState(String(t.status ?? ""))} />
                 </li>
               ))}
             </ul>

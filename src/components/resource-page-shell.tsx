@@ -68,12 +68,16 @@ export function ResourcePageShell({
 
   return (
     <AppLayout title={title} description={description} actions={actions}>
-      <div className="flex gap-6">
+      <div className="flex gap-6 animate-[fade-in_0.25s_ease-out]">
         <div className="flex-1 min-w-0 space-y-4">
           {showToolbar && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/40 backdrop-blur-sm px-3 py-2 panel-glow">
               {!hideStationScope && (
-                <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                <Badge
+                  variant="outline"
+                  className="text-[10px] uppercase tracking-wider border-signal/40 text-signal bg-signal/5"
+                >
+                  <span className="mr-1.5 inline-block w-1.5 h-1.5 rounded-full bg-signal" />
                   {scopeLabel}
                 </Badge>
               )}
@@ -84,7 +88,7 @@ export function ResourcePageShell({
                     value={searchValue ?? ""}
                     onChange={(e) => onSearchChange(e.target.value)}
                     placeholder={searchPlaceholder}
-                    className="pl-8 h-9"
+                    className="pl-8 h-9 bg-background/50"
                   />
                 </div>
               )}
@@ -94,21 +98,21 @@ export function ResourcePageShell({
           )}
 
           {bulkActions && (
-            <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2">
-              <div className="text-xs text-muted-foreground">Bulk actions</div>
+            <div className="flex items-center justify-between gap-2 rounded-md border border-signal/30 bg-signal/5 px-3 py-2">
+              <div className="text-xs uppercase tracking-wider text-signal font-medium">Bulk actions</div>
               <div className="flex items-center gap-2">{bulkActions}</div>
             </div>
           )}
 
           {wrapContent ? (
-            <Card className={cn("p-0 overflow-hidden", state.kind === "loading" && "opacity-70")}>
+            <Card className={cn("p-0 overflow-hidden border-border/80 panel-glow", state.kind === "loading" && "opacity-70")}>
               {body}
             </Card>
           ) : body}
 
           {syncSummary && (
-            <Card className="p-3 text-xs text-muted-foreground flex flex-wrap gap-3 items-center">
-              <span className="uppercase tracking-wider">Sync</span>
+            <Card className="p-3 text-xs text-muted-foreground flex flex-wrap gap-3 items-center border-border/80">
+              <span className="uppercase tracking-wider text-foreground/70">Sync</span>
               {syncSummary}
             </Card>
           )}
