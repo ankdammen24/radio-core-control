@@ -220,9 +220,18 @@ function RuntimeTargetsPage() {
                     </Button>
                   )}
                   {isAdmin && (
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setConfirmDel(t.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    <ConfirmDialog
+                      title="Delete runtime target?"
+                      description="This permanently removes the registration. Health-check history will also be cleared."
+                      confirmText="Delete"
+                      destructive
+                      onConfirm={async () => { await deleteFn({ data: { id: t.id } }); toast.success("Target removed"); qc.invalidateQueries({ queryKey: ["runtime-targets"] }); }}
+                      trigger={
+                        <Button size="sm" variant="ghost" className="text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      }
+                    />
                   )}
                 </div>
               </TableCell>
