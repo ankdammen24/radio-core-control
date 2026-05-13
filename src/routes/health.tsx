@@ -96,7 +96,7 @@ function HealthPage() {
     const map = new Map<string, { name: string; rows: any[] }>();
     for (const t of visibleTargets) {
       const sid = t.station_id ?? "—";
-      const sname = t.stations?.name ?? "Unassigned";
+      const sname = t.station_name ?? "Unassigned";
       if (!map.has(sid)) map.set(sid, { name: sname, rows: [] });
       map.get(sid)!.rows.push(t);
     }
