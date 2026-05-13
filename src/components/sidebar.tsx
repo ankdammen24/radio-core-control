@@ -108,34 +108,35 @@ const GROUPS: Group[] = [
   },
 ];
 
-const LEGACY_DASHBOARD: Item = { label: "Dashboard (legacy)", icon: LayoutDashboard, to: "/" };
+const LEGACY_DASHBOARD: Item = { label: "Dashboard", icon: LayoutDashboard, to: "/" };
 
-export function Sidebar() {
+export function Sidebar({ onNavigate, showClose }: { onNavigate?: () => void; showClose?: boolean }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const { user, signOut, roles } = useAuth();
-  const { theme, toggle } = useTheme();
 
-  // A group is open when explicitly toggled OR when it contains the active route.
   const groupHasActive = (g: Group) => g.items.some((it) => it.to && (path === it.to || (it.to !== "/" && path.startsWith(it.to))));
   const [openOverrides, setOpenOverrides] = useState<Record<string, boolean | undefined>>({});
 
   return (
-    <aside className="w-64 shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col h-screen sticky top-0">
-      <div className="px-3 py-3 border-b border-sidebar-border space-y-3">
-        <div className="flex items-center gap-2 px-1">
-          <div className="w-7 h-7 rounded bg-sidebar-primary flex items-center justify-center">
-            <Radio className="w-3.5 h-3.5 text-sidebar-primary-foreground" />
-          </div>
-          <div>
-            <div className="font-semibold tracking-tight text-xs">RADIO CORE</div>
-            <div className="text-[9px] uppercase tracking-widest text-sidebar-foreground/60">Control Plane</div>
-          </div>
-        </div>
-        <StationSwitcher allowAll />
+    <aside className="w-64 shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col h-full">
+      <div className="px-4 py-4 border-b border-sidebar-border flex items-center justify-between">
+        <Link to={"/" as "/"} onClick={onNavigate} className="block text-sidebar-foreground hover:opacity-90 transition">
+          <RadioCoreLogo size="md" tone="brand" />
+        </Link>
+        {showClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onNavigate}
+            className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            aria-label="Close navigation"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
-        <NavLink path={path} item={LEGACY_DASHBOARD} />
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
+        <NavLink path={path} item={LEGACY_DASHBOARD} onNavigate={onNavigate} />
         {GROUPS.map((g) => {
           const explicit = openOverrides[g.id];
           const open = explicit ?? groupHasActive(g);
@@ -147,25 +148,17 @@ export function Sidebar() {
               onToggle={() => setOpenOverrides((s) => ({ ...s, [g.id]: !open }))}
             >
               {g.items.map((it) => (
-                <NavLink key={it.label} path={path} item={it} />
+                <NavLink key={it.label} path={path} item={it} onNavigate={onNavigate} />
               ))}
             </NavGroup>
           );
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3 space-y-2">
-        <div className="text-xs text-sidebar-foreground/70 px-2">
-          <div className="truncate font-medium text-sidebar-foreground">{user?.email}</div>
-          <div className="uppercase tracking-wider text-[10px] mt-0.5">{roles.join(" · ") || "no role"}</div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="flex-1 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" onClick={toggle}>
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button>
-          <Button variant="ghost" size="sm" className="flex-1 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" onClick={signOut}>
-            <LogOut className="w-4 h-4" />
-          </Button>
+      <div className="border-t border-sidebar-border px-4 py-3 text-[10px] uppercase tracking-widest text-sidebar-foreground/50">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-success" />
+          <span>System ready</span>
         </div>
       </div>
     </aside>
