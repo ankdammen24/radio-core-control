@@ -245,14 +245,14 @@ function AgentsPage() {
                           <ConfirmDialog
                             title="Revoke agent?"
                             description="Deactivates the linked stack token and marks the agent offline. The agent will no longer be able to authenticate."
-                            confirmLabel="Revoke"
+                            confirmText="Revoke"
                             onConfirm={() => mRevoke.mutate(a.id)}
                             trigger={<Button size="sm" variant="ghost" title="Revoke"><ShieldOff className="w-4 h-4" /></Button>}
                           />
                           <ConfirmDialog
                             title="Delete agent?"
                             description="Permanently removes the agent registration. The paired stack token is kept; revoke it separately if needed."
-                            confirmLabel="Delete"
+                            confirmText="Delete"
                             onConfirm={() => mDelete.mutate(a.id)}
                             trigger={<Button size="sm" variant="ghost" title="Delete"><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                           />
