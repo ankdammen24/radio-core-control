@@ -15,13 +15,11 @@ import {
   LayoutDashboard, Radio, Music, ListMusic, Mic, Megaphone, MessageSquare,
   Calendar, Repeat, ShieldAlert, CalendarClock, Activity, Headphones, Server,
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
-  Settings, LogOut, Moon, Sun, ChevronDown, Webhook, Antenna, Mic2, Podcast,
-  ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd,
+  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast,
+  ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
 } from "lucide-react";
-import { useAuth } from "@/lib/auth";
-import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
-import { StationSwitcher } from "@/components/station-switcher";
+import { RadioCoreLogo } from "@/components/radio-core-logo";
 import { cn } from "@/lib/utils";
 
 type Item = {
