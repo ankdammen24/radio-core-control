@@ -183,7 +183,7 @@ function NavGroup({ label, open, onToggle, children }: {
   );
 }
 
-function NavLink({ path, item }: { path: string; item: Item }) {
+function NavLink({ path, item, onNavigate }: { path: string; item: Item; onNavigate?: () => void }) {
   const Icon = item.icon;
   if (item.disabled || !item.to) {
     return (
@@ -201,14 +201,15 @@ function NavLink({ path, item }: { path: string; item: Item }) {
   return (
     <Link
       to={item.to as "/"}
+      onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors",
+        "flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors relative",
         active
-          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          ? "bg-sidebar-accent text-sidebar-accent-foreground before:content-[''] before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-r before:bg-sidebar-primary"
           : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
       )}
     >
-      <Icon className="w-4 h-4 shrink-0" />
+      <Icon className={cn("w-4 h-4 shrink-0", active && "text-sidebar-primary")} />
       <span className="truncate">{item.label}</span>
     </Link>
   );
