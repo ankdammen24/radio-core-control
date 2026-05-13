@@ -60,7 +60,7 @@ export async function runStorageHealthCheck(
       payload: { storage_target_id: cfg.id, provider: cfg.provider, purpose: cfg.purpose } as any,
       started_at: startedAt,
       finished_at: finishedAt,
-      error_message: result.status === "online" ? null : result.message,
+      message: result.status === "online" ? null : result.message,
     });
   } catch {
     // sync_jobs schema may differ across deployments; do not block health check.
