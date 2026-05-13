@@ -67,7 +67,6 @@ function RuntimeTargetsPage() {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM());
-  const [confirmDel, setConfirmDel] = useState<string | null>(null);
 
   const stations = useQuery({
     queryKey: ["stations-list"],
