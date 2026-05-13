@@ -35,6 +35,12 @@ export const enqueueSyncJob = createServerFn({ method: "POST" })
 export const runSyncWorkerOnce = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ limit: z.number().int().min(1).max(50).optional() }).parse(input ?? {}))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { data: roles } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    const ok = (roles ?? []).some((r: { role: string }) => r.role === "admin" || r.role === "editor");
+    if (!ok) throw new Response("Forbidden", { status: 403 });
     return runSyncWorker({ limit: data.limit ?? 10, worker: "manual" });
   });
