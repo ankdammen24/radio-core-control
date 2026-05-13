@@ -126,15 +126,7 @@ function RuntimeTargetsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const del = useMutation({
-    mutationFn: async (id: string) => deleteFn({ data: { id } }),
-    onSuccess: () => {
-      toast.success("Target removed");
-      setConfirmDel(null);
-      qc.invalidateQueries({ queryKey: ["runtime-targets"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  // del handled inline via ConfirmDialog trigger
 
   const test = useMutation({
     mutationFn: async (id: string) => testFn({ data: { id } }),
