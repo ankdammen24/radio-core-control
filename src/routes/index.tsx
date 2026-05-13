@@ -43,12 +43,12 @@ function Dashboard() {
         sFilter(supabase.from("media_files").select("*", { count: "exact", head: true }).eq("status", "missing_metadata")),
         sFilter(supabase.from("playlists").select("*", { count: "exact", head: true }).eq("is_active", true)),
         sFilter(supabase.from("voicetracks").select("*", { count: "exact", head: true })),
-        sFilter(supabase.from("ads").select("*", { count: "exact", head: true })),
-        sFilter(supabase.from("runtime_targets").select("id,name,type,status,is_active,last_check_at,station_id")).then((r) => r),
+        sFilter(supabase.from("ad_spots").select("*", { count: "exact", head: true })),
+        sFilter(supabase.from("runtime_targets").select("id,name,type,status,is_active,last_checked_at,station_id")),
         sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "failed")),
-        sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "succeeded")),
+        sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "completed")),
         sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
-        sFilter(supabase.from("storage_objects").select("size_bytes,bucket_type")).then((r) => r),
+        sFilter(supabase.from("storage_objects").select("size_bytes,bucket_type")),
         supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
       ]);
 
