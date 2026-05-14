@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { readFileSync } from "node:fs";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
   type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
@@ -7,6 +8,17 @@ import {
 import { renderOutputsLiq, type StreamingOutput } from "@/server/streaming-adapters.server";
 
 type GenInput = { stationId: string; persist?: boolean };
+
+function readSecretFromEnv(name: string): string | undefined {
+  const direct = process.env[name]?.trim();
+  if (direct) return direct;
+
+  const filePath = process.env[`${name}_FILE`]?.trim();
+  if (!filePath) return undefined;
+
+  const fromFile = readFileSync(filePath, "utf8").trim();
+  return fromFile || undefined;
+}
 
 export const generateStationConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -50,8 +62,13 @@ export const generateStationConfig = createServerFn({ method: "POST" })
       playlists.push({ name: (p as any).name, weight: (p as any).priority ?? 1, files });
     }
 
-    const apiBaseUrl = process.env.PUBLIC_APP_URL ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
-    const stackToken = "REPLACE_WITH_STACK_TOKEN";
+    const apiBaseUrl = process.env.PUBLIC_APP_URL
+      ?? process.env.APP_BASE_URL
+      ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
+    const stackToken = readSecretFromEnv("STACK_TOKEN");
+    if (!stackToken) {
+      throw new Error("STACK_TOKEN is missing. Configure it server-side before generating runtime config.");
+    }
 
     const fallbacks: FallbackEntry[] = (fbRows ?? []).map((r: any) => {
       const rel = r.media_files?.file_path ?? r.media_files?.file_name ?? null;
