@@ -167,7 +167,6 @@ const handlers: Record<string, Handler> = {
     const secretAccessKey = (target.secret_key_ref ? readEnv(target.secret_key_ref) : undefined) ?? readEnv("S3_SECRET_ACCESS_KEY");
     if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Storage target credentials missing");
 
-    const mediaKind = parseMediaKind(p.media_kind);
 
     const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
 
