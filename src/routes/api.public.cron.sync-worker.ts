@@ -1,10 +1,11 @@
-// Cron-triggered endpoint. Requires Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>.
-// Configure pg_cron (or external scheduler) to send the service role key.
+// Cron-triggered endpoint. Requires Authorization: Bearer <CRON_SECRET>.
+// Falls back to SUPABASE_SERVICE_ROLE_KEY for backwards compatibility.
 import { createFileRoute } from "@tanstack/react-router";
 import { runSyncWorker } from "@/server/sync-worker.server";
+import { readEnv } from "@/server/env.server";
 
 function authorize(request: Request): boolean {
-  const expected = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const expected = readEnv("CRON_SECRET") ?? readEnv("SUPABASE_SERVICE_ROLE_KEY");
   if (!expected) return false;
   const header = request.headers.get("authorization") ?? "";
   const token = header.replace(/^Bearer\s+/i, "").trim();

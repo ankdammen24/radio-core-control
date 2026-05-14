@@ -15,6 +15,7 @@ import {
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { readEnv, readEnvOrThrow } from "@/server/env.server";
 
 export type BucketType = "media" | "artwork" | "public";
 
@@ -33,27 +34,21 @@ export const IMAGE_MIME = [
 export const MAX_AUDIO_BYTES = 500 * 1024 * 1024; // 500 MB
 export const MAX_IMAGE_BYTES = 25 * 1024 * 1024;  //  25 MB
 
-function envOrThrow(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
-}
-
 export function getR2Config() {
   return {
-    endpoint: envOrThrow("S3_ENDPOINT"),
-    region: process.env.S3_REGION || "auto",
-    accessKeyId: envOrThrow("S3_ACCESS_KEY_ID"),
-    secretAccessKey: envOrThrow("S3_SECRET_ACCESS_KEY"),
+    endpoint: readEnvOrThrow("S3_ENDPOINT"),
+    region: readEnv("S3_REGION", "auto") || "auto",
+    accessKeyId: readEnvOrThrow("S3_ACCESS_KEY_ID"),
+    secretAccessKey: readEnvOrThrow("S3_SECRET_ACCESS_KEY"),
     buckets: {
-      media: envOrThrow("S3_BUCKET_MEDIA"),
-      artwork: envOrThrow("S3_BUCKET_ARTWORK"),
-      public: envOrThrow("S3_BUCKET_PUBLIC"),
+      media: readEnvOrThrow("S3_BUCKET_MEDIA"),
+      artwork: readEnvOrThrow("S3_BUCKET_ARTWORK"),
+      public: readEnvOrThrow("S3_BUCKET_PUBLIC"),
     },
     publicUrls: {
-      media: envOrThrow("MEDIA_PUBLIC_URL").replace(/\/+$/, ""),
-      artwork: envOrThrow("ARTWORK_PUBLIC_URL").replace(/\/+$/, ""),
-      public: envOrThrow("PUBLIC_CDN_URL").replace(/\/+$/, ""),
+      media: readEnvOrThrow("MEDIA_PUBLIC_URL").replace(/\/+$/, ""),
+      artwork: readEnvOrThrow("ARTWORK_PUBLIC_URL").replace(/\/+$/, ""),
+      public: readEnvOrThrow("PUBLIC_CDN_URL").replace(/\/+$/, ""),
     },
   };
 }
