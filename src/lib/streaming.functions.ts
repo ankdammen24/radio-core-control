@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { readFileSync } from "node:fs";
+import { readEnv } from "@/server/env.server";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
   type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
@@ -8,17 +8,6 @@ import {
 import { renderOutputsLiq, type StreamingOutput } from "@/server/streaming-adapters.server";
 
 type GenInput = { stationId: string; persist?: boolean };
-
-function readSecretFromEnv(name: string): string | undefined {
-  const direct = process.env[name]?.trim();
-  if (direct) return direct;
-
-  const filePath = process.env[`${name}_FILE`]?.trim();
-  if (!filePath) return undefined;
-
-  const fromFile = readFileSync(filePath, "utf8").trim();
-  return fromFile || undefined;
-}
 
 export const generateStationConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -65,7 +54,7 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     const apiBaseUrl = process.env.PUBLIC_APP_URL
       ?? process.env.APP_BASE_URL
       ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
-    const stackToken = readSecretFromEnv("STACK_TOKEN");
+    const stackToken = readEnv("STACK_TOKEN");
     if (!stackToken) {
       throw new Error("STACK_TOKEN is missing. Configure it server-side before generating runtime config.");
     }
