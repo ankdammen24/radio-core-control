@@ -24,6 +24,12 @@ function parseMediaKind(value: unknown): MediaKind {
   return "music";
 }
 
+function requireTargetForSeparatedBuckets(targetId: unknown, mediaKind: MediaKind) {
+  if (mediaKind !== "music" && typeof targetId !== "string") {
+    throw new Error(`target_id is required when media_kind is "${mediaKind}"`);
+  }
+}
+
 // ---------- helpers ----------
 
 async function loadConnection(opts: { connection_id?: string; station_id?: string | null }): Promise<AzuracastConnectionRow> {
@@ -139,6 +145,8 @@ const handlers: Record<string, Handler> = {
     const playlistName = (typeof p.playlist_name === "string" && p.playlist_name) || "Default";
     const limit = typeof p.limit === "number" ? Math.min(p.limit, 5000) : 1000;
     const dryRun = p.dry_run === true;
+    const mediaKind = parseMediaKind(p.media_kind);
+    requireTargetForSeparatedBuckets(p.target_id, mediaKind);
 
     // Resolve target storage bucket: explicit target_id OR the active media target for the station.
     // IMPORTANT: when running separate buckets (music/jingles/fx), provide target_id explicitly per job.

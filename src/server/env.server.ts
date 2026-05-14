@@ -6,8 +6,13 @@ export function readEnv(name: string, fallback?: string): string | undefined {
 
   const filePath = process.env[`${name}_FILE`]?.trim();
   if (filePath) {
-    const fromFile = readFileSync(filePath, "utf8").trim();
-    if (fromFile) return fromFile;
+    try {
+      const fromFile = readFileSync(filePath, "utf8").trim();
+      if (fromFile) return fromFile;
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed reading ${name}_FILE at "${filePath}": ${detail}`);
+    }
   }
 
   return fallback;
