@@ -4,6 +4,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
 import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { readEnv } from "@/server/env.server";
 
 interface SyncJob {
   id: string;
@@ -16,6 +17,18 @@ interface SyncJob {
 
 type HandlerResult = Record<string, unknown> | void;
 type Handler = (job: SyncJob) => Promise<HandlerResult>;
+type MediaKind = "music" | "jingle" | "sweeper" | "promo" | "fx";
+
+function parseMediaKind(value: unknown): MediaKind {
+  if (value === "jingle" || value === "sweeper" || value === "promo" || value === "fx") return value;
+  return "music";
+}
+
+function requireTargetForSeparatedBuckets(targetId: unknown, mediaKind: MediaKind) {
+  if (mediaKind !== "music" && typeof targetId !== "string") {
+    throw new Error(`target_id is required when media_kind is "${mediaKind}"`);
+  }
+}
 
 // ---------- helpers ----------
 
@@ -132,8 +145,11 @@ const handlers: Record<string, Handler> = {
     const playlistName = (typeof p.playlist_name === "string" && p.playlist_name) || "Default";
     const limit = typeof p.limit === "number" ? Math.min(p.limit, 5000) : 1000;
     const dryRun = p.dry_run === true;
+    const mediaKind = parseMediaKind(p.media_kind);
+    requireTargetForSeparatedBuckets(p.target_id, mediaKind);
 
-    // Resolve target storage bucket: explicit target_id OR the active media target for the station
+    // Resolve target storage bucket: explicit target_id OR the active media target for the station.
+    // IMPORTANT: when running separate buckets (music/jingles/fx), provide target_id explicitly per job.
     let targetQuery = supabaseAdmin
       .from("storage_targets")
       .select("id,bucket,endpoint_url,region,access_key_ref,secret_key_ref")
@@ -145,10 +161,10 @@ const handlers: Record<string, Handler> = {
     if (tErr) throw tErr;
     if (!target?.bucket) throw new Error("No active media storage target found for this station");
 
-    const endpoint = target.endpoint_url ?? process.env.S3_ENDPOINT;
-    const region = target.region ?? process.env.S3_REGION ?? "auto";
-    const accessKeyId = (target.access_key_ref ? process.env[target.access_key_ref] : undefined) ?? process.env.S3_ACCESS_KEY_ID;
-    const secretAccessKey = (target.secret_key_ref ? process.env[target.secret_key_ref] : undefined) ?? process.env.S3_SECRET_ACCESS_KEY;
+    const endpoint = target.endpoint_url ?? readEnv("S3_ENDPOINT");
+    const region = target.region ?? readEnv("S3_REGION", "auto") ?? "auto";
+    const accessKeyId = (target.access_key_ref ? readEnv(target.access_key_ref) : undefined) ?? readEnv("S3_ACCESS_KEY_ID");
+    const secretAccessKey = (target.secret_key_ref ? readEnv(target.secret_key_ref) : undefined) ?? readEnv("S3_SECRET_ACCESS_KEY");
     if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Storage target credentials missing");
 
     const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
@@ -216,7 +232,7 @@ const handlers: Record<string, Handler> = {
             mime_type: row.mime_type ?? contentType,
             file_size: row.size ?? bytes.byteLength,
             duration_seconds: row.length ?? null,
-            media_kind: "music",
+            media_kind: mediaKind,
             status: "imported",
           }, { onConflict: "azuracast_media_id" });
         }

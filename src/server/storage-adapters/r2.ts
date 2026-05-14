@@ -7,6 +7,7 @@ import {
   HeadBucketCommand,
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
+import { readEnv } from "@/server/env.server";
 import {
   type StorageAdapter,
   type StorageInfo,
@@ -18,17 +19,17 @@ import {
 
 function envOr(name: string | null | undefined, fallback?: string): string | undefined {
   if (!name) return fallback;
-  return process.env[name] ?? fallback;
+  return readEnv(name, fallback);
 }
 
 export class R2Adapter implements StorageAdapter {
   constructor(private cfg: StorageTargetConfig) {}
 
   private buildClient(): S3Client {
-    const endpoint = this.cfg.endpoint_url ?? process.env.S3_ENDPOINT;
-    const region = this.cfg.region ?? process.env.S3_REGION ?? "auto";
-    const accessKeyId = envOr(this.cfg.access_key_ref, process.env.S3_ACCESS_KEY_ID);
-    const secretAccessKey = envOr(this.cfg.secret_key_ref, process.env.S3_SECRET_ACCESS_KEY);
+    const endpoint = this.cfg.endpoint_url ?? readEnv("S3_ENDPOINT");
+    const region = this.cfg.region ?? readEnv("S3_REGION", "auto") ?? "auto";
+    const accessKeyId = envOr(this.cfg.access_key_ref, readEnv("S3_ACCESS_KEY_ID"));
+    const secretAccessKey = envOr(this.cfg.secret_key_ref, readEnv("S3_SECRET_ACCESS_KEY"));
 
     if (!endpoint) throw new Error("R2 endpoint URL is missing");
     if (!accessKeyId || !secretAccessKey) {

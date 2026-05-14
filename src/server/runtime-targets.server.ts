@@ -1,6 +1,7 @@
 // Server-only helpers for runtime targets: secret resolution + execution.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { buildAdapter, type RuntimeTargetConfig } from "@/server/runtime-adapters";
+import { readEnv } from "@/server/env.server";
 
 export async function loadRuntimeTarget(targetId: string): Promise<RuntimeTargetConfig> {
   const { data, error } = await supabaseAdmin
@@ -18,7 +19,7 @@ export async function loadRuntimeTarget(targetId: string): Promise<RuntimeTarget
 
 export function resolveSecret(secretName: string | null): string | null {
   if (!secretName) return null;
-  const v = process.env[secretName];
+  const v = readEnv(secretName);
   return v && v.length > 0 ? v : null;
 }
 
