@@ -1,6 +1,7 @@
 // Typed Azuracast REST API client. Server-only.
 // Wraps the full Azuracast public + admin API surface used by Radio Core.
 // Docs: https://www.azuracast.com/docs/developers/apis/
+import { readEnv } from "@/server/env.server";
 
 export interface AzuracastConnectionConfig {
   baseUrl: string;
@@ -260,7 +261,7 @@ export function buildAzuracastClient(conn: AzuracastConnectionRow): AzuracastCli
     throw new Error(`Azuracast connection ${conn.id} is missing base_url or azuracast_station_id`);
   }
   const secretName = conn.api_key_secret_name ?? "AZURACAST_API_KEY";
-  const apiKey = process.env[secretName] ?? process.env.AZURACAST_API_KEY;
+  const apiKey = readEnv(secretName) ?? readEnv("AZURACAST_API_KEY");
   if (!apiKey) {
     throw new Error(`Azuracast API key not found in env (looked for ${secretName})`);
   }
