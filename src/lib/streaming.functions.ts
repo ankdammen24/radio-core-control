@@ -51,7 +51,10 @@ export const generateStationConfig = createServerFn({ method: "POST" })
     }
 
     const apiBaseUrl = process.env.PUBLIC_APP_URL ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
-    const stackToken = "REPLACE_WITH_STACK_TOKEN";
+    const stackToken = process.env.STACK_TOKEN;
+    if (!stackToken) {
+      throw new Error("STACK_TOKEN is missing. Configure it server-side before generating runtime config.");
+    }
 
     const fallbacks: FallbackEntry[] = (fbRows ?? []).map((r: any) => {
       const rel = r.media_files?.file_path ?? r.media_files?.file_name ?? null;
