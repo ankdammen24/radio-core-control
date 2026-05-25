@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
 import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { readEnv } from "@/server/env.server";
+import { parseMediaKind, type MediaKind } from "@/lib/media-kind";
 
 interface SyncJob {
   id: string;
@@ -17,7 +18,6 @@ interface SyncJob {
 
 type HandlerResult = Record<string, unknown> | void;
 type Handler = (job: SyncJob) => Promise<HandlerResult>;
-type MediaKind = "music" | "jingle" | "sweeper" | "promo" | "fx";
 
 // Error carrying extra structured context (e.g. current storage target fields).
 class SyncWorkerError extends Error {
@@ -36,11 +36,6 @@ function firstAppStackFrame(stack: string | undefined): string | undefined {
   const lines = stack.split("\n").map((l) => l.trim()).filter((l) => l.startsWith("at "));
   // Prefer frames pointing at our own source; fall back to the topmost frame.
   return lines.find((l) => l.includes("/src/server/") || l.includes("sync-worker")) ?? lines[0];
-}
-
-function parseMediaKind(value: unknown): MediaKind {
-  if (value === "jingle" || value === "sweeper" || value === "promo" || value === "fx") return value;
-  return "music";
 }
 
 function requireTargetForSeparatedBuckets(targetId: unknown, mediaKind: MediaKind) {
