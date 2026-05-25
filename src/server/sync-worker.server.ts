@@ -341,9 +341,26 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
       result.details.push({ id: job.id, job_type: job.job_type, status: "completed" });
     } catch (e) {
       const err = e as Error & { status?: number; body?: unknown };
-      const message = e instanceof AzuracastError
+      const context = e instanceof SyncWorkerError ? err.context : undefined;
+      const at = firstAppStackFrame(err.stack);
+      const baseMessage = e instanceof AzuracastError
         ? `${err.message} :: ${typeof err.body === "string" ? err.body : JSON.stringify(err.body)}`
         : err.message ?? String(e);
+      const message = [
+        baseMessage,
+        at ? `at ${at}` : null,
+        context ? `context=${JSON.stringify(context)}` : null,
+      ].filter(Boolean).join(" | ");
+      console.error("[sync-worker] job failed", {
+        job_id: job.id,
+        job_type: job.job_type,
+        station_id: job.station_id,
+        attempts: job.attempts,
+        message: baseMessage,
+        at,
+        context,
+        stack: err.stack,
+      });
       const willRetry = job.attempts < job.max_attempts;
       const backoffSec = Math.min(60 * Math.pow(2, job.attempts), 3600);
       await supabaseAdmin.from("sync_jobs").update({
