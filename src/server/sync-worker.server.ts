@@ -341,7 +341,7 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
       result.details.push({ id: job.id, job_type: job.job_type, status: "completed" });
     } catch (e) {
       const err = e as Error & { status?: number; body?: unknown };
-      const context = e instanceof SyncWorkerError ? err.context : undefined;
+      const context = e instanceof SyncWorkerError ? e.context : undefined;
       const at = firstAppStackFrame(err.stack);
       const baseMessage = e instanceof AzuracastError
         ? `${err.message} :: ${typeof err.body === "string" ? err.body : JSON.stringify(err.body)}`
