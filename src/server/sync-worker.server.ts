@@ -272,7 +272,13 @@ const handlers: Record<string, Handler> = {
         uploaded++;
       } catch (e) {
         failed++;
-        errors.push({ path, message: (e as Error).message });
+        const err = e as Error;
+        errors.push({
+          path,
+          message: err.message,
+          at: firstAppStackFrame(err.stack),
+          target_bucket: target.bucket,
+        });
       }
     }
 
