@@ -20,7 +20,7 @@ type HandlerResult = Record<string, unknown> | void;
 type Handler = (job: SyncJob) => Promise<HandlerResult>;
 
 // Error carrying extra structured context (e.g. current storage target fields).
-class SyncWorkerError extends Error {
+export class SyncWorkerError extends Error {
   context: Record<string, unknown>;
   cause?: unknown;
   constructor(message: string, context: Record<string, unknown>, cause?: unknown) {
@@ -31,17 +31,68 @@ class SyncWorkerError extends Error {
   }
 }
 
-function firstAppStackFrame(stack: string | undefined): string | undefined {
+export function firstAppStackFrame(stack: string | undefined): string | undefined {
   if (!stack) return undefined;
   const lines = stack.split("\n").map((l) => l.trim()).filter((l) => l.startsWith("at "));
   // Prefer frames pointing at our own source; fall back to the topmost frame.
   return lines.find((l) => l.includes("/src/server/") || l.includes("sync-worker")) ?? lines[0];
 }
 
-function requireTargetForSeparatedBuckets(targetId: unknown, mediaKind: MediaKind) {
+export function requireTargetForSeparatedBuckets(targetId: unknown, mediaKind: MediaKind) {
   if (mediaKind !== "music" && typeof targetId !== "string") {
     throw new Error(`target_id is required when media_kind is "${mediaKind}"`);
   }
+}
+
+// Pure helper: given a storage_targets row and an env reader, resolve the
+// effective S3 credentials + structured context. Throws SyncWorkerError when
+// any required credential field is missing. Extracted so it can be unit-tested
+// without a live Supabase/S3 connection.
+export interface StorageTargetRow {
+  id: string;
+  bucket: string;
+  endpoint_url: string | null;
+  region: string | null;
+  access_key_ref: string | null;
+  secret_key_ref: string | null;
+}
+
+export interface ResolvedStorageCredentials {
+  endpoint: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  context: Record<string, unknown>;
+}
+
+export function resolveStorageTargetCredentials(
+  target: StorageTargetRow,
+  mediaKind: MediaKind,
+  envReader: (name: string, fallback?: string) => string | undefined,
+): ResolvedStorageCredentials {
+  const endpoint = target.endpoint_url ?? envReader("S3_ENDPOINT");
+  const region = target.region ?? envReader("S3_REGION", "auto") ?? "auto";
+  const accessKeyId =
+    (target.access_key_ref ? envReader(target.access_key_ref) : undefined) ??
+    envReader("S3_ACCESS_KEY_ID");
+  const secretAccessKey =
+    (target.secret_key_ref ? envReader(target.secret_key_ref) : undefined) ??
+    envReader("S3_SECRET_ACCESS_KEY");
+  const context = {
+    target_id: target.id,
+    bucket: target.bucket,
+    endpoint,
+    region,
+    access_key_ref: target.access_key_ref ?? null,
+    secret_key_ref: target.secret_key_ref ?? null,
+    has_access_key: Boolean(accessKeyId),
+    has_secret_key: Boolean(secretAccessKey),
+    mediaKind,
+  };
+  if (!endpoint || !accessKeyId || !secretAccessKey) {
+    throw new SyncWorkerError("Storage target credentials missing", context);
+  }
+  return { endpoint, region, accessKeyId, secretAccessKey, context };
 }
 
 // ---------- helpers ----------
@@ -175,25 +226,11 @@ const handlers: Record<string, Handler> = {
     if (tErr) throw new SyncWorkerError("Failed to load storage target", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind }, tErr);
     if (!target?.bucket) throw new SyncWorkerError("No active media storage target found for this station", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind });
 
-    const endpoint = target.endpoint_url ?? readEnv("S3_ENDPOINT");
-    const region = target.region ?? readEnv("S3_REGION", "auto") ?? "auto";
-    const accessKeyId = (target.access_key_ref ? readEnv(target.access_key_ref) : undefined) ?? readEnv("S3_ACCESS_KEY_ID");
-    const secretAccessKey = (target.secret_key_ref ? readEnv(target.secret_key_ref) : undefined) ?? readEnv("S3_SECRET_ACCESS_KEY");
-    const targetContext = {
-      target_id: target.id,
-      bucket: target.bucket,
-      endpoint,
-      region,
-      access_key_ref: target.access_key_ref ?? null,
-      secret_key_ref: target.secret_key_ref ?? null,
-      has_access_key: Boolean(accessKeyId),
-      has_secret_key: Boolean(secretAccessKey),
+    const { endpoint, region, accessKeyId, secretAccessKey } = resolveStorageTargetCredentials(
+      target as StorageTargetRow,
       mediaKind,
-    };
-    if (!endpoint || !accessKeyId || !secretAccessKey) {
-      throw new SyncWorkerError("Storage target credentials missing", targetContext);
-    }
-
+      readEnv,
+    );
 
     const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
 
