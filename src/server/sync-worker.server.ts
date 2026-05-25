@@ -177,14 +177,27 @@ const handlers: Record<string, Handler> = {
     if (typeof p.target_id === "string") targetQuery = targetQuery.eq("id", p.target_id);
     else targetQuery = targetQuery.eq("station_id", conn.station_id!).eq("purpose", "media");
     const { data: target, error: tErr } = await targetQuery.maybeSingle();
-    if (tErr) throw tErr;
-    if (!target?.bucket) throw new Error("No active media storage target found for this station");
+    if (tErr) throw new SyncWorkerError("Failed to load storage target", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind }, tErr);
+    if (!target?.bucket) throw new SyncWorkerError("No active media storage target found for this station", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind });
 
     const endpoint = target.endpoint_url ?? readEnv("S3_ENDPOINT");
     const region = target.region ?? readEnv("S3_REGION", "auto") ?? "auto";
     const accessKeyId = (target.access_key_ref ? readEnv(target.access_key_ref) : undefined) ?? readEnv("S3_ACCESS_KEY_ID");
     const secretAccessKey = (target.secret_key_ref ? readEnv(target.secret_key_ref) : undefined) ?? readEnv("S3_SECRET_ACCESS_KEY");
-    if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Storage target credentials missing");
+    const targetContext = {
+      target_id: target.id,
+      bucket: target.bucket,
+      endpoint,
+      region,
+      access_key_ref: target.access_key_ref ?? null,
+      secret_key_ref: target.secret_key_ref ?? null,
+      has_access_key: Boolean(accessKeyId),
+      has_secret_key: Boolean(secretAccessKey),
+      mediaKind,
+    };
+    if (!endpoint || !accessKeyId || !secretAccessKey) {
+      throw new SyncWorkerError("Storage target credentials missing", targetContext);
+    }
 
 
     const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
