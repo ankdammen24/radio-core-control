@@ -133,6 +133,7 @@ function AuthPage() {
                   <Input id="sso" type="email" placeholder="you@company.com" value={ssoEmail} onChange={(e) => setSsoEmail(e.target.value)} />
                   <Button type="submit" variant="outline" disabled={busy}>Continue</Button>
                 </div>
+                <p className="text-[11px] text-muted-foreground">Use your work email — you'll be redirected to your company's sign-in. Always start here, not from the Microsoft "My Apps" portal.</p>
               </form>
             </TabsContent>
             <TabsContent value="signup" className="mt-5">
