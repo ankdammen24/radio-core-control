@@ -51,6 +51,16 @@ function AuthPage() {
     if (result.redirected) return;
     toast.success("Welcome back");
   };
+  const signInWithApple = async () => {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    setBusy(false);
+    if (result.error) toast.error(result.error.message || "Apple sign-in failed");
+    if (result.redirected) return;
+    toast.success("Welcome back");
+  };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
