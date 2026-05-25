@@ -224,7 +224,7 @@ const handlers: Record<string, Handler> = {
     let uploaded = 0;
     let skipped = 0;
     let failed = 0;
-    const errors: Array<{ path?: string; message: string }> = [];
+    const errors: Array<{ path?: string; message: string; at?: string; target_bucket?: string }> = [];
 
     for (const row of rows) {
       const path = row.path;
