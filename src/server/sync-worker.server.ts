@@ -19,6 +19,25 @@ type HandlerResult = Record<string, unknown> | void;
 type Handler = (job: SyncJob) => Promise<HandlerResult>;
 type MediaKind = "music" | "jingle" | "sweeper" | "promo" | "fx";
 
+// Error carrying extra structured context (e.g. current storage target fields).
+class SyncWorkerError extends Error {
+  context: Record<string, unknown>;
+  cause?: unknown;
+  constructor(message: string, context: Record<string, unknown>, cause?: unknown) {
+    super(message);
+    this.name = "SyncWorkerError";
+    this.context = context;
+    this.cause = cause;
+  }
+}
+
+function firstAppStackFrame(stack: string | undefined): string | undefined {
+  if (!stack) return undefined;
+  const lines = stack.split("\n").map((l) => l.trim()).filter((l) => l.startsWith("at "));
+  // Prefer frames pointing at our own source; fall back to the topmost frame.
+  return lines.find((l) => l.includes("/src/server/") || l.includes("sync-worker")) ?? lines[0];
+}
+
 function parseMediaKind(value: unknown): MediaKind {
   if (value === "jingle" || value === "sweeper" || value === "promo" || value === "fx") return value;
   return "music";
@@ -158,14 +177,27 @@ const handlers: Record<string, Handler> = {
     if (typeof p.target_id === "string") targetQuery = targetQuery.eq("id", p.target_id);
     else targetQuery = targetQuery.eq("station_id", conn.station_id!).eq("purpose", "media");
     const { data: target, error: tErr } = await targetQuery.maybeSingle();
-    if (tErr) throw tErr;
-    if (!target?.bucket) throw new Error("No active media storage target found for this station");
+    if (tErr) throw new SyncWorkerError("Failed to load storage target", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind }, tErr);
+    if (!target?.bucket) throw new SyncWorkerError("No active media storage target found for this station", { target_id: p.target_id ?? null, station_id: conn.station_id, mediaKind });
 
     const endpoint = target.endpoint_url ?? readEnv("S3_ENDPOINT");
     const region = target.region ?? readEnv("S3_REGION", "auto") ?? "auto";
     const accessKeyId = (target.access_key_ref ? readEnv(target.access_key_ref) : undefined) ?? readEnv("S3_ACCESS_KEY_ID");
     const secretAccessKey = (target.secret_key_ref ? readEnv(target.secret_key_ref) : undefined) ?? readEnv("S3_SECRET_ACCESS_KEY");
-    if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Storage target credentials missing");
+    const targetContext = {
+      target_id: target.id,
+      bucket: target.bucket,
+      endpoint,
+      region,
+      access_key_ref: target.access_key_ref ?? null,
+      secret_key_ref: target.secret_key_ref ?? null,
+      has_access_key: Boolean(accessKeyId),
+      has_secret_key: Boolean(secretAccessKey),
+      mediaKind,
+    };
+    if (!endpoint || !accessKeyId || !secretAccessKey) {
+      throw new SyncWorkerError("Storage target credentials missing", targetContext);
+    }
 
 
     const s3 = new S3Client({ endpoint, region, forcePathStyle: true, credentials: { accessKeyId, secretAccessKey } });
@@ -192,7 +224,7 @@ const handlers: Record<string, Handler> = {
     let uploaded = 0;
     let skipped = 0;
     let failed = 0;
-    const errors: Array<{ path?: string; message: string }> = [];
+    const errors: Array<{ path?: string; message: string; at?: string; target_bucket?: string }> = [];
 
     for (const row of rows) {
       const path = row.path;
@@ -240,7 +272,13 @@ const handlers: Record<string, Handler> = {
         uploaded++;
       } catch (e) {
         failed++;
-        errors.push({ path, message: (e as Error).message });
+        const err = e as Error;
+        errors.push({
+          path,
+          message: err.message,
+          at: firstAppStackFrame(err.stack),
+          target_bucket: target.bucket,
+        });
       }
     }
 
@@ -303,9 +341,26 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
       result.details.push({ id: job.id, job_type: job.job_type, status: "completed" });
     } catch (e) {
       const err = e as Error & { status?: number; body?: unknown };
-      const message = e instanceof AzuracastError
+      const context = e instanceof SyncWorkerError ? e.context : undefined;
+      const at = firstAppStackFrame(err.stack);
+      const baseMessage = e instanceof AzuracastError
         ? `${err.message} :: ${typeof err.body === "string" ? err.body : JSON.stringify(err.body)}`
         : err.message ?? String(e);
+      const message = [
+        baseMessage,
+        at ? `at ${at}` : null,
+        context ? `context=${JSON.stringify(context)}` : null,
+      ].filter(Boolean).join(" | ");
+      console.error("[sync-worker] job failed", {
+        job_id: job.id,
+        job_type: job.job_type,
+        station_id: job.station_id,
+        attempts: job.attempts,
+        message: baseMessage,
+        at,
+        context,
+        stack: err.stack,
+      });
       const willRetry = job.attempts < job.max_attempts;
       const backoffSec = Math.min(60 * Math.pow(2, job.attempts), 3600);
       await supabaseAdmin.from("sync_jobs").update({
