@@ -127,6 +127,13 @@ function AuthPage() {
                 <svg className="mr-2 h-4 w-4" viewBox="0 1 24 24" fill="currentColor"><path d="M17.05 20.28c-.98 1.44-2.2 2.84-3.96 2.86-1.74.02-2.3-1.02-4.28-1.02-1.96 1.02-2.66 1-4.28 1.02-1.76.02-3.12-1.4-4.1-2.84-3.4-4.9-2.9-12.18 2.46-14.76 1.18-.62 2.5-.96 3.88-.96 1.78 1.02 2.68 1.02 4.46 1.02 1.78 1.02 2.68 1.02 4.46 1.02 1.38 0 2.72-.34 3.88-.96 4.54 7.82-.48 14.76 2.48 14.78-1.78 0-2.68 0-4.46 1.02zM16.36 6.06c.92-1.1 1.54-2.58 1.38-4.08-1.34.06-2.96.88-3.92 1.98-.84.96-1.56 2.52-1.36 3.98 1.44.1 2.92-.72 3.9-1.88z"/></svg>
                 Sign in with Apple
               </Button>
+              <form onSubmit={signInWithSSO} className="space-y-2 pt-1">
+                <Label htmlFor="sso" className="text-xs uppercase tracking-wide text-muted-foreground">Enterprise SSO (SAML)</Label>
+                <div className="flex gap-2">
+                  <Input id="sso" type="email" placeholder="you@company.com" value={ssoEmail} onChange={(e) => setSsoEmail(e.target.value)} />
+                  <Button type="submit" variant="outline" disabled={busy}>Continue</Button>
+                </div>
+              </form>
             </TabsContent>
             <TabsContent value="signup" className="mt-5">
               <form onSubmit={signUp} className="space-y-4">
