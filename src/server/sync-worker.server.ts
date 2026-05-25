@@ -19,6 +19,25 @@ type HandlerResult = Record<string, unknown> | void;
 type Handler = (job: SyncJob) => Promise<HandlerResult>;
 type MediaKind = "music" | "jingle" | "sweeper" | "promo" | "fx";
 
+// Error carrying extra structured context (e.g. current storage target fields).
+class SyncWorkerError extends Error {
+  context: Record<string, unknown>;
+  cause?: unknown;
+  constructor(message: string, context: Record<string, unknown>, cause?: unknown) {
+    super(message);
+    this.name = "SyncWorkerError";
+    this.context = context;
+    this.cause = cause;
+  }
+}
+
+function firstAppStackFrame(stack: string | undefined): string | undefined {
+  if (!stack) return undefined;
+  const lines = stack.split("\n").map((l) => l.trim()).filter((l) => l.startsWith("at "));
+  // Prefer frames pointing at our own source; fall back to the topmost frame.
+  return lines.find((l) => l.includes("/src/server/") || l.includes("sync-worker")) ?? lines[0];
+}
+
 function parseMediaKind(value: unknown): MediaKind {
   if (value === "jingle" || value === "sweeper" || value === "promo" || value === "fx") return value;
   return "music";
