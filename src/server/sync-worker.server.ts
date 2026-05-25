@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
 import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { readEnv } from "@/server/env.server";
+import { parseMediaKind, type MediaKind } from "@/lib/media-kind";
 
 interface SyncJob {
   id: string;
