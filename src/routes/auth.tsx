@@ -62,6 +62,19 @@ function AuthPage() {
     if (result.redirected) return;
     toast.success("Welcome back");
   };
+  const signInWithSSO = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const domain = ssoEmail.split("@")[1]?.trim().toLowerCase();
+    if (!domain) { toast.error("Enter your work email"); return; }
+    setBusy(true);
+    const { data, error } = await supabase.auth.signInWithSSO({
+      domain,
+      options: { redirectTo: window.location.origin },
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    if (data?.url) window.location.href = data.url;
+  };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
