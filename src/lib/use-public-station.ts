@@ -68,8 +68,8 @@ export function useBootstrapPlayer(slug?: string) {
       id: stationQ.data.id,
       name: stationQ.data.name,
       slug: stationQ.data.slug,
-      logoUrl: stationQ.data.logo_url,
-      accentColor: stationQ.data.accent_color,
+      logoUrl: stationQ.data.demo_artwork_url,
+      accentColor: null,
       streams: streamsQ.data.map((s) => ({
         id: s.id, label: s.label, url: s.url, format: s.format, bitrate: s.bitrate,
       })),
