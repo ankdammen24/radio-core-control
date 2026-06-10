@@ -20,20 +20,25 @@ import { Route as StationsRouteImport } from './routes/stations'
 import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchedulerRouteImport } from './routes/scheduler'
+import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as RuntimeTargetsRouteImport } from './routes/runtime-targets'
 import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as R2StorageRouteImport } from './routes/r2-storage'
+import { Route as ProgramsRouteImport } from './routes/programs'
+import { Route as PodcastsRouteImport } from './routes/podcasts'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ListenersRouteImport } from './routes/listeners'
+import { Route as ListenRouteImport } from './routes/listen'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as FallbackRouteImport } from './routes/fallback'
 import { Route as EpisodesRouteImport } from './routes/episodes'
 import { Route as DemoRouteImport } from './routes/demo'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConfigsRouteImport } from './routes/configs'
 import { Route as CompanionRouteImport } from './routes/companion'
 import { Route as CockpitRouteImport } from './routes/cockpit'
@@ -44,9 +49,12 @@ import { Route as AuditRouteImport } from './routes/audit'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AdsRouteImport } from './routes/ads'
 import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.station-config'
 import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
@@ -108,6 +116,11 @@ const SchedulerRoute = SchedulerRouteImport.update({
   path: '/scheduler',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScheduleRoute = ScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RuntimeTargetsRoute = RuntimeTargetsRouteImport.update({
   id: '/runtime-targets',
   path: '/runtime-targets',
@@ -121,6 +134,16 @@ const RotationRoute = RotationRouteImport.update({
 const R2StorageRoute = R2StorageRouteImport.update({
   id: '/r2-storage',
   path: '/r2-storage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramsRoute = ProgramsRouteImport.update({
+  id: '/programs',
+  path: '/programs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodcastsRoute = PodcastsRouteImport.update({
+  id: '/podcasts',
+  path: '/podcasts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaylistsRoute = PlaylistsRouteImport.update({
@@ -146,6 +169,11 @@ const LiveRoute = LiveRouteImport.update({
 const ListenersRoute = ListenersRouteImport.update({
   id: '/listeners',
   path: '/listeners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListenRoute = ListenRouteImport.update({
+  id: '/listen',
+  path: '/listen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InboxRoute = InboxRouteImport.update({
@@ -176,6 +204,11 @@ const EpisodesRoute = EpisodesRouteImport.update({
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
   path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfigsRoute = ConfigsRouteImport.update({
@@ -228,6 +261,11 @@ const AccountsRoute = AccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -238,9 +276,19 @@ const MetadataIndexRoute = MetadataIndexRouteImport.update({
   path: '/metadata/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MetadataIdRoute = MetadataIdRouteImport.update({
   id: '/metadata/$id',
   path: '/metadata/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicStationConfigRoute = ApiPublicStationConfigRouteImport.update({
@@ -271,6 +319,7 @@ const ApiPublicCronSyncWorkerRoute = ApiPublicCronSyncWorkerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
   '/agents': typeof AgentsRoute
@@ -281,20 +330,25 @@ export interface FileRoutesByFullPath {
   '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
+  '/listen': typeof ListenRoute
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcasts': typeof PodcastsRoute
+  '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/runtime-targets': typeof RuntimeTargetsRoute
+  '/schedule': typeof ScheduleRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -306,7 +360,9 @@ export interface FileRoutesByFullPath {
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
+  '/admin/login': typeof AdminLoginRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -316,6 +372,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
   '/agents': typeof AgentsRoute
@@ -326,20 +383,25 @@ export interface FileRoutesByTo {
   '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
+  '/listen': typeof ListenRoute
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcasts': typeof PodcastsRoute
+  '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/runtime-targets': typeof RuntimeTargetsRoute
+  '/schedule': typeof ScheduleRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -351,7 +413,9 @@ export interface FileRoutesByTo {
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
+  '/admin/login': typeof AdminLoginRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin': typeof AdminIndexRoute
   '/metadata': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -362,6 +426,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
   '/ads': typeof AdsRoute
   '/agents': typeof AgentsRoute
@@ -372,20 +437,25 @@ export interface FileRoutesById {
   '/cockpit': typeof CockpitRoute
   '/companion': typeof CompanionRoute
   '/configs': typeof ConfigsRoute
+  '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/episodes': typeof EpisodesRoute
   '/fallback': typeof FallbackRoute
   '/files': typeof FilesRoute
   '/health': typeof HealthRoute
   '/inbox': typeof InboxRoute
+  '/listen': typeof ListenRoute
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcasts': typeof PodcastsRoute
+  '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
   '/rotation': typeof RotationRoute
   '/runtime-targets': typeof RuntimeTargetsRoute
+  '/schedule': typeof ScheduleRoute
   '/scheduler': typeof SchedulerRoute
   '/settings': typeof SettingsRoute
   '/shows': typeof ShowsRoute
@@ -397,7 +467,9 @@ export interface FileRoutesById {
   '/sync-jobs': typeof SyncJobsRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
+  '/admin/login': typeof AdminLoginRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -409,6 +481,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/accounts'
     | '/ads'
     | '/agents'
@@ -419,20 +492,25 @@ export interface FileRouteTypes {
     | '/cockpit'
     | '/companion'
     | '/configs'
+    | '/contact'
     | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
+    | '/listen'
     | '/listeners'
     | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcasts'
+    | '/programs'
     | '/r2-storage'
     | '/rotation'
     | '/runtime-targets'
+    | '/schedule'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -444,7 +522,9 @@ export interface FileRouteTypes {
     | '/sync-jobs'
     | '/users'
     | '/voicetracks'
+    | '/admin/login'
     | '/metadata/$id'
+    | '/admin/'
     | '/metadata/'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -454,6 +534,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/accounts'
     | '/ads'
     | '/agents'
@@ -464,20 +545,25 @@ export interface FileRouteTypes {
     | '/cockpit'
     | '/companion'
     | '/configs'
+    | '/contact'
     | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
+    | '/listen'
     | '/listeners'
     | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcasts'
+    | '/programs'
     | '/r2-storage'
     | '/rotation'
     | '/runtime-targets'
+    | '/schedule'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -489,7 +575,9 @@ export interface FileRouteTypes {
     | '/sync-jobs'
     | '/users'
     | '/voicetracks'
+    | '/admin/login'
     | '/metadata/$id'
+    | '/admin'
     | '/metadata'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -499,6 +587,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/accounts'
     | '/ads'
     | '/agents'
@@ -509,20 +598,25 @@ export interface FileRouteTypes {
     | '/cockpit'
     | '/companion'
     | '/configs'
+    | '/contact'
     | '/demo'
     | '/episodes'
     | '/fallback'
     | '/files'
     | '/health'
     | '/inbox'
+    | '/listen'
     | '/listeners'
     | '/live'
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcasts'
+    | '/programs'
     | '/r2-storage'
     | '/rotation'
     | '/runtime-targets'
+    | '/schedule'
     | '/scheduler'
     | '/settings'
     | '/shows'
@@ -534,7 +628,9 @@ export interface FileRouteTypes {
     | '/sync-jobs'
     | '/users'
     | '/voicetracks'
+    | '/admin/login'
     | '/metadata/$id'
+    | '/admin/'
     | '/metadata/'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -545,6 +641,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AccountsRoute: typeof AccountsRoute
   AdsRoute: typeof AdsRoute
   AgentsRoute: typeof AgentsRoute
@@ -555,20 +652,25 @@ export interface RootRouteChildren {
   CockpitRoute: typeof CockpitRoute
   CompanionRoute: typeof CompanionRoute
   ConfigsRoute: typeof ConfigsRoute
+  ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
   EpisodesRoute: typeof EpisodesRoute
   FallbackRoute: typeof FallbackRoute
   FilesRoute: typeof FilesRoute
   HealthRoute: typeof HealthRoute
   InboxRoute: typeof InboxRoute
+  ListenRoute: typeof ListenRoute
   ListenersRoute: typeof ListenersRoute
   LiveRoute: typeof LiveRoute
   MediaRoute: typeof MediaRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
+  PodcastsRoute: typeof PodcastsRoute
+  ProgramsRoute: typeof ProgramsRoute
   R2StorageRoute: typeof R2StorageRoute
   RotationRoute: typeof RotationRoute
   RuntimeTargetsRoute: typeof RuntimeTargetsRoute
+  ScheduleRoute: typeof ScheduleRoute
   SchedulerRoute: typeof SchedulerRoute
   SettingsRoute: typeof SettingsRoute
   ShowsRoute: typeof ShowsRoute
@@ -580,7 +682,9 @@ export interface RootRouteChildren {
   SyncJobsRoute: typeof SyncJobsRoute
   UsersRoute: typeof UsersRoute
   VoicetracksRoute: typeof VoicetracksRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   MetadataIdRoute: typeof MetadataIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   MetadataIndexRoute: typeof MetadataIndexRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
@@ -668,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SchedulerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/schedule': {
+      id: '/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/runtime-targets': {
       id: '/runtime-targets'
       path: '/runtime-targets'
@@ -687,6 +798,20 @@ declare module '@tanstack/react-router' {
       path: '/r2-storage'
       fullPath: '/r2-storage'
       preLoaderRoute: typeof R2StorageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programs': {
+      id: '/programs'
+      path: '/programs'
+      fullPath: '/programs'
+      preLoaderRoute: typeof ProgramsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podcasts': {
+      id: '/podcasts'
+      path: '/podcasts'
+      fullPath: '/podcasts'
+      preLoaderRoute: typeof PodcastsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playlists': {
@@ -722,6 +847,13 @@ declare module '@tanstack/react-router' {
       path: '/listeners'
       fullPath: '/listeners'
       preLoaderRoute: typeof ListenersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listen': {
+      id: '/listen'
+      path: '/listen'
+      fullPath: '/listen'
+      preLoaderRoute: typeof ListenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inbox': {
@@ -764,6 +896,13 @@ declare module '@tanstack/react-router' {
       path: '/demo'
       fullPath: '/demo'
       preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/configs': {
@@ -836,6 +975,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -850,11 +996,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MetadataIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/metadata/$id': {
       id: '/metadata/$id'
       path: '/metadata/$id'
       fullPath: '/metadata/$id'
       preLoaderRoute: typeof MetadataIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/station-config': {
@@ -897,6 +1057,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AccountsRoute: AccountsRoute,
   AdsRoute: AdsRoute,
   AgentsRoute: AgentsRoute,
@@ -907,20 +1068,25 @@ const rootRouteChildren: RootRouteChildren = {
   CockpitRoute: CockpitRoute,
   CompanionRoute: CompanionRoute,
   ConfigsRoute: ConfigsRoute,
+  ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
   EpisodesRoute: EpisodesRoute,
   FallbackRoute: FallbackRoute,
   FilesRoute: FilesRoute,
   HealthRoute: HealthRoute,
   InboxRoute: InboxRoute,
+  ListenRoute: ListenRoute,
   ListenersRoute: ListenersRoute,
   LiveRoute: LiveRoute,
   MediaRoute: MediaRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
+  PodcastsRoute: PodcastsRoute,
+  ProgramsRoute: ProgramsRoute,
   R2StorageRoute: R2StorageRoute,
   RotationRoute: RotationRoute,
   RuntimeTargetsRoute: RuntimeTargetsRoute,
+  ScheduleRoute: ScheduleRoute,
   SchedulerRoute: SchedulerRoute,
   SettingsRoute: SettingsRoute,
   ShowsRoute: ShowsRoute,
@@ -932,7 +1098,9 @@ const rootRouteChildren: RootRouteChildren = {
   SyncJobsRoute: SyncJobsRoute,
   UsersRoute: UsersRoute,
   VoicetracksRoute: VoicetracksRoute,
+  AdminLoginRoute: AdminLoginRoute,
   MetadataIdRoute: MetadataIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   MetadataIndexRoute: MetadataIndexRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,

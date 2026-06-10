@@ -4,6 +4,7 @@ import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { StationProvider } from "@/lib/station-context";
+import { PlayerProvider } from "@/lib/player-context";
 import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient({
@@ -39,8 +40,10 @@ function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <StationProvider>
-            <Outlet />
-            <Toaster richColors closeButton position="top-right" />
+            <PlayerProvider>
+              <Outlet />
+              <Toaster richColors closeButton position="top-right" />
+            </PlayerProvider>
           </StationProvider>
         </AuthProvider>
       </QueryClientProvider>
