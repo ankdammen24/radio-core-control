@@ -46,6 +46,7 @@ import { Route as AdsRouteImport } from './routes/ads'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
 import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.station-config'
 import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
@@ -238,6 +239,11 @@ const MetadataIndexRoute = MetadataIndexRouteImport.update({
   path: '/metadata/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MetadataIdRoute = MetadataIdRouteImport.update({
   id: '/metadata/$id',
   path: '/metadata/$id',
@@ -307,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -352,6 +359,7 @@ export interface FileRoutesByTo {
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin': typeof AdminIndexRoute
   '/metadata': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -398,6 +406,7 @@ export interface FileRoutesById {
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/metadata/$id': typeof MetadataIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/metadata/': typeof MetadataIndexRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
@@ -445,6 +454,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/voicetracks'
     | '/metadata/$id'
+    | '/admin/'
     | '/metadata/'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/voicetracks'
     | '/metadata/$id'
+    | '/admin'
     | '/metadata'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/voicetracks'
     | '/metadata/$id'
+    | '/admin/'
     | '/metadata/'
     | '/api/public/health'
     | '/api/public/listener-stats'
@@ -581,6 +593,7 @@ export interface RootRouteChildren {
   UsersRoute: typeof UsersRoute
   VoicetracksRoute: typeof VoicetracksRoute
   MetadataIdRoute: typeof MetadataIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   MetadataIndexRoute: typeof MetadataIndexRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
@@ -850,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MetadataIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/metadata/$id': {
       id: '/metadata/$id'
       path: '/metadata/$id'
@@ -933,6 +953,7 @@ const rootRouteChildren: RootRouteChildren = {
   UsersRoute: UsersRoute,
   VoicetracksRoute: VoicetracksRoute,
   MetadataIdRoute: MetadataIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   MetadataIndexRoute: MetadataIndexRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
