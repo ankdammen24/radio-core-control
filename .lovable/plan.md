@@ -1,43 +1,108 @@
-# Fix AADSTS165000 on SAML sign-in
 
-## What the error means
+# Plan: Adapt broadcast-core spec into Radio Core (React/TanStack)
 
-`AADSTS165000` from Microsoft Entra ID means the SAML authentication request that arrived at Microsoft did not match the browser session that finished the flow. In plain terms: cookies / state set at the start of the SSO redirect were not present (or did not match) when the browser came back. It is **not** a code bug in the app's sign-in button — it is an SSO configuration / browser-session issue between three parties: the app, Lovable Cloud's SAML endpoint, and Entra ID.
+The spec is Vue-based; we'll implement it as **React 19 + TanStack Start + Tailwind v4** to match this project. No backend work — we wire everything to existing `createServerFn` modules and `/api/public/*` routes already in `src/lib/` and `src/routes/`. All branding stays white-label and station-driven (per project memory) — Radio Uppsala only appears as seed data.
 
-## Most likely root causes (in order)
+## 1. Public listener site (new)
 
-1. **ACS / Entity ID mismatch in the Entra app.**
-   The Entra "Enterprise Application" must be configured against Lovable Cloud's SAML endpoints, exactly:
-   - Reply URL (ACS): `https://ieqjxltfujzzgpfqsnrh.supabase.co/auth/v1/sso/saml/acs`
-   - Identifier (Entity ID): `https://ieqjxltfujzzgpfqsnrh.supabase.co/auth/v1/sso/saml/metadata`
-   If Entra is pointing at the app's own domain (`core.radiouppsala.se` or `*.lovable.app`) instead, Entra issues a token bound to a different audience/session and rejects it as 165000.
+New routes under `src/routes/`:
 
-2. **IdP-initiated sign-in attempted.**
-   The flow we built is **SP-initiated** (`supabase.auth.signInWithSSO({ domain })`). If the user instead clicks the app tile in the Microsoft "My Apps" portal, Entra mints a SAML response with no matching outbound `AuthnRequest` — that surfaces as 165000. Sign-in must start from `/auth` in the app.
+```text
+index.tsx              -> hero + large player + now playing + recently played + schedule preview
+listen.tsx             -> full-page player experience, stream picker
+schedule.tsx           -> calendar + list view (read-only)
+programs.tsx           -> program grid
+programs.$slug.tsx     -> program detail
+podcasts.tsx           -> podcast listing (placeholder data source)
+podcasts.$slug.tsx     -> episodes list
+about.tsx
+contact.tsx
+```
 
-3. **Stale Microsoft session / multiple accounts.**
-   Reusing a half-finished login from a previous tab, signing in with a different work account in another tab, or third-party-cookie blocking can all cause the request-token mismatch.
+Each route gets its own `head()` meta (title, description, og:*). Index is the only one with og:image.
 
-4. **SAML SSO provider registered with the wrong metadata or no domain mapping.**
-   When `configure_saml_sso` was called earlier it was registered without a metadata URL or email-domain list. Without a metadata URL Lovable Cloud cannot verify Entra's response correctly, and without a domain mapping `signInWithSSO({ domain })` cannot route to Entra at all — both can manifest as confusing IdP errors.
+New layout: `src/components/public-layout.tsx` (top nav, footer, theme toggle, mini-player slot). Distinct from the existing `AppLayout` (which stays for `/admin`).
 
-## Plan
+Data sources (already exist):
+- `/api/public/now-playing` → Now Playing + Recently Played
+- `/api/public/station-config` → station branding, stream URLs, mountpoints
+- `/api/public/listener-stats` → optional listener counts
+- `src/lib/streaming.functions.ts` / `streaming-outputs.functions.ts` → stream profile list
+- Schedule: read via a new public server fn that wraps the existing scheduler queries (read-only, `supabaseAdmin` projection of safe columns).
 
-1. **Confirm Entra app config.** Open the Enterprise Application in Entra → Single sign-on → SAML, and verify:
-   - Reply URL matches the ACS URL above exactly (no trailing slash, no custom domain).
-   - Identifier matches the Entity ID above exactly.
-   - "Sign on URL" is blank or points at `https://core.radiouppsala.se/auth` (forces SP-initiated).
-2. **Re-run `configure_saml_sso`** with the real Entra **App Federation Metadata URL** and the list of email domains that should use this IdP (e.g. `radiouppsala.se`). Without these two values the SSO record is incomplete.
-3. **Force SP-initiated flow.** Document for operators that SSO must be started from the app's `/auth` page (typing email → Continue), not from Microsoft My Apps.
-4. **Reproduce cleanly.** In a fresh browser profile (no cached Entra session), sign in via `/auth`. If 165000 still appears, capture the Microsoft `Correlation Id` and the Lovable Cloud auth logs at the same timestamp to see whether the SAML response ever reached the ACS endpoint.
-5. **Optional UI nudge.** On the auth page, add a short hint under the SSO field: "Use your work email — you'll be redirected to your company's sign-in" so users don't try the Microsoft tile path.
+## 2. Persistent radio player
 
-## What I'd change in code
+- `src/lib/player-context.tsx` — React context with a singleton `<audio>` element mounted once in `__root.tsx`, so playback survives route changes.
+- `src/components/radio-player.tsx` — large player (hero/listen page).
+- `src/components/mini-player.tsx` — fixed bottom bar, appears after first play; rendered in `public-layout`.
+- HLS via `hls.js` (lazy-loaded, client-only); native MP3/AAC fallback.
+- Stream picker: Auto (HLS) / AAC 48 / AAC 96 / AAC 192 / MP3 192 — sourced from station-config; gracefully hidden if a profile is missing.
+- States: loading, error, fallback artwork. Mobile = expanded sheet; desktop = inline + mini.
 
-Only step 5 touches the app. Steps 1–4 are Entra and Lovable Cloud config — no code edits, and they're what actually resolves AADSTS165000.
+## 3. Admin shell under `/admin/*` (new, parallel)
 
-## Files
+Per your choice, we build a **new** admin tree. To avoid duplicating server logic, each new admin page calls the same `*.functions.ts` modules the current pages use (no new backend). The existing top-level pages (`/stations`, `/playlists`, …) stay in place; we can hide them from the sidebar later if you want.
 
-- `src/routes/auth.tsx` — add a one-line helper text under the Enterprise SSO input (cosmetic only).
+```text
+admin/login.tsx              -> wraps existing /auth flow
+admin/route.tsx              -> _authenticated-style guard + AdminLayout sidebar
+admin/index.tsx              -> Dashboard: station/icecast/liquidsoap status, now-playing,
+                                current playlist + block, recent logs,
+                                action buttons (Reload Liquidsoap, Generate Config,
+                                Restart Services, Refresh Status) → existing
+                                streaming.server / runtime-targets / agent-client fns
+admin/stations.tsx           -> list + editor (name, slug, domain, description,
+                                website, branding, default artwork)
+admin/playlists.tsx          -> CRUD + drag-and-drop ordering (dnd-kit),
+                                playlist types incl. toth/sponsor/fallback
+admin/tracks.tsx             -> search/filter table, upload + R2 + Catalogus
+                                Musicus placeholders
+admin/schedules.tsx          -> calendar + list, recurring + priorities,
+                                current/upcoming block markers
+admin/programs.tsx           -> CRUD
+admin/podcasts.tsx           -> podcasts + episodes nested
+admin/live.tsx               -> live input status, DJs, override/fallback,
+                                connection info (passwords masked)
+admin/streams.tsx            -> mountpoints, HLS profiles, public URLs,
+                                copy + test buttons
+admin/settings.tsx
+admin/logs.tsx               -> filter by source, severity badges, refresh
+```
 
-Everything else is done via the Lovable Cloud SAML configuration tool and the Entra admin portal.
+Auth: reuse existing `src/lib/auth.tsx`. Admin routes go under a new
+`src/routes/_authenticated/admin.*` tree using the integration-managed
+`_authenticated` layout (no custom auth gate).
+
+## 4. Shared components (new)
+
+`AdminLayout`, `PublicLayout`, `RadioPlayer`, `MiniPlayer`, `NowPlayingCard`,
+`RecentlyPlayedList`, `SchedulePreview`, `PodcastCard`, `DashboardStatusCards`,
+`PlaylistEditor`, `TrackTable`, `ScheduleEditor`, `LiveStatusPanel`,
+`StreamUrlsPanel`, `LogsTable`, `ThemeToggle` (already exists in theme.tsx — reuse).
+
+## 5. Design tokens & theming
+
+- Stay on existing oklch tokens in `src/styles.css`; add `--gradient-hero`,
+  `--shadow-player`, `--radius-player` for the Spotify/Apple-feel player.
+- Dark mode already wired via `ThemeProvider`. Mobile-first via Tailwind v4.
+- No station-specific colors hardcoded — accent comes from
+  `stations.accent_color` (already in `StationBrand`).
+
+## 6. Out of scope (placeholders only)
+
+News section, Catalogus Musicus import, Cloudflare R2 uploader UI, RSS feed,
+AI presenters, premium memberships, listener analytics dashboards, mobile
+apps. Each gets a `<PlaceholderNotice>` card pointing to where the integration
+will plug in.
+
+## 7. Delivery order
+
+1. Player context + audio singleton + mini/large player + `hls.js` install.
+2. PublicLayout + `/`, `/listen` wired to `/api/public/*`.
+3. `/schedule`, `/programs`, `/podcasts`, `/about`, `/contact` with route-level `head()`.
+4. AdminLayout + `/admin` dashboard wired to existing server fns.
+5. Remaining `/admin/*` pages, reusing current `.functions.ts` modules.
+6. Polish: empty/loading/error states everywhere, mobile sheet player.
+
+No DB migrations. No new edge functions. No changes to existing
+`src/integrations/supabase/*` files.
