@@ -131,3 +131,46 @@ function StationsPage() {
     </AppLayout>
   );
 }
+
+function StationApiKeyButton({ stationId, hasKey }: { stationId: string; hasKey: boolean }) {
+  const gen = useServerFn(generateStationApiKey);
+  const [issued, setIssued] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function generate() {
+    setBusy(true);
+    try {
+      const r = await gen({ data: { stationId } });
+      setIssued(r.plaintext);
+      setOpen(true);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <Button size="sm" variant={hasKey ? "ghost" : "outline"} onClick={generate} disabled={busy}>
+        <Key className="w-3.5 h-3.5 mr-1" />
+        {hasKey ? "Rotate" : "Generate"}
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>API key issued</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Copy this key now — it will not be shown again. Use it as <code className="font-mono">Authorization: Bearer &lt;key&gt;</code> when calling <code className="font-mono">/api/public/radio/news</code>.
+          </p>
+          <div className="flex gap-2 items-center bg-muted/40 p-2 rounded font-mono text-xs break-all">
+            <span className="flex-1">{issued}</span>
+            <Button size="sm" variant="ghost" onClick={() => { if (issued) { navigator.clipboard.writeText(issued); toast.success("Copied"); } }}>
+              <Copy className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
