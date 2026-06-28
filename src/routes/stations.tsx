@@ -14,11 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
-import { Plus, Trash2, Radio } from "lucide-react";
+import { Plus, Trash2, Radio, Key, Copy } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { stationSchema, formatZodError } from "@/lib/validation";
+import { useServerFn } from "@tanstack/react-start";
+import { generateStationApiKey } from "@/lib/news.functions";
 
 export const Route = createFileRoute("/stations")({ component: StationsPage });
 
@@ -92,7 +94,7 @@ function StationsPage() {
         <Card className="overflow-hidden">
           {stations.isLoading ? <LoadingRows cols={7} /> : (
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>API Key</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
               <TableBody>
                 {stations.data?.map((s: any) => (
                   <TableRow key={s.id}>
@@ -100,6 +102,9 @@ function StationsPage() {
                     <TableCell className="text-muted-foreground font-mono text-xs">{s.slug}</TableCell>
                     <TableCell className="text-muted-foreground">{s.accounts?.name ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">{s.azuracast_station_id ?? "—"}</TableCell>
+                    <TableCell>
+                      {isAdmin ? <StationApiKeyButton stationId={s.id} hasKey={!!s.api_key_hash} /> : (s.api_key_hash ? <span className="text-xs text-emerald-400">set</span> : <span className="text-xs text-muted-foreground">none</span>)}
+                    </TableCell>
                     <TableCell><StatusBadge status={s.azuracast_station_id ? "ok" : "untested"} /></TableCell>
                     <TableCell><Switch checked={s.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: s.id, val: v })} /></TableCell>
                     <TableCell>
@@ -124,5 +129,48 @@ function StationsPage() {
         </Card>
       )}
     </AppLayout>
+  );
+}
+
+function StationApiKeyButton({ stationId, hasKey }: { stationId: string; hasKey: boolean }) {
+  const gen = useServerFn(generateStationApiKey);
+  const [issued, setIssued] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function generate() {
+    setBusy(true);
+    try {
+      const r = await gen({ data: { stationId } });
+      setIssued(r.plaintext);
+      setOpen(true);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <Button size="sm" variant={hasKey ? "ghost" : "outline"} onClick={generate} disabled={busy}>
+        <Key className="w-3.5 h-3.5 mr-1" />
+        {hasKey ? "Rotate" : "Generate"}
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>API key issued</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Copy this key now — it will not be shown again. Use it as <code className="font-mono">Authorization: Bearer &lt;key&gt;</code> when calling <code className="font-mono">/api/public/radio/news</code>.
+          </p>
+          <div className="flex gap-2 items-center bg-muted/40 p-2 rounded font-mono text-xs break-all">
+            <span className="flex-1">{issued}</span>
+            <Button size="sm" variant="ghost" onClick={() => { if (issued) { navigator.clipboard.writeText(issued); toast.success("Copied"); } }}>
+              <Copy className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

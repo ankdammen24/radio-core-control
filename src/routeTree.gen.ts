@@ -29,6 +29,7 @@ import { Route as PodcastsRouteImport } from './routes/podcasts'
 import { Route as PodcastHubRouteImport } from './routes/podcast-hub'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ListenersRouteImport } from './routes/listeners'
@@ -60,10 +61,13 @@ import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.
 import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
+import { Route as ApiPublicRadioNewsRouteImport } from './routes/api.public.radio.news'
 import { Route as ApiPublicCronSyncWorkerRouteImport } from './routes/api.public.cron.sync-worker'
 import { Route as ApiPublicCronPodcastSyncRouteImport } from './routes/api.public.cron.podcast-sync'
 import { Route as ApiPublicStationsStationIdPodcastsRouteImport } from './routes/api.public.stations.$stationId.podcasts'
+import { Route as ApiPublicRadioNewsIdRouteImport } from './routes/api.public.radio.news.$id'
 import { Route as ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport } from './routes/api.public.stations.$stationId.episodes.$episodeId'
+import { Route as ApiPublicRadioNewsIdBroadcastedRouteImport } from './routes/api.public.radio.news.$id.broadcasted'
 import { Route as ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport } from './routes/api.public.stations.$stationId.podcasts.$podcastId.episodes'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
@@ -164,6 +168,11 @@ const PlaylistsRoute = PlaylistsRouteImport.update({
 const NowPlayingRoute = NowPlayingRouteImport.update({
   id: '/now-playing',
   path: '/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MediaRoute = MediaRouteImport.update({
@@ -321,6 +330,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRadioNewsRoute = ApiPublicRadioNewsRouteImport.update({
+  id: '/api/public/radio/news',
+  path: '/api/public/radio/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronSyncWorkerRoute = ApiPublicCronSyncWorkerRouteImport.update({
   id: '/api/public/cron/sync-worker',
   path: '/api/public/cron/sync-worker',
@@ -338,11 +352,22 @@ const ApiPublicStationsStationIdPodcastsRoute =
     path: '/api/public/stations/$stationId/podcasts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicRadioNewsIdRoute = ApiPublicRadioNewsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiPublicRadioNewsRoute,
+} as any)
 const ApiPublicStationsStationIdEpisodesEpisodeIdRoute =
   ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport.update({
     id: '/api/public/stations/$stationId/episodes/$episodeId',
     path: '/api/public/stations/$stationId/episodes/$episodeId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicRadioNewsIdBroadcastedRoute =
+  ApiPublicRadioNewsIdBroadcastedRouteImport.update({
+    id: '/broadcasted',
+    path: '/broadcasted',
+    getParentRoute: () => ApiPublicRadioNewsIdRoute,
   } as any)
 const ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute =
   ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport.update({
@@ -375,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -405,7 +431,10 @@ export interface FileRoutesByFullPath {
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
@@ -433,6 +462,7 @@ export interface FileRoutesByTo {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -463,7 +493,10 @@ export interface FileRoutesByTo {
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
@@ -492,6 +525,7 @@ export interface FileRoutesById {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -522,7 +556,10 @@ export interface FileRoutesById {
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
@@ -552,6 +589,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -582,7 +620,10 @@ export interface FileRouteTypes {
     | '/api/public/station-config'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/radio/news'
+    | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesByTo: FileRoutesByTo
@@ -610,6 +651,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -640,7 +682,10 @@ export interface FileRouteTypes {
     | '/api/public/station-config'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/radio/news'
+    | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   id:
@@ -668,6 +713,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -698,7 +744,10 @@ export interface FileRouteTypes {
     | '/api/public/station-config'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/radio/news'
+    | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesById: FileRoutesById
@@ -727,6 +776,7 @@ export interface RootRouteChildren {
   ListenersRoute: typeof ListenersRoute
   LiveRoute: typeof LiveRoute
   MediaRoute: typeof MediaRoute
+  NewsRoute: typeof NewsRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
   PodcastHubRoute: typeof PodcastHubRoute
@@ -757,6 +807,7 @@ export interface RootRouteChildren {
   ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
   ApiPublicCronPodcastSyncRoute: typeof ApiPublicCronPodcastSyncRoute
   ApiPublicCronSyncWorkerRoute: typeof ApiPublicCronSyncWorkerRoute
+  ApiPublicRadioNewsRoute: typeof ApiPublicRadioNewsRouteWithChildren
   ApiPublicStationsStationIdPodcastsRoute: typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
   ApiPublicStationsStationIdEpisodesEpisodeIdRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
 }
@@ -901,6 +952,13 @@ declare module '@tanstack/react-router' {
       path: '/now-playing'
       fullPath: '/now-playing'
       preLoaderRoute: typeof NowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/media': {
@@ -1120,6 +1178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/radio/news': {
+      id: '/api/public/radio/news'
+      path: '/api/public/radio/news'
+      fullPath: '/api/public/radio/news'
+      preLoaderRoute: typeof ApiPublicRadioNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/sync-worker': {
       id: '/api/public/cron/sync-worker'
       path: '/api/public/cron/sync-worker'
@@ -1141,12 +1206,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStationsStationIdPodcastsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/radio/news/$id': {
+      id: '/api/public/radio/news/$id'
+      path: '/$id'
+      fullPath: '/api/public/radio/news/$id'
+      preLoaderRoute: typeof ApiPublicRadioNewsIdRouteImport
+      parentRoute: typeof ApiPublicRadioNewsRoute
+    }
     '/api/public/stations/$stationId/episodes/$episodeId': {
       id: '/api/public/stations/$stationId/episodes/$episodeId'
       path: '/api/public/stations/$stationId/episodes/$episodeId'
       fullPath: '/api/public/stations/$stationId/episodes/$episodeId'
       preLoaderRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/public/radio/news/$id/broadcasted': {
+      id: '/api/public/radio/news/$id/broadcasted'
+      path: '/broadcasted'
+      fullPath: '/api/public/radio/news/$id/broadcasted'
+      preLoaderRoute: typeof ApiPublicRadioNewsIdBroadcastedRouteImport
+      parentRoute: typeof ApiPublicRadioNewsIdRoute
     }
     '/api/public/stations/$stationId/podcasts/$podcastId/episodes': {
       id: '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
@@ -1157,6 +1236,28 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface ApiPublicRadioNewsIdRouteChildren {
+  ApiPublicRadioNewsIdBroadcastedRoute: typeof ApiPublicRadioNewsIdBroadcastedRoute
+}
+
+const ApiPublicRadioNewsIdRouteChildren: ApiPublicRadioNewsIdRouteChildren = {
+  ApiPublicRadioNewsIdBroadcastedRoute: ApiPublicRadioNewsIdBroadcastedRoute,
+}
+
+const ApiPublicRadioNewsIdRouteWithChildren =
+  ApiPublicRadioNewsIdRoute._addFileChildren(ApiPublicRadioNewsIdRouteChildren)
+
+interface ApiPublicRadioNewsRouteChildren {
+  ApiPublicRadioNewsIdRoute: typeof ApiPublicRadioNewsIdRouteWithChildren
+}
+
+const ApiPublicRadioNewsRouteChildren: ApiPublicRadioNewsRouteChildren = {
+  ApiPublicRadioNewsIdRoute: ApiPublicRadioNewsIdRouteWithChildren,
+}
+
+const ApiPublicRadioNewsRouteWithChildren =
+  ApiPublicRadioNewsRoute._addFileChildren(ApiPublicRadioNewsRouteChildren)
 
 interface ApiPublicStationsStationIdPodcastsRouteChildren {
   ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute: typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
@@ -1197,6 +1298,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListenersRoute: ListenersRoute,
   LiveRoute: LiveRoute,
   MediaRoute: MediaRoute,
+  NewsRoute: NewsRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
   PodcastHubRoute: PodcastHubRoute,
@@ -1227,6 +1329,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
   ApiPublicCronPodcastSyncRoute: ApiPublicCronPodcastSyncRoute,
   ApiPublicCronSyncWorkerRoute: ApiPublicCronSyncWorkerRoute,
+  ApiPublicRadioNewsRoute: ApiPublicRadioNewsRouteWithChildren,
   ApiPublicStationsStationIdPodcastsRoute:
     ApiPublicStationsStationIdPodcastsRouteWithChildren,
   ApiPublicStationsStationIdEpisodesEpisodeIdRoute:

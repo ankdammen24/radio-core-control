@@ -17,7 +17,7 @@ import {
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
   Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
-  Cpu,
+  Cpu, Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
@@ -56,6 +56,7 @@ const GROUPS: Group[] = [
       { label: "Voicetracks", icon: Mic,           to: "/voicetracks" },
       { label: "Ads",         icon: Megaphone,     to: "/ads" },
       { label: "Inbox",       icon: MessageSquare, to: "/inbox" },
+      { label: "News",        icon: Newspaper,     to: "/news" },
     ],
   },
   {
