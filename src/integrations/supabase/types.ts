@@ -817,6 +817,267 @@ export type Database = {
           },
         ]
       }
+      podcast_episodes: {
+        Row: {
+          artwork_url: string | null
+          audio_format: string | null
+          audio_url: string
+          checksum: string | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          duration_seconds: number | null
+          episode_number: number | null
+          explicit: boolean
+          guid: string
+          id: string
+          podcast_id: string
+          publish_date: string | null
+          season: number | null
+          title: string
+          transcript_url: string | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          artwork_url?: string | null
+          audio_format?: string | null
+          audio_url: string
+          checksum?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          episode_number?: number | null
+          explicit?: boolean
+          guid: string
+          id?: string
+          podcast_id: string
+          publish_date?: string | null
+          season?: number | null
+          title: string
+          transcript_url?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          artwork_url?: string | null
+          audio_format?: string | null
+          audio_url?: string
+          checksum?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          episode_number?: number | null
+          explicit?: boolean
+          guid?: string
+          id?: string
+          podcast_id?: string
+          publish_date?: string | null
+          season?: number | null
+          title?: string
+          transcript_url?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "podcast_episodes_podcast_id_fkey"
+            columns: ["podcast_id"]
+            isOneToOne: false
+            referencedRelation: "podcasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      podcast_play_log: {
+        Row: {
+          duration_played: number | null
+          episode_id: string
+          id: string
+          played_at: string
+          source: Database["public"]["Enums"]["podcast_play_source"]
+          station_id: string
+        }
+        Insert: {
+          duration_played?: number | null
+          episode_id: string
+          id?: string
+          played_at?: string
+          source?: Database["public"]["Enums"]["podcast_play_source"]
+          station_id: string
+        }
+        Update: {
+          duration_played?: number | null
+          episode_id?: string
+          id?: string
+          played_at?: string
+          source?: Database["public"]["Enums"]["podcast_play_source"]
+          station_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "podcast_play_log_episode_id_fkey"
+            columns: ["episode_id"]
+            isOneToOne: false
+            referencedRelation: "podcast_episodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "podcast_play_log_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      podcast_sources: {
+        Row: {
+          auth_secret_name: string | null
+          base_url: string
+          created_at: string
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["podcast_source_kind"]
+          last_synced_at: string | null
+          name: string
+          sync_interval_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          auth_secret_name?: string | null
+          base_url: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["podcast_source_kind"]
+          last_synced_at?: string | null
+          name: string
+          sync_interval_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          auth_secret_name?: string | null
+          base_url?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["podcast_source_kind"]
+          last_synced_at?: string | null
+          name?: string
+          sync_interval_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      podcast_sync_runs: {
+        Row: {
+          episodes_deleted: number
+          episodes_new: number
+          episodes_updated: number
+          error: string | null
+          finished_at: string | null
+          id: string
+          podcasts_seen: number
+          source_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["podcast_sync_status"]
+        }
+        Insert: {
+          episodes_deleted?: number
+          episodes_new?: number
+          episodes_updated?: number
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          podcasts_seen?: number
+          source_id: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["podcast_sync_status"]
+        }
+        Update: {
+          episodes_deleted?: number
+          episodes_new?: number
+          episodes_updated?: number
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          podcasts_seen?: number
+          source_id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["podcast_sync_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "podcast_sync_runs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "podcast_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      podcasts: {
+        Row: {
+          artwork_url: string | null
+          categories: string[]
+          checksum: string | null
+          created_at: string
+          description: string | null
+          external_id: string
+          id: string
+          is_active: boolean
+          language: string | null
+          last_updated_at: string | null
+          owner: string | null
+          source_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artwork_url?: string | null
+          categories?: string[]
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          external_id: string
+          id?: string
+          is_active?: boolean
+          language?: string | null
+          last_updated_at?: string | null
+          owner?: string | null
+          source_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artwork_url?: string | null
+          categories?: string[]
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          external_id?: string
+          id?: string
+          is_active?: boolean
+          language?: string | null
+          last_updated_at?: string | null
+          owner?: string | null
+          source_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "podcasts_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "podcast_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       presenters: {
         Row: {
           avatar_url: string | null
@@ -1105,6 +1366,7 @@ export type Database = {
       }
       schedule_blocks: {
         Row: {
+          block_kind: Database["public"]["Enums"]["schedule_block_kind"]
           created_at: string
           day_of_week: Database["public"]["Enums"]["day_of_week"]
           end_time: string
@@ -1112,12 +1374,14 @@ export type Database = {
           is_active: boolean
           name: string
           playlist_id: string | null
+          podcast_selector: Json | null
           rotation_rule_id: string | null
           start_time: string
           station_id: string
           updated_at: string
         }
         Insert: {
+          block_kind?: Database["public"]["Enums"]["schedule_block_kind"]
           created_at?: string
           day_of_week: Database["public"]["Enums"]["day_of_week"]
           end_time: string
@@ -1125,12 +1389,14 @@ export type Database = {
           is_active?: boolean
           name: string
           playlist_id?: string | null
+          podcast_selector?: Json | null
           rotation_rule_id?: string | null
           start_time: string
           station_id: string
           updated_at?: string
         }
         Update: {
+          block_kind?: Database["public"]["Enums"]["schedule_block_kind"]
           created_at?: string
           day_of_week?: Database["public"]["Enums"]["day_of_week"]
           end_time?: string
@@ -1138,6 +1404,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           playlist_id?: string | null
+          podcast_selector?: Json | null
           rotation_rule_id?: string | null
           start_time?: string
           station_id?: string
@@ -1299,9 +1566,74 @@ export type Database = {
         }
         Relationships: []
       }
+      station_podcast_subscriptions: {
+        Row: {
+          allow_explicit: boolean
+          auto_import: boolean
+          created_at: string
+          id: string
+          is_active: boolean
+          manual_review: boolean
+          max_episodes: number | null
+          only_owned: boolean
+          only_swedish: boolean
+          podcast_id: string
+          priority: number
+          station_id: string
+          updated_at: string
+        }
+        Insert: {
+          allow_explicit?: boolean
+          auto_import?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manual_review?: boolean
+          max_episodes?: number | null
+          only_owned?: boolean
+          only_swedish?: boolean
+          podcast_id: string
+          priority?: number
+          station_id: string
+          updated_at?: string
+        }
+        Update: {
+          allow_explicit?: boolean
+          auto_import?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          manual_review?: boolean
+          max_episodes?: number | null
+          only_owned?: boolean
+          only_swedish?: boolean
+          podcast_id?: string
+          priority?: number
+          station_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "station_podcast_subscriptions_podcast_id_fkey"
+            columns: ["podcast_id"]
+            isOneToOne: false
+            referencedRelation: "podcasts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "station_podcast_subscriptions_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stations: {
         Row: {
           account_id: string | null
+          api_key_hash: string | null
+          api_key_prefix: string | null
           azuracast_station_id: string | null
           created_at: string
           demo_artwork_url: string | null
@@ -1316,6 +1648,8 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
+          api_key_hash?: string | null
+          api_key_prefix?: string | null
           azuracast_station_id?: string | null
           created_at?: string
           demo_artwork_url?: string | null
@@ -1330,6 +1664,8 @@ export type Database = {
         }
         Update: {
           account_id?: string | null
+          api_key_hash?: string | null
+          api_key_prefix?: string | null
           azuracast_station_id?: string | null
           created_at?: string
           demo_artwork_url?: string | null
@@ -2046,6 +2382,9 @@ export type Database = {
         | "promo"
         | "special"
         | "paused"
+      podcast_play_source: "schedule" | "manual" | "live"
+      podcast_source_kind: "fablesh" | "rss"
+      podcast_sync_status: "running" | "success" | "partial" | "error"
       rights_status:
         | "unknown"
         | "cleared"
@@ -2061,6 +2400,13 @@ export type Database = {
         | "liquidsoap"
         | "stereo_tool"
         | "custom"
+      schedule_block_kind:
+        | "music"
+        | "jingle"
+        | "ad"
+        | "live"
+        | "news"
+        | "podcast"
       storage_provider: "r2" | "s3" | "local" | "azure_blob" | "external_url"
       storage_purpose: "media" | "artwork" | "cdn" | "backup" | "exports"
       storage_status: "unknown" | "online" | "warning" | "offline"
@@ -2222,6 +2568,9 @@ export const Constants = {
         "special",
         "paused",
       ],
+      podcast_play_source: ["schedule", "manual", "live"],
+      podcast_source_kind: ["fablesh", "rss"],
+      podcast_sync_status: ["running", "success", "partial", "error"],
       rights_status: [
         "unknown",
         "cleared",
@@ -2239,6 +2588,7 @@ export const Constants = {
         "stereo_tool",
         "custom",
       ],
+      schedule_block_kind: ["music", "jingle", "ad", "live", "news", "podcast"],
       storage_provider: ["r2", "s3", "local", "azure_blob", "external_url"],
       storage_purpose: ["media", "artwork", "cdn", "backup", "exports"],
       storage_status: ["unknown", "online", "warning", "offline"],

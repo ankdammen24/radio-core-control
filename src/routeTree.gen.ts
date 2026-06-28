@@ -26,6 +26,7 @@ import { Route as RotationRouteImport } from './routes/rotation'
 import { Route as R2StorageRouteImport } from './routes/r2-storage'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as PodcastsRouteImport } from './routes/podcasts'
+import { Route as PodcastHubRouteImport } from './routes/podcast-hub'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
 import { Route as MediaRouteImport } from './routes/media'
@@ -60,6 +61,10 @@ import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
 import { Route as ApiPublicCronSyncWorkerRouteImport } from './routes/api.public.cron.sync-worker'
+import { Route as ApiPublicCronPodcastSyncRouteImport } from './routes/api.public.cron.podcast-sync'
+import { Route as ApiPublicStationsStationIdPodcastsRouteImport } from './routes/api.public.stations.$stationId.podcasts'
+import { Route as ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport } from './routes/api.public.stations.$stationId.episodes.$episodeId'
+import { Route as ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport } from './routes/api.public.stations.$stationId.podcasts.$podcastId.episodes'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -144,6 +149,11 @@ const ProgramsRoute = ProgramsRouteImport.update({
 const PodcastsRoute = PodcastsRouteImport.update({
   id: '/podcasts',
   path: '/podcasts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodcastHubRoute = PodcastHubRouteImport.update({
+  id: '/podcast-hub',
+  path: '/podcast-hub',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaylistsRoute = PlaylistsRouteImport.update({
@@ -316,6 +326,30 @@ const ApiPublicCronSyncWorkerRoute = ApiPublicCronSyncWorkerRouteImport.update({
   path: '/api/public/cron/sync-worker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronPodcastSyncRoute =
+  ApiPublicCronPodcastSyncRouteImport.update({
+    id: '/api/public/cron/podcast-sync',
+    path: '/api/public/cron/podcast-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicStationsStationIdPodcastsRoute =
+  ApiPublicStationsStationIdPodcastsRouteImport.update({
+    id: '/api/public/stations/$stationId/podcasts',
+    path: '/api/public/stations/$stationId/podcasts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicStationsStationIdEpisodesEpisodeIdRoute =
+  ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport.update({
+    id: '/api/public/stations/$stationId/episodes/$episodeId',
+    path: '/api/public/stations/$stationId/episodes/$episodeId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute =
+  ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport.update({
+    id: '/$podcastId/episodes',
+    path: '/$podcastId/episodes',
+    getParentRoute: () => ApiPublicStationsStationIdPodcastsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -343,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcast-hub': typeof PodcastHubRoute
   '/podcasts': typeof PodcastsRoute
   '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
@@ -368,7 +403,11 @@ export interface FileRoutesByFullPath {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -396,6 +435,7 @@ export interface FileRoutesByTo {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcast-hub': typeof PodcastHubRoute
   '/podcasts': typeof PodcastsRoute
   '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
@@ -421,7 +461,11 @@ export interface FileRoutesByTo {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -450,6 +494,7 @@ export interface FileRoutesById {
   '/media': typeof MediaRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
+  '/podcast-hub': typeof PodcastHubRoute
   '/podcasts': typeof PodcastsRoute
   '/programs': typeof ProgramsRoute
   '/r2-storage': typeof R2StorageRoute
@@ -475,7 +520,11 @@ export interface FileRoutesById {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
+  '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -505,6 +554,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcast-hub'
     | '/podcasts'
     | '/programs'
     | '/r2-storage'
@@ -530,7 +580,11 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -558,6 +612,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcast-hub'
     | '/podcasts'
     | '/programs'
     | '/r2-storage'
@@ -583,7 +638,11 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   id:
     | '__root__'
     | '/'
@@ -611,6 +670,7 @@ export interface FileRouteTypes {
     | '/media'
     | '/now-playing'
     | '/playlists'
+    | '/podcast-hub'
     | '/podcasts'
     | '/programs'
     | '/r2-storage'
@@ -636,7 +696,11 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
+    | '/api/public/stations/$stationId/podcasts'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -665,6 +729,7 @@ export interface RootRouteChildren {
   MediaRoute: typeof MediaRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
+  PodcastHubRoute: typeof PodcastHubRoute
   PodcastsRoute: typeof PodcastsRoute
   ProgramsRoute: typeof ProgramsRoute
   R2StorageRoute: typeof R2StorageRoute
@@ -690,7 +755,10 @@ export interface RootRouteChildren {
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
   ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
   ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
+  ApiPublicCronPodcastSyncRoute: typeof ApiPublicCronPodcastSyncRoute
   ApiPublicCronSyncWorkerRoute: typeof ApiPublicCronSyncWorkerRoute
+  ApiPublicStationsStationIdPodcastsRoute: typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  ApiPublicStationsStationIdEpisodesEpisodeIdRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -812,6 +880,13 @@ declare module '@tanstack/react-router' {
       path: '/podcasts'
       fullPath: '/podcasts'
       preLoaderRoute: typeof PodcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podcast-hub': {
+      id: '/podcast-hub'
+      path: '/podcast-hub'
+      fullPath: '/podcast-hub'
+      preLoaderRoute: typeof PodcastHubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playlists': {
@@ -1052,8 +1127,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronSyncWorkerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/podcast-sync': {
+      id: '/api/public/cron/podcast-sync'
+      path: '/api/public/cron/podcast-sync'
+      fullPath: '/api/public/cron/podcast-sync'
+      preLoaderRoute: typeof ApiPublicCronPodcastSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stations/$stationId/podcasts': {
+      id: '/api/public/stations/$stationId/podcasts'
+      path: '/api/public/stations/$stationId/podcasts'
+      fullPath: '/api/public/stations/$stationId/podcasts'
+      preLoaderRoute: typeof ApiPublicStationsStationIdPodcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stations/$stationId/episodes/$episodeId': {
+      id: '/api/public/stations/$stationId/episodes/$episodeId'
+      path: '/api/public/stations/$stationId/episodes/$episodeId'
+      fullPath: '/api/public/stations/$stationId/episodes/$episodeId'
+      preLoaderRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stations/$stationId/podcasts/$podcastId/episodes': {
+      id: '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
+      path: '/$podcastId/episodes'
+      fullPath: '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
+      preLoaderRoute: typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport
+      parentRoute: typeof ApiPublicStationsStationIdPodcastsRoute
+    }
   }
 }
+
+interface ApiPublicStationsStationIdPodcastsRouteChildren {
+  ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute: typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
+}
+
+const ApiPublicStationsStationIdPodcastsRouteChildren: ApiPublicStationsStationIdPodcastsRouteChildren =
+  {
+    ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute:
+      ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute,
+  }
+
+const ApiPublicStationsStationIdPodcastsRouteWithChildren =
+  ApiPublicStationsStationIdPodcastsRoute._addFileChildren(
+    ApiPublicStationsStationIdPodcastsRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1081,6 +1199,7 @@ const rootRouteChildren: RootRouteChildren = {
   MediaRoute: MediaRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
+  PodcastHubRoute: PodcastHubRoute,
   PodcastsRoute: PodcastsRoute,
   ProgramsRoute: ProgramsRoute,
   R2StorageRoute: R2StorageRoute,
@@ -1106,17 +1225,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
   ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
   ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
+  ApiPublicCronPodcastSyncRoute: ApiPublicCronPodcastSyncRoute,
   ApiPublicCronSyncWorkerRoute: ApiPublicCronSyncWorkerRoute,
+  ApiPublicStationsStationIdPodcastsRoute:
+    ApiPublicStationsStationIdPodcastsRouteWithChildren,
+  ApiPublicStationsStationIdEpisodesEpisodeIdRoute:
+    ApiPublicStationsStationIdEpisodesEpisodeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

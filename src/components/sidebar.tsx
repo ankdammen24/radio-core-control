@@ -89,7 +89,7 @@ const GROUPS: Group[] = [
       { label: "Agents",    icon: Cpu,     to: "/agents" },
       { label: "Webhooks",  icon: Webhook, disabled: true },
       { label: "Sync Jobs", icon: RefreshCw, to: "/sync-jobs" },
-      { label: "Podcasts",  icon: Podcast, disabled: true },
+      { label: "Podcast Hub", icon: Podcast, to: "/podcast-hub" },
     ],
   },
   {
