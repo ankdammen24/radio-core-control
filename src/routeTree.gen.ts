@@ -29,6 +29,7 @@ import { Route as PodcastsRouteImport } from './routes/podcasts'
 import { Route as PodcastHubRouteImport } from './routes/podcast-hub'
 import { Route as PlaylistsRouteImport } from './routes/playlists'
 import { Route as NowPlayingRouteImport } from './routes/now-playing'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ListenersRouteImport } from './routes/listeners'
@@ -167,6 +168,11 @@ const PlaylistsRoute = PlaylistsRouteImport.update({
 const NowPlayingRoute = NowPlayingRouteImport.update({
   id: '/now-playing',
   path: '/now-playing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MediaRoute = MediaRouteImport.update({
@@ -394,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -455,6 +462,7 @@ export interface FileRoutesByTo {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -517,6 +525,7 @@ export interface FileRoutesById {
   '/listeners': typeof ListenersRoute
   '/live': typeof LiveRoute
   '/media': typeof MediaRoute
+  '/news': typeof NewsRoute
   '/now-playing': typeof NowPlayingRoute
   '/playlists': typeof PlaylistsRoute
   '/podcast-hub': typeof PodcastHubRoute
@@ -580,6 +589,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -641,6 +651,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -702,6 +713,7 @@ export interface FileRouteTypes {
     | '/listeners'
     | '/live'
     | '/media'
+    | '/news'
     | '/now-playing'
     | '/playlists'
     | '/podcast-hub'
@@ -764,6 +776,7 @@ export interface RootRouteChildren {
   ListenersRoute: typeof ListenersRoute
   LiveRoute: typeof LiveRoute
   MediaRoute: typeof MediaRoute
+  NewsRoute: typeof NewsRoute
   NowPlayingRoute: typeof NowPlayingRoute
   PlaylistsRoute: typeof PlaylistsRoute
   PodcastHubRoute: typeof PodcastHubRoute
@@ -939,6 +952,13 @@ declare module '@tanstack/react-router' {
       path: '/now-playing'
       fullPath: '/now-playing'
       preLoaderRoute: typeof NowPlayingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/media': {
@@ -1278,6 +1298,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListenersRoute: ListenersRoute,
   LiveRoute: LiveRoute,
   MediaRoute: MediaRoute,
+  NewsRoute: NewsRoute,
   NowPlayingRoute: NowPlayingRoute,
   PlaylistsRoute: PlaylistsRoute,
   PodcastHubRoute: PodcastHubRoute,
