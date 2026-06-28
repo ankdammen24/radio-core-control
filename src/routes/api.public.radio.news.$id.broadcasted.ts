@@ -57,6 +57,19 @@ export const Route = createFileRoute("/api/public/radio/news/$id/broadcasted")({
           await supabaseAdmin.from("news_items").update({ status: "broadcasted" }).eq("id", params.id);
         }
 
+        await supabaseAdmin.from("audit_logs").insert({
+          user_id: null,
+          action: "news.broadcasted",
+          entity_type: "news_items",
+          entity_id: params.id,
+          new_value: {
+            stationId: auth.station.id,
+            stationSlug: auth.station.slug,
+            broadcastTime,
+            programName: parsed.data.programName ?? null,
+          },
+        });
+
         return Response.json({ ok: true, broadcast: history }, { status: 201 });
       },
     },
