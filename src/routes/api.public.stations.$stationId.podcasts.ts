@@ -2,7 +2,7 @@
  * Distribution API — list podcasts a station is subscribed to.
  *
  * Auth: Authorization: Bearer <station-api-key>
- * Returns metadata only. Audio URLs point at Catalogus Media.
+ * Returns metadata only. Audio URLs point at Fablesh.
  */
 import { createFileRoute } from "@tanstack/react-router";
 
