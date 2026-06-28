@@ -25,7 +25,8 @@ export const Route = createFileRoute("/api/public/radio/news")({
         const q = url.searchParams;
 
         const status = q.get("status");
-        const statusFilter = status && ALLOWED_STATUS.has(status) ? status : "ready_for_radio";
+        const statusFilter = (status && ALLOWED_STATUS.has(status) ? status : "ready_for_radio") as
+          "ready_for_radio" | "broadcasted";
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         let query = supabaseAdmin.from("news_items").select("*").eq("status", statusFilter);
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/api/public/radio/news")({
         const category = q.get("category");
         if (category) query = query.eq("category", category);
         const priority = q.get("priority");
-        if (priority) query = query.eq("priority", priority);
+        if (priority) query = query.eq("priority", priority as "low" | "normal" | "high" | "breaking");
         const language = q.get("language");
         if (language) query = query.eq("language", language);
         if (q.get("hasAudio") === "true") query = query.not("audio_url", "is", null);

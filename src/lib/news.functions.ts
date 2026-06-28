@@ -37,7 +37,7 @@ export const listNews = createServerFn({ method: "GET" })
   .inputValidator((data: { status?: string } | undefined) => data ?? {})
   .handler(async ({ data, context }) => {
     let q = context.supabase.from("news_items").select("*").order("created_at", { ascending: false }).limit(200);
-    if (data.status) q = q.eq("status", data.status);
+    if (data.status) q = q.eq("status", data.status as typeof NEWS_STATUSES[number]);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
