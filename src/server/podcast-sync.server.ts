@@ -4,7 +4,7 @@
  * Pulls podcasts + episodes from a configured source (Fablesh today, RSS later),
  * diffs against the local Radio Core cache via GUID/checksum/version and
  * upserts metadata. No audio files are stored — `audio_url` is assumed to be
- * the Catalogus Media streaming URL passed through verbatim.
+ * the Fablesh streaming URL passed through verbatim.
  */
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";

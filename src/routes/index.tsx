@@ -121,7 +121,7 @@ function PublicHome() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
         <PlaceholderCard icon={Newspaper} title="News" body="A live news feed will appear here when the news module is connected." />
         <PlaceholderCard icon={Mic} title="Podcasts" body="Browse on-demand episodes once the podcast catalog is published." link="/podcasts" linkLabel="Podcasts" />
-        <PlaceholderCard icon={Sparkles} title="Catalogus Musicus" body="External music catalog import — placeholder for the upcoming integration." />
+        <PlaceholderCard icon={Sparkles} title="Fablesh" body="External media catalog — fully accessible via the Fablesh API." />
       </section>
 
       <div className="text-center">
