@@ -76,11 +76,42 @@ function PodcastHubPage() {
 
   const [sourceOpen, setSourceOpen] = useState(false);
   const [sourceForm, setSourceForm] = useState<SourceForm>(EMPTY_SOURCE);
+  const [sourceTouched, setSourceTouched] = useState(false);
+
+  const sourceErrors = (() => {
+    const errs: { name?: string; base_url?: string; auth_secret_name?: string } = {};
+    if (!sourceForm.name.trim()) errs.name = "Name is required.";
+    const url = sourceForm.base_url.trim();
+    if (!url) {
+      errs.base_url = "Base URL is required.";
+    } else {
+      try {
+        const u = new URL(url);
+        if (u.protocol !== "https:" && u.protocol !== "http:") {
+          errs.base_url = "Base URL must start with http:// or https://";
+        }
+      } catch {
+        errs.base_url = "Not a valid URL (e.g. https://api.fablesh.com).";
+      }
+    }
+    if (sourceForm.kind === "fablesh") {
+      const secret = sourceForm.auth_secret_name.trim();
+      if (!secret) {
+        errs.auth_secret_name = "Fablesh requires an auth secret name (e.g. FABLESH_API_TOKEN).";
+      } else if (!/^[A-Z_][A-Z0-9_]*$/.test(secret)) {
+        errs.auth_secret_name = "Use uppercase letters, digits and underscores only (env-var convention).";
+      }
+    }
+    return errs;
+  })();
+  const hasSourceErrors = Object.keys(sourceErrors).length > 0;
 
   const saveSource = useMutation({
     mutationFn: async () => {
-      if (!sourceForm.name.trim()) throw new Error("Name required");
-      if (!sourceForm.base_url.trim()) throw new Error("Base URL required");
+      setSourceTouched(true);
+      if (hasSourceErrors) {
+        throw new Error(Object.values(sourceErrors)[0] ?? "Invalid form");
+      }
       return upsertFn({
         data: {
           id: sourceForm.id,
@@ -97,6 +128,7 @@ function PodcastHubPage() {
       toast.success(sourceForm.id ? "Source updated" : "Source created");
       setSourceOpen(false);
       setSourceForm(EMPTY_SOURCE);
+      setSourceTouched(false);
       qc.invalidateQueries({ queryKey: ["podcast-sources"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -331,7 +363,13 @@ function PodcastHubPage() {
       </div>
 
       {/* Source editor */}
-      <Dialog open={sourceOpen} onOpenChange={setSourceOpen}>
+      <Dialog
+        open={sourceOpen}
+        onOpenChange={(open) => {
+          setSourceOpen(open);
+          if (!open) setSourceTouched(false);
+        }}
+      >
         <DialogContent className="max-w-xl">
           <DialogHeader>
             <DialogTitle>{sourceForm.id ? "Edit source" : "New podcast source"}</DialogTitle>
@@ -339,7 +377,16 @@ function PodcastHubPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
               <Label>Name *</Label>
-              <Input value={sourceForm.name} onChange={(e) => setSourceForm({ ...sourceForm, name: e.target.value })} placeholder="Fablesh Production" />
+              <Input
+                value={sourceForm.name}
+                onChange={(e) => setSourceForm({ ...sourceForm, name: e.target.value })}
+                placeholder="Fablesh Production"
+                aria-invalid={sourceTouched && !!sourceErrors.name}
+                className={sourceTouched && sourceErrors.name ? "border-destructive" : undefined}
+              />
+              {sourceTouched && sourceErrors.name && (
+                <p className="text-[11px] text-destructive mt-1">{sourceErrors.name}</p>
+              )}
             </div>
             <div>
               <Label>Kind *</Label>
@@ -358,14 +405,35 @@ function PodcastHubPage() {
             </div>
             <div className="col-span-2">
               <Label>Base URL *</Label>
-              <Input value={sourceForm.base_url} onChange={(e) => setSourceForm({ ...sourceForm, base_url: e.target.value })} placeholder="https://api.fablesh.example" />
+              <Input
+                value={sourceForm.base_url}
+                onChange={(e) => setSourceForm({ ...sourceForm, base_url: e.target.value })}
+                placeholder="https://api.fablesh.example"
+                aria-invalid={sourceTouched && !!sourceErrors.base_url}
+                className={sourceTouched && sourceErrors.base_url ? "border-destructive" : undefined}
+              />
+              {sourceTouched && sourceErrors.base_url && (
+                <p className="text-[11px] text-destructive mt-1">{sourceErrors.base_url}</p>
+              )}
             </div>
             <div className="col-span-2">
-              <Label>Auth secret name</Label>
-              <Input value={sourceForm.auth_secret_name} onChange={(e) => setSourceForm({ ...sourceForm, auth_secret_name: e.target.value })} placeholder="FABLESH_API_TOKEN" />
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Name of an environment variable holding the Bearer token. Configure the value via the secrets panel — never paste raw tokens here.
-              </p>
+              <Label>
+                Auth secret name {sourceForm.kind === "fablesh" && <span className="text-destructive">*</span>}
+              </Label>
+              <Input
+                value={sourceForm.auth_secret_name}
+                onChange={(e) => setSourceForm({ ...sourceForm, auth_secret_name: e.target.value })}
+                placeholder="FABLESH_API_TOKEN"
+                aria-invalid={sourceTouched && !!sourceErrors.auth_secret_name}
+                className={sourceTouched && sourceErrors.auth_secret_name ? "border-destructive" : undefined}
+              />
+              {sourceTouched && sourceErrors.auth_secret_name ? (
+                <p className="text-[11px] text-destructive mt-1">{sourceErrors.auth_secret_name}</p>
+              ) : (
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Name of an environment variable holding the Bearer token. Configure the value via the secrets panel — never paste raw tokens here.
+                </p>
+              )}
             </div>
             <div className="col-span-2 flex items-center gap-2">
               <Switch id="active" checked={sourceForm.is_active} onCheckedChange={(v) => setSourceForm({ ...sourceForm, is_active: v })} />
@@ -374,7 +442,13 @@ function PodcastHubPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSourceOpen(false)}>Cancel</Button>
-            <Button onClick={() => saveSource.mutate()} disabled={saveSource.isPending}>
+            <Button
+              onClick={() => {
+                setSourceTouched(true);
+                if (!hasSourceErrors) saveSource.mutate();
+              }}
+              disabled={saveSource.isPending || (sourceTouched && hasSourceErrors)}
+            >
               {saveSource.isPending ? "Saving…" : sourceForm.id ? "Save" : "Create"}
             </Button>
           </DialogFooter>
