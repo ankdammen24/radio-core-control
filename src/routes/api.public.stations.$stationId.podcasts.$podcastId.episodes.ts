@@ -1,6 +1,6 @@
 /**
  * Distribution API — list episodes of a podcast for a station.
- * Audio URLs point at Catalogus Media; Radio Core does not proxy audio.
+ * Audio URLs point at Fablesh; Radio Core does not proxy audio.
  */
 import { createFileRoute } from "@tanstack/react-router";
 
