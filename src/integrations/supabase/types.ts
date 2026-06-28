@@ -653,6 +653,126 @@ export type Database = {
           },
         ]
       }
+      news_broadcast_history: {
+        Row: {
+          broadcast_time: string
+          created_at: string
+          id: string
+          metadata: Json
+          news_item_id: string
+          program_name: string | null
+          station_id: string
+        }
+        Insert: {
+          broadcast_time?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          news_item_id: string
+          program_name?: string | null
+          station_id: string
+        }
+        Update: {
+          broadcast_time?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          news_item_id?: string
+          program_name?: string | null
+          station_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_broadcast_history_news_item_id_fkey"
+            columns: ["news_item_id"]
+            isOneToOne: false
+            referencedRelation: "news_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_broadcast_history_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_items: {
+        Row: {
+          audio_url: string | null
+          category: string | null
+          created_at: string
+          estimated_duration_seconds: number | null
+          expires_at: string | null
+          external_id: string | null
+          full_article: string | null
+          id: string
+          image_url: string | null
+          language: string
+          municipality: string | null
+          priority: Database["public"]["Enums"]["news_priority"]
+          published_at: string | null
+          radio_script: string | null
+          region: string | null
+          short_title: string | null
+          source: string | null
+          status: Database["public"]["Enums"]["news_status"]
+          summary: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          category?: string | null
+          created_at?: string
+          estimated_duration_seconds?: number | null
+          expires_at?: string | null
+          external_id?: string | null
+          full_article?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string
+          municipality?: string | null
+          priority?: Database["public"]["Enums"]["news_priority"]
+          published_at?: string | null
+          radio_script?: string | null
+          region?: string | null
+          short_title?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["news_status"]
+          summary?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          category?: string | null
+          created_at?: string
+          estimated_duration_seconds?: number | null
+          expires_at?: string | null
+          external_id?: string | null
+          full_article?: string | null
+          id?: string
+          image_url?: string | null
+          language?: string
+          municipality?: string | null
+          priority?: Database["public"]["Enums"]["news_priority"]
+          published_at?: string | null
+          radio_script?: string | null
+          region?: string | null
+          short_title?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["news_status"]
+          summary?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       now_playing: {
         Row: {
           album: string | null
@@ -2375,6 +2495,14 @@ export type Database = {
         | "synced"
         | "error"
         | "paused"
+      news_priority: "low" | "normal" | "high" | "breaking"
+      news_status:
+        | "draft"
+        | "processing"
+        | "ready_for_radio"
+        | "broadcasted"
+        | "archived"
+        | "expired"
       playlist_type:
         | "rotation"
         | "jingle"
@@ -2559,6 +2687,15 @@ export const Constants = {
         "synced",
         "error",
         "paused",
+      ],
+      news_priority: ["low", "normal", "high", "breaking"],
+      news_status: [
+        "draft",
+        "processing",
+        "ready_for_radio",
+        "broadcasted",
+        "archived",
+        "expired",
       ],
       playlist_type: [
         "rotation",
