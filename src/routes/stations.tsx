@@ -14,11 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
-import { Plus, Trash2, Radio } from "lucide-react";
+import { Plus, Trash2, Radio, Key, Copy } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { stationSchema, formatZodError } from "@/lib/validation";
+import { useServerFn } from "@tanstack/react-start";
+import { generateStationApiKey } from "@/lib/news.functions";
 
 export const Route = createFileRoute("/stations")({ component: StationsPage });
 
@@ -92,7 +94,7 @@ function StationsPage() {
         <Card className="overflow-hidden">
           {stations.isLoading ? <LoadingRows cols={7} /> : (
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead>Account</TableHead><TableHead>AzuraCast ID</TableHead><TableHead>API Key</TableHead><TableHead>Status</TableHead><TableHead>Active</TableHead><TableHead className="w-12" /></TableRow></TableHeader>
               <TableBody>
                 {stations.data?.map((s: any) => (
                   <TableRow key={s.id}>
@@ -100,6 +102,9 @@ function StationsPage() {
                     <TableCell className="text-muted-foreground font-mono text-xs">{s.slug}</TableCell>
                     <TableCell className="text-muted-foreground">{s.accounts?.name ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">{s.azuracast_station_id ?? "—"}</TableCell>
+                    <TableCell>
+                      {isAdmin ? <StationApiKeyButton stationId={s.id} hasKey={!!s.api_key_hash} /> : (s.api_key_hash ? <span className="text-xs text-emerald-400">set</span> : <span className="text-xs text-muted-foreground">none</span>)}
+                    </TableCell>
                     <TableCell><StatusBadge status={s.azuracast_station_id ? "ok" : "untested"} /></TableCell>
                     <TableCell><Switch checked={s.is_active} disabled={!isEditor} onCheckedChange={(v) => toggle.mutate({ id: s.id, val: v })} /></TableCell>
                     <TableCell>
