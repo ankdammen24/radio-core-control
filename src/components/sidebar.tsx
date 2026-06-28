@@ -56,6 +56,7 @@ const GROUPS: Group[] = [
       { label: "Voicetracks", icon: Mic,           to: "/voicetracks" },
       { label: "Ads",         icon: Megaphone,     to: "/ads" },
       { label: "Inbox",       icon: MessageSquare, to: "/inbox" },
+      { label: "News",        icon: Newspaper,     to: "/news" },
     ],
   },
   {
