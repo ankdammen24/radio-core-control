@@ -76,11 +76,42 @@ function PodcastHubPage() {
 
   const [sourceOpen, setSourceOpen] = useState(false);
   const [sourceForm, setSourceForm] = useState<SourceForm>(EMPTY_SOURCE);
+  const [sourceTouched, setSourceTouched] = useState(false);
+
+  const sourceErrors = (() => {
+    const errs: { name?: string; base_url?: string; auth_secret_name?: string } = {};
+    if (!sourceForm.name.trim()) errs.name = "Name is required.";
+    const url = sourceForm.base_url.trim();
+    if (!url) {
+      errs.base_url = "Base URL is required.";
+    } else {
+      try {
+        const u = new URL(url);
+        if (u.protocol !== "https:" && u.protocol !== "http:") {
+          errs.base_url = "Base URL must start with http:// or https://";
+        }
+      } catch {
+        errs.base_url = "Not a valid URL (e.g. https://api.fablesh.com).";
+      }
+    }
+    if (sourceForm.kind === "fablesh") {
+      const secret = sourceForm.auth_secret_name.trim();
+      if (!secret) {
+        errs.auth_secret_name = "Fablesh requires an auth secret name (e.g. FABLESH_API_TOKEN).";
+      } else if (!/^[A-Z_][A-Z0-9_]*$/.test(secret)) {
+        errs.auth_secret_name = "Use uppercase letters, digits and underscores only (env-var convention).";
+      }
+    }
+    return errs;
+  })();
+  const hasSourceErrors = Object.keys(sourceErrors).length > 0;
 
   const saveSource = useMutation({
     mutationFn: async () => {
-      if (!sourceForm.name.trim()) throw new Error("Name required");
-      if (!sourceForm.base_url.trim()) throw new Error("Base URL required");
+      setSourceTouched(true);
+      if (hasSourceErrors) {
+        throw new Error(Object.values(sourceErrors)[0] ?? "Invalid form");
+      }
       return upsertFn({
         data: {
           id: sourceForm.id,
@@ -97,6 +128,7 @@ function PodcastHubPage() {
       toast.success(sourceForm.id ? "Source updated" : "Source created");
       setSourceOpen(false);
       setSourceForm(EMPTY_SOURCE);
+      setSourceTouched(false);
       qc.invalidateQueries({ queryKey: ["podcast-sources"] });
     },
     onError: (e: Error) => toast.error(e.message),
