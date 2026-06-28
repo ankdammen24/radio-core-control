@@ -136,7 +136,7 @@ function PodcastHubPage() {
             <h1 className="text-2xl font-semibold tracking-tight">Podcast Hub</h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
               Central distribution between podcast sources (Fablesh) and broadcast stations.
-              Audio is streamed from Catalogus Media — Radio Core only caches metadata.
+              Audio streamas direkt från Fablesh via dess API — Radio Core cachar enbart metadata.
             </p>
           </div>
           <div className="flex gap-2">
