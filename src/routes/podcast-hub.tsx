@@ -126,7 +126,7 @@ function PodcastHubPage() {
   });
 
   return (
-    <AppLayout>
+    <AppLayout title="Podcast Hub" description="Central distribution between podcast sources (Fablesh) and broadcast stations.">
       <div className="p-6 space-y-6">
         <header className="flex items-start justify-between gap-4">
           <div>
