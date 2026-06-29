@@ -17,7 +17,7 @@ import {
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
   Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
-  Cpu, Newspaper,
+  Cpu, Newspaper, Key,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
@@ -101,6 +101,7 @@ const GROUPS: Group[] = [
       { label: "Accounts",  icon: Building2,   to: "/accounts" },
       { label: "Users",     icon: Users,       to: "/users" },
       { label: "Roles",     icon: ShieldCheck, disabled: true },
+      { label: "API Tokens", icon: Key,        to: "/tokens" },
       { label: "Storage",   icon: HardDrive,   to: "/storage" },
       { label: "R2 Files",  icon: HardDrive,   to: "/r2-storage" },
       { label: "Storage Targets", icon: Cloud, to: "/storage-targets" },

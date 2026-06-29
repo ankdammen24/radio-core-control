@@ -1661,6 +1661,7 @@ export type Database = {
           last_used_at: string | null
           name: string
           purpose: string
+          revoked_at: string | null
           station_id: string | null
           token_hash: string
         }
@@ -1671,6 +1672,7 @@ export type Database = {
           last_used_at?: string | null
           name: string
           purpose?: string
+          revoked_at?: string | null
           station_id?: string | null
           token_hash: string
         }
@@ -1681,6 +1683,7 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           purpose?: string
+          revoked_at?: string | null
           station_id?: string | null
           token_hash?: string
         }
