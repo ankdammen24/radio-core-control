@@ -19,10 +19,10 @@ export const Route = createFileRoute(
           });
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { adminDatabase } = await import("@/services/database/server");
 
         // Verify station has an active subscription to this podcast
-        const { data: sub } = await supabaseAdmin
+        const { data: sub } = await adminDatabase
           .from("station_podcast_subscriptions")
           .select("id, allow_explicit, max_episodes")
           .eq("station_id", auth.station.id)
@@ -36,7 +36,7 @@ export const Route = createFileRoute(
           });
         }
 
-        let q = supabaseAdmin
+        let q = adminDatabase
           .from("podcast_episodes")
           .select(
             "id, guid, title, description, publish_date, duration_seconds, explicit, season, episode_number, audio_url, audio_format, artwork_url, transcript_url",

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,12 @@ function ShowsPage() {
   const [q, setQ] = useState("");
   const [form, setForm] = useState({ name: "", description: "", station_id: "", presenter_id: "", color: "#3b82f6" });
 
-  const stations = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name").order("name")).data ?? [] });
-  const presenters = useQuery({ queryKey: ["presenters"], queryFn: async () => (await supabase.from("presenters").select("*").order("name")).data ?? [] });
+  const stations = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await database.from("stations").select("id,name").order("name")).data ?? [] });
+  const presenters = useQuery({ queryKey: ["presenters"], queryFn: async () => (await database.from("presenters").select("*").order("name")).data ?? [] });
   const shows = useQuery({
     queryKey: ["shows"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("shows").select("*, stations(name), presenters(name)").order("name");
+      const { data, error } = await database.from("shows").select("*, stations(name), presenters(name)").order("name");
       if (error) throw error;
       return data ?? [];
     },
@@ -43,7 +43,7 @@ function ShowsPage() {
   const createShow = useMutation({
     mutationFn: async () => {
       if (!form.name || !form.station_id) throw new Error("Name and station required");
-      const { error } = await supabase.from("shows").insert({
+      const { error } = await database.from("shows").insert({
         name: form.name, description: form.description, station_id: form.station_id,
         presenter_id: form.presenter_id || null, color: form.color,
       });
@@ -62,7 +62,7 @@ function ShowsPage() {
   const addPresenter = useMutation({
     mutationFn: async () => {
       if (!pname.trim()) throw new Error("Name required");
-      const { error } = await supabase.from("presenters").insert({ name: pname.trim() });
+      const { error } = await database.from("presenters").insert({ name: pname.trim() });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Presenter added"); setPname(""); qc.invalidateQueries({ queryKey: ["presenters"] }); },

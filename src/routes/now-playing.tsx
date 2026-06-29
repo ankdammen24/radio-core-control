@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ function NowPlayingPage() {
   const { data: stations } = useQuery({
     queryKey: ["stations-with-az"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("stations")
         .select("id,name,slug, azuracast_connections(id)")
         .order("name");
@@ -33,7 +33,7 @@ function NowPlayingPage() {
     queryKey: ["now-playing-all"],
     refetchInterval: 5_000,
     queryFn: async () => {
-      const { data } = await supabase.from("now_playing").select("*, stations(name,slug)").order("updated_at", { ascending: false });
+      const { data } = await database.from("now_playing").select("*, stations(name,slug)").order("updated_at", { ascending: false });
       return data ?? [];
     },
   });
@@ -41,7 +41,7 @@ function NowPlayingPage() {
     queryKey: ["play-history"],
     refetchInterval: 15_000,
     queryFn: async () => {
-      const { data } = await supabase.from("play_history").select("*, stations(name,slug)").order("played_at", { ascending: false }).limit(50);
+      const { data } = await database.from("play_history").select("*, stations(name,slug)").order("played_at", { ascending: false }).limit(50);
       return data ?? [];
     },
   });

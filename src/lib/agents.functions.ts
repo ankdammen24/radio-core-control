@@ -1,9 +1,9 @@
 // Agent instances server functions. Client-importable.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { pingAgent, revokeAgent, type AgentRow } from "@/server/agent-client.server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { adminDatabase } from "@/services/database/server";
 
 async function requireAdmin(context: { supabase: ReturnType<typeof Object>; userId: string | null }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,14 +87,14 @@ export const pingAgentNow = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const { data: agent, error } = await supabaseAdmin
+    const { data: agent, error } = await adminDatabase
       .from("agent_instances")
       .select("id, station_id, name, hostname, status, stack_token_id")
       .eq("id", data.id)
       .single();
     if (error) throw error;
     const result = await pingAgent(agent as AgentRow);
-    await supabaseAdmin
+    await adminDatabase
       .from("agent_instances")
       .update({ last_seen_at: new Date().toISOString(), status: "unknown" })
       .eq("id", data.id);
@@ -106,7 +106,7 @@ export const revokeAgentNow = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const { data: agent, error } = await supabaseAdmin
+    const { data: agent, error } = await adminDatabase
       .from("agent_instances")
       .select("id, station_id, name, hostname, status, stack_token_id")
       .eq("id", data.id)
@@ -125,7 +125,7 @@ export const requestAgentReload = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const { error } = await supabaseAdmin
+    const { error } = await adminDatabase
       .from("agent_instances")
       .update({ reload_requested_at: new Date().toISOString() })
       .eq("id", data.id);

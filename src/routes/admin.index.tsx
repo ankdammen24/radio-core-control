@@ -7,7 +7,7 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,20 +39,20 @@ function Dashboard() {
         runtimeTargets, syncFailed, syncSucceeded, syncQueued,
         storage, audit, agents, events,
       ] = await Promise.all([
-        supabase.from("stations").select("*", { count: "exact", head: true }).eq("is_active", true),
-        sFilter(supabase.from("media_files").select("*", { count: "exact", head: true })),
-        sFilter(supabase.from("media_files").select("*", { count: "exact", head: true }).eq("status", "missing_metadata")),
-        sFilter(supabase.from("playlists").select("*", { count: "exact", head: true }).eq("is_active", true)),
-        sFilter(supabase.from("voicetracks").select("*", { count: "exact", head: true })),
-        sFilter(supabase.from("ad_spots").select("*", { count: "exact", head: true })),
-        sFilter(supabase.from("runtime_targets").select("id,name,type,status,is_active,last_checked_at,station_id")),
-        sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "failed")),
-        sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "completed")),
-        sFilter(supabase.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
-        sFilter(supabase.from("storage_objects").select("size_bytes,bucket_type")),
-        supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
-        sFilter(supabase.from("agent_instances").select("id,name,status,hostname,station_id,last_seen_at")),
-        sFilter(supabase.from("system_events").select("id,level,event_type,message,source,created_at,station_id").order("created_at", { ascending: false }).limit(10)),
+        database.from("stations").select("*", { count: "exact", head: true }).eq("is_active", true),
+        sFilter(database.from("media_files").select("*", { count: "exact", head: true })),
+        sFilter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "missing_metadata")),
+        sFilter(database.from("playlists").select("*", { count: "exact", head: true }).eq("is_active", true)),
+        sFilter(database.from("voicetracks").select("*", { count: "exact", head: true })),
+        sFilter(database.from("ad_spots").select("*", { count: "exact", head: true })),
+        sFilter(database.from("runtime_targets").select("id,name,type,status,is_active,last_checked_at,station_id")),
+        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "failed")),
+        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "completed")),
+        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
+        sFilter(database.from("storage_objects").select("size_bytes,bucket_type")),
+        database.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
+        sFilter(database.from("agent_instances").select("id,name,status,hostname,station_id,last_seen_at")),
+        sFilter(database.from("system_events").select("id,level,event_type,message,source,created_at,station_id").order("created_at", { ascending: false }).limit(10)),
       ]);
 
       const targets = (runtimeTargets.data ?? []).filter((r) => r.is_active);

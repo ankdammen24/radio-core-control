@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,19 +24,19 @@ function EpisodesPage() {
 
   const shows = useQuery({
     queryKey: ["shows-min"],
-    queryFn: async () => (await supabase.from("shows").select("id,name,color,station_id").order("name")).data ?? [],
+    queryFn: async () => (await database.from("shows").select("id,name,color,station_id").order("name")).data ?? [],
   });
   const episodes = useQuery({
     queryKey: ["episodes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("episodes").select("*, shows(name,color,station_id)").order("scheduled_start", { ascending: false }).limit(50);
+      const { data, error } = await database.from("episodes").select("*, shows(name,color,station_id)").order("scheduled_start", { ascending: false }).limit(50);
       if (error) throw error;
       return data ?? [];
     },
   });
   const rundown = useQuery({
     queryKey: ["rundown", selectedEpisode], enabled: !!selectedEpisode,
-    queryFn: async () => (await supabase.from("rundown_items").select("*").eq("episode_id", selectedEpisode).order("position")).data ?? [],
+    queryFn: async () => (await database.from("rundown_items").select("*").eq("episode_id", selectedEpisode).order("position")).data ?? [],
   });
 
   const visibleShows = (shows.data ?? []).filter((s: any) =>
@@ -47,7 +47,7 @@ function EpisodesPage() {
   const createEp = useMutation({
     mutationFn: async () => {
       if (!showId || !start || !end) throw new Error("Show + start + end required");
-      const { error } = await supabase.from("episodes").insert({ show_id: showId, scheduled_start: start, scheduled_end: end });
+      const { error } = await database.from("episodes").insert({ show_id: showId, scheduled_start: start, scheduled_end: end });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Episode planned"); qc.invalidateQueries({ queryKey: ["episodes"] }); },
@@ -59,14 +59,14 @@ function EpisodesPage() {
     mutationFn: async () => {
       if (!selectedEpisode || !item.title) throw new Error("Episode + title required");
       const pos = (rundown.data?.length ?? 0);
-      const { error } = await supabase.from("rundown_items").insert({ episode_id: selectedEpisode, position: pos, ...item });
+      const { error } = await database.from("rundown_items").insert({ episode_id: selectedEpisode, position: pos, ...item });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Item added"); setItem({ title: "", item_type: "talk", duration_seconds: 60 }); qc.invalidateQueries({ queryKey: ["rundown", selectedEpisode] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const delItem = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("rundown_items").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("rundown_items").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["rundown", selectedEpisode] }),
   });
 

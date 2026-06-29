@@ -17,7 +17,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -158,13 +158,13 @@ function AgentsPage() {
 
   const stations = useQuery({
     queryKey: ["stations-list"],
-    queryFn: async () => (await supabase.from("stations").select("id,name").order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name").order("name")).data ?? [],
   });
 
   const agentTokens = useQuery({
     queryKey: ["agent-stack-tokens"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("stack_tokens")
         .select("id,name,station_id,is_active,purpose")
         .in("purpose", ["runner", "agent"])

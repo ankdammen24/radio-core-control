@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,7 @@ function LivePage() {
 
   const stations = useQuery({
     queryKey: ["live-stations"],
-    queryFn: async () => (await supabase.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
   });
 
   // Auto-select first station
@@ -56,27 +56,27 @@ function LivePage() {
 
   const liveInput = useQuery({
     queryKey: ["live-input", stationId], enabled: !!stationId, refetchInterval: 10_000,
-    queryFn: async () => (await supabase.from("live_inputs").select("*").eq("station_id", stationId).maybeSingle()).data as LiveInput | null,
+    queryFn: async () => (await database.from("live_inputs").select("*").eq("station_id", stationId).maybeSingle()).data as LiveInput | null,
   });
 
   const schedule = useQuery({
     queryKey: ["live-schedule", stationId], enabled: !!stationId, refetchInterval: 30_000,
-    queryFn: async () => (await supabase.from("live_takeover_schedule").select("*, presenters(name,color)").eq("station_id", stationId).order("starts_at", { ascending: true })).data ?? [],
+    queryFn: async () => (await database.from("live_takeover_schedule").select("*, presenters(name,color)").eq("station_id", stationId).order("starts_at", { ascending: true })).data ?? [],
   });
 
   const events = useQuery({
     queryKey: ["live-events", stationId], enabled: !!stationId, refetchInterval: 15_000,
-    queryFn: async () => (await supabase.from("live_takeover_events").select("*").eq("station_id", stationId).order("created_at", { ascending: false }).limit(20)).data ?? [],
+    queryFn: async () => (await database.from("live_takeover_events").select("*").eq("station_id", stationId).order("created_at", { ascending: false }).limit(20)).data ?? [],
   });
 
   const presenters = useQuery({
     queryKey: ["presenters-list"],
-    queryFn: async () => (await supabase.from("presenters").select("id,name").eq("is_active", true).order("name")).data ?? [],
+    queryFn: async () => (await database.from("presenters").select("id,name").eq("is_active", true).order("name")).data ?? [],
   });
 
   const createInput = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("live_inputs").insert({ station_id: stationId });
+      const { error } = await database.from("live_inputs").insert({ station_id: stationId });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Live input created"); qc.invalidateQueries({ queryKey: ["live-input", stationId] }); },
@@ -85,7 +85,7 @@ function LivePage() {
 
   const saveInput = useMutation({
     mutationFn: async (patch: Partial<LiveInput>) => {
-      const { error } = await supabase.from("live_inputs").update(patch).eq("station_id", stationId);
+      const { error } = await database.from("live_inputs").update(patch).eq("station_id", stationId);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["live-input", stationId] }); },
@@ -94,12 +94,12 @@ function LivePage() {
 
   const toggleTakeover = useMutation({
     mutationFn: async (forced: boolean) => {
-      const { error } = await supabase.from("live_inputs").update({
+      const { error } = await database.from("live_inputs").update({
         forced_takeover: forced,
         last_state_change: new Date().toISOString(),
       }).eq("station_id", stationId);
       if (error) throw error;
-      await supabase.from("live_takeover_events").insert({
+      await database.from("live_takeover_events").insert({
         station_id: stationId,
         event_type: forced ? "takeover_forced" : "takeover_released",
         source: "manual",
@@ -282,7 +282,7 @@ function SchedulePanel({ stationId, schedule, presenters, canEdit, isAdmin, onCh
 
   const create = async () => {
     if (!form.title || !form.starts_at || !form.ends_at) { toast.error("Title + tider krävs"); return; }
-    const { error } = await supabase.from("live_takeover_schedule").insert({
+    const { error } = await database.from("live_takeover_schedule").insert({
       station_id: stationId,
       title: form.title,
       presenter_id: form.presenter_id || null,
@@ -299,7 +299,7 @@ function SchedulePanel({ stationId, schedule, presenters, canEdit, isAdmin, onCh
   };
 
   const remove = async (id: string) => {
-    const { error } = await supabase.from("live_takeover_schedule").delete().eq("id", id);
+    const { error } = await database.from("live_takeover_schedule").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success("Borttaget"); onChanged();
   };

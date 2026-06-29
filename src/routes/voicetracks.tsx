@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,16 +36,16 @@ function VoicetracksPage() {
 
   const { data: stations } = useQuery({
     queryKey: ["vt-stations"],
-    queryFn: async () => (await supabase.from("stations").select("id,name").eq("is_active", true)).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name").eq("is_active", true)).data ?? [],
   });
   const { data: presenters } = useQuery({
     queryKey: ["vt-presenters"],
-    queryFn: async () => (await supabase.from("presenters").select("id,name").eq("is_active", true)).data ?? [],
+    queryFn: async () => (await database.from("presenters").select("id,name").eq("is_active", true)).data ?? [],
   });
   const list = useQuery({
     queryKey: ["voicetracks"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await database
         .from("voicetracks")
         .select("*, stations(name), presenters(name)")
         .order("created_at", { ascending: false })
@@ -141,7 +141,7 @@ function VoicetracksPage() {
     mutationFn: async () => {
       if (!processedBlob || !stationId || !title.trim()) throw new Error("Titel, station och inspelning krävs");
       setPhase("uploading");
-      const { data: vt, error } = await supabase.from("voicetracks").insert({
+      const { data: vt, error } = await database.from("voicetracks").insert({
         station_id: stationId,
         title: title.trim(),
         description: description.trim() || null,
@@ -156,7 +156,7 @@ function VoicetracksPage() {
       const safeTitle = title.trim().replace(/[^a-z0-9-_ ]/gi, "_").slice(0, 60);
       const filename = `${Date.now()}-${safeTitle || "voicetrack"}.mp3`;
 
-      const { data, error: fnErr } = await supabase.functions.invoke("azuracast-upload-voicetrack", {
+      const { data, error: fnErr } = await database.functions.invoke("azuracast-upload-voicetrack", {
         body: { voicetrack_id: vt.id, filename, mime: "audio/mpeg", base64 },
       });
       if (fnErr) throw fnErr;
@@ -176,7 +176,7 @@ function VoicetracksPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("voicetracks").delete().eq("id", id);
+      const { error } = await database.from("voicetracks").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Borttagen"); qc.invalidateQueries({ queryKey: ["voicetracks"] }); },

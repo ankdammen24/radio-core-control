@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,11 +44,11 @@ function ConnectServerTab({ isAdmin }: { isAdmin: boolean }) {
   const qc = useQueryClient();
   const { data: stations } = useQuery({
     queryKey: ["stations-min"],
-    queryFn: async () => (await supabase.from("stations").select("id,name").order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name").order("name")).data ?? [],
   });
   const conns = useQuery({
     queryKey: ["azura-conn-settings"],
-    queryFn: async () => (await supabase.from("azuracast_connections").select("*, stations(name)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await database.from("azuracast_connections").select("*, stations(name)").order("created_at", { ascending: false })).data ?? [],
   });
 
   const [needStation, setNeedStation] = useState(false);
@@ -62,7 +62,7 @@ function ConnectServerTab({ isAdmin }: { isAdmin: boolean }) {
   const createStation = useMutation({
     mutationFn: async () => {
       const slug = (stationDraft.slug || stationDraft.name).toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "");
-      const { data, error } = await supabase.from("stations").insert({ name: stationDraft.name, slug }).select().single();
+      const { data, error } = await database.from("stations").insert({ name: stationDraft.name, slug }).select().single();
       if (error) throw error;
       return data;
     },
@@ -78,7 +78,7 @@ function ConnectServerTab({ isAdmin }: { isAdmin: boolean }) {
   const save = useMutation({
     mutationFn: async () => {
       if (!form.station_id || !form.base_url || !form.azuracast_station_id) throw new Error("Fyll i station, URL och remote station ID");
-      const { error } = await supabase.from("azuracast_connections").insert(form as any);
+      const { error } = await database.from("azuracast_connections").insert(form as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -91,7 +91,7 @@ function ConnectServerTab({ isAdmin }: { isAdmin: boolean }) {
 
   const test = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke("azuracast-test-connection", { body: { connection_id: id } });
+      const { data, error } = await database.functions.invoke("azuracast-test-connection", { body: { connection_id: id } });
       if (error) throw error;
       return data;
     },
@@ -186,7 +186,7 @@ function ProfileTab() {
   const profile = useQuery({
     queryKey: ["my-profile", user?.id],
     enabled: !!user?.id,
-    queryFn: async () => (await supabase.from("profiles").select("*").eq("id", user!.id).single()).data,
+    queryFn: async () => (await database.from("profiles").select("*").eq("id", user!.id).single()).data,
   });
   const [name, setName] = useState("");
   const [pw, setPw] = useState("");
@@ -194,7 +194,7 @@ function ProfileTab() {
 
   const saveProfile = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("profiles").update({ display_name: name }).eq("id", user!.id);
+      const { error } = await database.from("profiles").update({ display_name: name }).eq("id", user!.id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Profil sparad"); qc.invalidateQueries({ queryKey: ["my-profile"] }); },
@@ -203,7 +203,7 @@ function ProfileTab() {
   const changePw = useMutation({
     mutationFn: async () => {
       if (pw.length < 8) throw new Error("Lösenord måste vara minst 8 tecken");
-      const { error } = await supabase.auth.updateUser({ password: pw });
+      const { error } = await database.auth.updateUser({ password: pw });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Lösenord uppdaterat"); setPw(""); },
@@ -237,11 +237,11 @@ function BrandTab({ isAdmin }: { isAdmin: boolean }) {
   const qc = useQueryClient();
   const { data: stations } = useQuery({
     queryKey: ["stations-brand"],
-    queryFn: async () => (await supabase.from("stations").select("*").order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("*").order("name")).data ?? [],
   });
   const update = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: any }) => {
-      const { error } = await supabase.from("stations").update(patch).eq("id", id);
+      const { error } = await database.from("stations").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Sparat"); qc.invalidateQueries({ queryKey: ["stations-brand"] }); },
@@ -277,14 +277,14 @@ function BrandTab({ isAdmin }: { isAdmin: boolean }) {
 function AdvancedTab() {
   const qc = useQueryClient();
   const { isAdmin } = useAuth();
-  const { data } = useQuery({ queryKey: ["system_settings"], queryFn: async () => (await supabase.from("system_settings").select("*").order("key")).data ?? [] });
+  const { data } = useQuery({ queryKey: ["system_settings"], queryFn: async () => (await database.from("system_settings").select("*").order("key")).data ?? [] });
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   useEffect(() => { if (data) setDrafts(Object.fromEntries(data.map((s: any) => [s.id, JSON.stringify(s.value, null, 2)]))); }, [data]);
 
   const save = useMutation({
     mutationFn: async ({ id, raw }: { id: string; raw: string }) => {
       let parsed; try { parsed = JSON.parse(raw); } catch { throw new Error("Ogiltig JSON"); }
-      const { error } = await supabase.from("system_settings").update({ value: parsed }).eq("id", id);
+      const { error } = await database.from("system_settings").update({ value: parsed }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Sparat"); qc.invalidateQueries({ queryKey: ["system_settings"] }); },

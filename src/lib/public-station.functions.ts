@@ -46,8 +46,8 @@ export type PublicScheduleBlock = {
 export const getPublicStation = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => slugSchema.parse(input ?? {}))
   .handler(async ({ data }): Promise<PublicStation | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const query = supabaseAdmin
+    const { adminDatabase } = await import("@/services/database/server");
+    const query = adminDatabase
       .from("stations")
       .select("id,name,slug,description,demo_artwork_url,demo_stream_url,demo_mode")
       .eq("is_active", true);
@@ -70,19 +70,19 @@ export const getPublicStation = createServerFn({ method: "GET" })
 export const getPublicStreams = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<PublicStreamProfile[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { adminDatabase } = await import("@/services/database/server");
     const [{ data: mounts }, { data: ic }, { data: station }] = await Promise.all([
-      supabaseAdmin
+      adminDatabase
         .from("stream_mounts")
         .select("id,mount_path,format,bitrate,is_default,is_active")
         .eq("station_id", data.stationId)
         .eq("is_active", true),
-      supabaseAdmin
+      adminDatabase
         .from("icecast_configs")
         .select("hostname,port")
         .eq("station_id", data.stationId)
         .maybeSingle(),
-      supabaseAdmin
+      adminDatabase
         .from("stations")
         .select("demo_stream_url,demo_mode")
         .eq("id", data.stationId)
@@ -117,8 +117,8 @@ export const getPublicStreams = createServerFn({ method: "GET" })
 export const getPublicNowPlaying = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<PublicNowPlaying | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: np } = await supabaseAdmin
+    const { adminDatabase } = await import("@/services/database/server");
+    const { data: np } = await adminDatabase
       .from("now_playing")
       .select("title,artist,album,listeners,started_at")
       .eq("station_id", data.stationId)
@@ -137,8 +137,8 @@ export const getPublicNowPlaying = createServerFn({ method: "GET" })
 export const getPublicRecentlyPlayed = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
+    const { adminDatabase } = await import("@/services/database/server");
+    const { data: rows } = await adminDatabase
       .from("play_history")
       .select("id,title,artist,album,played_at")
       .eq("station_id", data.stationId)
@@ -157,8 +157,8 @@ export const getPublicRecentlyPlayed = createServerFn({ method: "GET" })
 export const getPublicSchedule = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<PublicScheduleBlock[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
+    const { adminDatabase } = await import("@/services/database/server");
+    const { data: rows } = await adminDatabase
       .from("schedule_blocks")
       .select("id,name,day_of_week,start_time,end_time,is_active")
       .eq("station_id", data.stationId)

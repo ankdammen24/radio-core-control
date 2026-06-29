@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,11 @@ function AdsPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [form, setForm] = useState({ advertiser: "", name: "", station_id: "", start_date: "", end_date: "", daily_target: 6 });
 
-  const stations = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name").order("name")).data ?? [] });
+  const stations = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await database.from("stations").select("id,name").order("name")).data ?? [] });
   const camps = useQuery({
     queryKey: ["ad-campaigns"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("ad_campaigns").select("*, stations(name)").order("created_at", { ascending: false });
+      const { data, error } = await database.from("ad_campaigns").select("*, stations(name)").order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -45,7 +45,7 @@ function AdsPage() {
   const create = useMutation({
     mutationFn: async () => {
       if (!form.advertiser || !form.name || !form.station_id) throw new Error("Advertiser, name and station required");
-      const { error } = await supabase.from("ad_campaigns").insert({
+      const { error } = await database.from("ad_campaigns").insert({
         advertiser: form.advertiser, name: form.name, station_id: form.station_id,
         start_date: form.start_date || null, end_date: form.end_date || null,
         daily_target: form.daily_target,

@@ -2,7 +2,7 @@
 // No auth required. Anon writes are allowed by RLS for song_requests + studio_messages.
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,21 +16,21 @@ export const Route = createFileRoute("/companion")({ component: CompanionPage })
 
 function CompanionPage() {
   const qc = useQueryClient();
-  const stations = useQuery({ queryKey: ["pub-stations"], queryFn: async () => (await supabase.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [] });
+  const stations = useQuery({ queryKey: ["pub-stations"], queryFn: async () => (await database.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [] });
   const np = useQuery({
     queryKey: ["pub-now"], refetchInterval: 8_000,
-    queryFn: async () => (await supabase.from("now_playing").select("*, stations(name,slug)")).data ?? [],
+    queryFn: async () => (await database.from("now_playing").select("*, stations(name,slug)")).data ?? [],
   });
   const upcoming = useQuery({
     queryKey: ["pub-upcoming"], refetchInterval: 60_000,
-    queryFn: async () => (await supabase.from("episodes").select("*, shows(name,color,stations(name))").gte("scheduled_end", new Date().toISOString()).order("scheduled_start").limit(10)).data ?? [],
+    queryFn: async () => (await database.from("episodes").select("*, shows(name,color,stations(name))").gte("scheduled_end", new Date().toISOString()).order("scheduled_start").limit(10)).data ?? [],
   });
 
   const [req, setReq] = useState({ station_id: "", requester_name: "", track_text: "", message: "" });
   const sendRequest = useMutation({
     mutationFn: async () => {
       if (!req.station_id || !req.track_text) throw new Error("Station + track required");
-      const { error } = await supabase.from("song_requests").insert(req);
+      const { error } = await database.from("song_requests").insert(req);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Tack! Önskning skickad till studion."); setReq({ station_id: req.station_id, requester_name: "", track_text: "", message: "" }); qc.invalidateQueries({ queryKey: ["pub-requests-mine"] }); },
@@ -41,7 +41,7 @@ function CompanionPage() {
   const sendMsg = useMutation({
     mutationFn: async () => {
       if (!msg.station_id || !msg.body) throw new Error("Station + message required");
-      const { error } = await supabase.from("studio_messages").insert({ ...msg, kind: "chat" });
+      const { error } = await database.from("studio_messages").insert({ ...msg, kind: "chat" });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Skickat till studion."); setMsg({ station_id: msg.station_id, from_name: "", body: "" }); },

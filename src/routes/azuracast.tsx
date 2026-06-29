@@ -10,7 +10,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,11 @@ function AzuraPage() {
   const [form, setForm] = useState({ station_id: "", base_url: "", azuracast_station_id: "", api_key_secret_name: "AZURACAST_API_KEY" });
   const [errors, setErrors] = useState<string | null>(null);
 
-  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
+  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await database.from("stations").select("id,name")).data ?? [] });
   const conns = useQuery({
     queryKey:["azura-conn"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("azuracast_connections").select("*, stations(name)").order("created_at", { ascending: false });
+      const { data, error } = await database.from("azuracast_connections").select("*, stations(name)").order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -52,7 +52,7 @@ function AzuraPage() {
       const parsed = azuraConnectionSchema.safeParse(form);
       if (!parsed.success) { setErrors(formatZodError(parsed.error)); throw new Error(formatZodError(parsed.error)); }
       setErrors(null);
-      const { error } = await supabase.from("azuracast_connections").insert(parsed.data as any);
+      const { error } = await database.from("azuracast_connections").insert(parsed.data as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -64,7 +64,7 @@ function AzuraPage() {
   });
   const test = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke("azuracast-test-connection", { body: { connection_id: id } });
+      const { data, error } = await database.functions.invoke("azuracast-test-connection", { body: { connection_id: id } });
       if (error) throw error;
       await logAudit("azuracast.test_connection", "azuracast_connections", id, { result: data });
       return data;
@@ -76,13 +76,13 @@ function AzuraPage() {
     onError: (e: any) => toast.error(`Test failed: ${e.message}`),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("azuracast_connections").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("azuracast_connections").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Connection removed"); qc.invalidateQueries({ queryKey:["azura-conn"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const queueSync = useMutation({
     mutationFn: async ({ station_id, job_type, payload }: { station_id: string; job_type: string; payload?: Record<string, unknown> }) => {
-      const { error } = await supabase.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: (payload ?? {}) as any });
+      const { error } = await database.from("sync_jobs").insert({ station_id, job_type, status: "pending", payload: (payload ?? {}) as any });
       if (error) throw error;
       await logAudit(`sync.queue.${job_type}`, "stations", station_id);
     },

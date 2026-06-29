@@ -19,8 +19,8 @@ export const Route = createFileRoute("/api/public/stations/$stationId/podcasts")
           });
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin
+        const { adminDatabase } = await import("@/services/database/server");
+        const { data, error } = await adminDatabase
           .from("station_podcast_subscriptions")
           .select(
             "priority, allow_explicit, only_swedish, max_episodes, podcasts(id,title,description,language,categories,artwork_url,owner,last_updated_at)",

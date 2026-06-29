@@ -1,7 +1,7 @@
 // Server fns for Runtime Targets. Client-importable.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { runHealthCheck, loadRuntimeTarget, resolveSecret } from "@/server/runtime-targets.server";
 import { buildAdapter } from "@/server/runtime-adapters";
 

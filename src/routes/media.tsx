@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,7 +28,7 @@ function MediaPage() {
   const query = useQuery({
     queryKey: ["media-files"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await database
         .from("media_files")
         .select("*, track_metadata(*), stations(name)")
         .order("created_at", { ascending: false })

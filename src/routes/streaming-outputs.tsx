@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import {
   listStreamingAdapters, probeStreamingOutput, renderOutputPreview,
 } from "@/lib/streaming-outputs.functions";
@@ -48,7 +48,7 @@ function StreamingOutputsPage() {
   const { data: stations } = useQuery({
     queryKey: ["stations-streaming-outputs"],
     queryFn: async () =>
-      (await supabase.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
+      (await database.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
   });
 
   const { data: adapters } = useQuery({
@@ -60,13 +60,13 @@ function StreamingOutputsPage() {
     queryKey: ["streaming-outputs", stationId],
     enabled: !!stationId,
     queryFn: async () =>
-      ((await supabase.from("streaming_outputs").select("*").eq("station_id", stationId).order("priority"))
+      ((await database.from("streaming_outputs").select("*").eq("station_id", stationId).order("priority"))
         .data ?? []) as Output[],
   });
 
   const addOutput = useMutation({
     mutationFn: async (type: string) => {
-      const { error } = await supabase.from("streaming_outputs").insert({
+      const { error } = await database.from("streaming_outputs").insert({
         station_id: stationId,
         type,
         name: `${type}-${Date.now().toString(36).slice(-4)}`,
@@ -80,7 +80,7 @@ function StreamingOutputsPage() {
 
   const updateOutput = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Partial<Output> }) => {
-      const { error } = await supabase.from("streaming_outputs").update(patch as any).eq("id", id);
+      const { error } = await database.from("streaming_outputs").update(patch as any).eq("id", id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["streaming-outputs", stationId] }),
@@ -89,7 +89,7 @@ function StreamingOutputsPage() {
 
   const deleteOutput = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("streaming_outputs").delete().eq("id", id);
+      const { error } = await database.from("streaming_outputs").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["streaming-outputs", stationId] }); toast.success("Removed"); },

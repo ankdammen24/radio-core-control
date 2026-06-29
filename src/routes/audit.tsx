@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,7 @@ function AuditPage() {
   const qc = useQueryClient();
   const { data, isLoading, refetch, isFetching, dataUpdatedAt } = useQuery({
     queryKey:["audit_logs"],
-    queryFn: async () => (await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(500)).data ?? [],
+    queryFn: async () => (await database.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(500)).data ?? [],
     refetchInterval: 5000,
     refetchOnWindowFocus: true,
   });
@@ -48,13 +48,13 @@ function AuditPage() {
   }, [data]);
 
   useEffect(() => {
-    const channel = supabase
+    const channel = database
       .channel("audit_logs_changes")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "audit_logs" }, () => {
         qc.invalidateQueries({ queryKey: ["audit_logs"] });
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { database.removeChannel(channel); };
   }, [qc]);
   const filtered = useMemo(() => (data ?? []).filter((a: any) =>
     !q || [a.action, a.entity_type, a.entity_id].filter(Boolean).join(" ").toLowerCase().includes(q.toLowerCase())

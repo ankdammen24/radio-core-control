@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -45,7 +45,7 @@ function SyncJobsPage() {
   const jobs = useQuery({
     queryKey: ["sync_jobs"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sync_jobs").select("*, stations(name)").order("created_at", { ascending: false }).limit(200);
+      const { data, error } = await database.from("sync_jobs").select("*, stations(name)").order("created_at", { ascending: false }).limit(200);
       if (error) throw error;
       return data ?? [];
     },
@@ -61,7 +61,7 @@ function SyncJobsPage() {
 
   const retry = useMutation({
     mutationFn: async (j: any) => {
-      const { error } = await supabase.from("sync_jobs").insert({ station_id: j.station_id, job_type: j.job_type, status: "pending", payload: j.payload });
+      const { error } = await database.from("sync_jobs").insert({ station_id: j.station_id, job_type: j.job_type, status: "pending", payload: j.payload });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Re-queued"); qc.invalidateQueries({ queryKey: ["sync_jobs"] }); },

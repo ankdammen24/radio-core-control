@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SyncStatusBadge, type SyncStatus } from "@/components/sync-status-badge";
 import { useActiveStation, useStationScope } from "@/lib/station-context";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { cn } from "@/lib/utils";
 import {
   Activity, SkipForward, RotateCw, Radio, Headphones, Music, ListMusic,
@@ -101,7 +101,7 @@ function CockpitForStation() {
     queryKey: ["cockpit", "now_playing", station.id],
     refetchInterval: 5_000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("now_playing")
         .select("*")
         .eq("station_id", station.id)
@@ -115,7 +115,7 @@ function CockpitForStation() {
     queryKey: ["cockpit", "sync_jobs", station.id],
     refetchInterval: 10_000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("sync_jobs")
         .select("id,job_type,status,created_at,finished_at")
         .eq("station_id", station.id)
@@ -130,7 +130,7 @@ function CockpitForStation() {
     queryKey: ["cockpit", "service_health", station.id],
     refetchInterval: 15_000,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("service_health")
         .select("*")
         .eq("station_id", station.id)

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { generateStationConfig } from "@/lib/streaming.functions";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
@@ -47,7 +47,7 @@ function ConfigsPage() {
     queryKey: ["configs-liq", station?.id],
     enabled: !!station,
     queryFn: async () =>
-      (await supabase.from("liquidsoap_configs").select("generated_at").eq("station_id", station!.id).maybeSingle()).data,
+      (await database.from("liquidsoap_configs").select("generated_at").eq("station_id", station!.id).maybeSingle()).data,
   });
 
   const generate = useServerFn(generateStationConfig);

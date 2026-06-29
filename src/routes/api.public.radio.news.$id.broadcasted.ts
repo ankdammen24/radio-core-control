@@ -34,14 +34,14 @@ export const Route = createFileRoute("/api/public/radio/news/$id/broadcasted")({
           return Response.json({ error: "stationId does not match API key" }, { status: 403 });
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: item, error: itemErr } = await supabaseAdmin
+        const { adminDatabase } = await import("@/services/database/server");
+        const { data: item, error: itemErr } = await adminDatabase
           .from("news_items").select("id,status").eq("id", params.id).maybeSingle();
         if (itemErr) return Response.json({ error: itemErr.message }, { status: 500 });
         if (!item) return Response.json({ error: "Not found" }, { status: 404 });
 
         const broadcastTime = parsed.data.broadcastTime ?? new Date().toISOString();
-        const { data: history, error: insErr } = await supabaseAdmin
+        const { data: history, error: insErr } = await adminDatabase
           .from("news_broadcast_history")
           .insert({
             news_item_id: params.id,
@@ -54,10 +54,10 @@ export const Route = createFileRoute("/api/public/radio/news/$id/broadcasted")({
         if (insErr) return Response.json({ error: insErr.message }, { status: 500 });
 
         if (item.status === "ready_for_radio") {
-          await supabaseAdmin.from("news_items").update({ status: "broadcasted" }).eq("id", params.id);
+          await adminDatabase.from("news_items").update({ status: "broadcasted" }).eq("id", params.id);
         }
 
-        await supabaseAdmin.from("audit_logs").insert({
+        await adminDatabase.from("audit_logs").insert({
           user_id: null,
           action: "news.broadcasted",
           entity_type: "news_items",

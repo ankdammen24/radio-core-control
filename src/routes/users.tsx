@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -20,8 +20,8 @@ function UsersPage() {
     queryKey: ["users-with-roles"],
     queryFn: async () => {
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("*").order("created_at", { ascending: false }),
-        supabase.from("user_roles").select("*"),
+        database.from("profiles").select("*").order("created_at", { ascending: false }),
+        database.from("user_roles").select("*"),
       ]);
       return (profiles ?? []).map((p) => ({ ...p, roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role) }));
     },
@@ -29,8 +29,8 @@ function UsersPage() {
 
   const setRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: "admin"|"editor"|"viewer" }) => {
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
+      await database.from("user_roles").delete().eq("user_id", userId);
+      const { error } = await database.from("user_roles").insert({ user_id: userId, role });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Role updated"); qc.invalidateQueries({ queryKey: ["users-with-roles"] }); },
@@ -38,7 +38,7 @@ function UsersPage() {
   });
   const toggleActive = useMutation({
     mutationFn: async ({ id, val }: { id: string; val: boolean }) => {
-      const { error } = await supabase.from("profiles").update({ is_active: val }).eq("id", id);
+      const { error } = await database.from("profiles").update({ is_active: val }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users-with-roles"] }),

@@ -1,10 +1,10 @@
 // Server-only helpers for runtime targets: secret resolution + execution.
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { adminDatabase } from "@/services/database/server";
 import { buildAdapter, type RuntimeTargetConfig } from "@/server/runtime-adapters";
 import { readEnv } from "@/server/env.server";
 
 export async function loadRuntimeTarget(targetId: string): Promise<RuntimeTargetConfig> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await adminDatabase
     .from("runtime_targets")
     .select("id, station_id, type, name, base_url, api_key_secret_name, external_station_id, metadata")
     .eq("id", targetId)
@@ -29,7 +29,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
   const startedAt = new Date();
 
   // Insert pending health check row first.
-  const { data: log, error: logErr } = await supabaseAdmin
+  const { data: log, error: logErr } = await adminDatabase
     .from("runtime_health_checks")
     .insert({
       target_id: cfg.id,
@@ -64,7 +64,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
   const finishedAt = new Date();
   const duration = finishedAt.getTime() - startedAt.getTime();
 
-  await supabaseAdmin
+  await adminDatabase
     .from("runtime_health_checks")
     .update({
       status,
@@ -75,7 +75,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
     })
     .eq("id", log.id);
 
-  await supabaseAdmin
+  await adminDatabase
     .from("runtime_targets")
     .update({
       status,
@@ -85,7 +85,7 @@ export async function runHealthCheck(targetId: string, triggeredBy: string | nul
     .eq("id", cfg.id);
 
   // Mirror to sync_jobs for unified ops log.
-  await supabaseAdmin.from("sync_jobs").insert({
+  await adminDatabase.from("sync_jobs").insert({
     job_type: "runtime_health_check",
     station_id: cfg.station_id,
     status: status === "ok" ? "completed" : "failed",

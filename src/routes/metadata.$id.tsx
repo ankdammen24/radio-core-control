@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ function MetadataDetail() {
   const { data, isLoading } = useQuery({
     queryKey: ["track", id],
     queryFn: async () => {
-      const { data: m } = await supabase.from("media_files").select("*, track_metadata(*), playlist_assignments(playlist_id, playlists(name)), stations(name)").eq("id", id).single();
+      const { data: m } = await database.from("media_files").select("*, track_metadata(*), playlist_assignments(playlist_id, playlists(name)), stations(name)").eq("id", id).single();
       return m;
     },
   });
@@ -46,11 +46,11 @@ function MetadataDetail() {
   const save = useMutation({
     mutationFn: async () => {
       const payload = { ...form, year: form.year ? Number(form.year) : null };
-      const { error } = await supabase.from("track_metadata").upsert(payload, { onConflict: "media_file_id" });
+      const { error } = await database.from("track_metadata").upsert(payload, { onConflict: "media_file_id" });
       if (error) throw error;
       // also flip media status if metadata now present
       if (form.artist && form.title) {
-        await supabase.from("media_files").update({ status: data?.status === "missing_metadata" ? "ready" : data?.status }).eq("id", id);
+        await database.from("media_files").update({ status: data?.status === "missing_metadata" ? "ready" : data?.status }).eq("id", id);
       }
     },
     onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["track", id] }); },

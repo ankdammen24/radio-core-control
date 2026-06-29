@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FolderOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status-badge";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/files")({ component: FilesPage });
 function FilesPage() {
   const { data } = useQuery({
     queryKey: ["files"],
-    queryFn: async () => (await supabase.from("media_files").select("*, storage_locations(name, base_path)").order("created_at", { ascending: false }).limit(200)).data ?? [],
+    queryFn: async () => (await database.from("media_files").select("*, storage_locations(name, base_path)").order("created_at", { ascending: false }).limit(200)).data ?? [],
   });
   const grouped = (data ?? []).reduce((acc: Record<string, any[]>, m: any) => {
     const key = m.storage_locations?.name ?? "Unassigned";

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,30 +31,30 @@ function StreamingPage() {
 
   const { data: stations } = useQuery({
     queryKey: ["stations-streaming"],
-    queryFn: async () => (await supabase.from("stations").select("id,name,slug").order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name,slug").order("name")).data ?? [],
   });
 
   const ic = useQuery({
     queryKey: ["ic", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase.from("icecast_configs").select("*").eq("station_id", stationId).maybeSingle()).data,
+    queryFn: async () => (await database.from("icecast_configs").select("*").eq("station_id", stationId).maybeSingle()).data,
   });
   const liq = useQuery({
     queryKey: ["liq", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase.from("liquidsoap_configs").select("*").eq("station_id", stationId).maybeSingle()).data,
+    queryFn: async () => (await database.from("liquidsoap_configs").select("*").eq("station_id", stationId).maybeSingle()).data,
   });
   const mounts = useQuery({
     queryKey: ["mounts", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase.from("stream_mounts").select("*").eq("station_id", stationId)).data ?? [],
+    queryFn: async () => (await database.from("stream_mounts").select("*").eq("station_id", stationId)).data ?? [],
   });
 
   const ensureDefaults = useMutation({
     mutationFn: async () => {
       if (!stationId) throw new Error("Pick a station");
-      if (!ic.data) await supabase.from("icecast_configs").insert({ station_id: stationId });
-      if (!liq.data) await supabase.from("liquidsoap_configs").insert({ station_id: stationId });
+      if (!ic.data) await database.from("icecast_configs").insert({ station_id: stationId });
+      if (!liq.data) await database.from("liquidsoap_configs").insert({ station_id: stationId });
       if (!mounts.data || mounts.data.length === 0) {
         const slug = (stations ?? []).find((s) => s.id === stationId)?.slug ?? "live";
-        await supabase.from("stream_mounts").insert({ station_id: stationId, mount_path: `/${slug}.mp3`, format: "mp3", bitrate: 128, is_default: true });
+        await database.from("stream_mounts").insert({ station_id: stationId, mount_path: `/${slug}.mp3`, format: "mp3", bitrate: 128, is_default: true });
       }
     },
     onSuccess: () => { toast.success("Streaming defaults created"); qc.invalidateQueries(); },

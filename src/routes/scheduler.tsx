@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,13 +27,13 @@ function SchedulerPage() {
   const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name:"", day_of_week:"mon", start_time:"06:00", end_time:"10:00", station_id:"", playlist_id:"", rotation_rule_id:"" });
 
-  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
-  const { data: playlists } = useQuery({ queryKey:["playlists-list"], queryFn: async () => (await supabase.from("playlists").select("id,name")).data ?? [] });
-  const { data: rules } = useQuery({ queryKey:["rules-list"], queryFn: async () => (await supabase.from("rotation_rules").select("id,name")).data ?? [] });
+  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await database.from("stations").select("id,name")).data ?? [] });
+  const { data: playlists } = useQuery({ queryKey:["playlists-list"], queryFn: async () => (await database.from("playlists").select("id,name")).data ?? [] });
+  const { data: rules } = useQuery({ queryKey:["rules-list"], queryFn: async () => (await database.from("rotation_rules").select("id,name")).data ?? [] });
   const blocks = useQuery({
     queryKey:["schedule_blocks"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("schedule_blocks").select("*, playlists(name), rotation_rules(name)").order("day_of_week").order("start_time");
+      const { data, error } = await database.from("schedule_blocks").select("*, playlists(name), rotation_rules(name)").order("day_of_week").order("start_time");
       if (error) throw error;
       return data ?? [];
     },
@@ -45,14 +45,14 @@ function SchedulerPage() {
       if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
       setErrs(null);
       const payload = { ...parsed.data, playlist_id: form.playlist_id || null, rotation_rule_id: form.rotation_rule_id || null };
-      const { error } = await supabase.from("schedule_blocks").insert(payload as any);
+      const { error } = await database.from("schedule_blocks").insert(payload as any);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Block added"); setOpen(false); qc.invalidateQueries({ queryKey:["schedule_blocks"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("schedule_blocks").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("schedule_blocks").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["schedule_blocks"] }); },
     onError: (e: any) => toast.error(e.message),
   });

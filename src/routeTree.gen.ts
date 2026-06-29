@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoicetracksRouteImport } from './routes/voicetracks'
 import { Route as UsersRouteImport } from './routes/users'
+import { Route as TokensRouteImport } from './routes/tokens'
 import { Route as SyncJobsRouteImport } from './routes/sync-jobs'
 import { Route as StreamingOutputsRouteImport } from './routes/streaming-outputs'
 import { Route as StreamingRouteImport } from './routes/streaming'
@@ -64,6 +65,7 @@ import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
 import { Route as ApiPublicRadioNewsRouteImport } from './routes/api.public.radio.news'
 import { Route as ApiPublicCronSyncWorkerRouteImport } from './routes/api.public.cron.sync-worker'
 import { Route as ApiPublicCronPodcastSyncRouteImport } from './routes/api.public.cron.podcast-sync'
+import { Route as ApiPublicAgentHeartbeatRouteImport } from './routes/api.public.agent.heartbeat'
 import { Route as ApiPublicStationsStationIdPodcastsRouteImport } from './routes/api.public.stations.$stationId.podcasts'
 import { Route as ApiPublicRadioNewsIdRouteImport } from './routes/api.public.radio.news.$id'
 import { Route as ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport } from './routes/api.public.stations.$stationId.episodes.$episodeId'
@@ -78,6 +80,11 @@ const VoicetracksRoute = VoicetracksRouteImport.update({
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokensRoute = TokensRouteImport.update({
+  id: '/tokens',
+  path: '/tokens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SyncJobsRoute = SyncJobsRouteImport.update({
@@ -346,6 +353,11 @@ const ApiPublicCronPodcastSyncRoute =
     path: '/api/public/cron/podcast-sync',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAgentHeartbeatRoute = ApiPublicAgentHeartbeatRouteImport.update({
+  id: '/api/public/agent/heartbeat',
+  path: '/api/public/agent/heartbeat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStationsStationIdPodcastsRoute =
   ApiPublicStationsStationIdPodcastsRouteImport.update({
     id: '/api/public/stations/$stationId/podcasts',
@@ -419,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
+  '/tokens': typeof TokensRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/admin/login': typeof AdminLoginRoute
@@ -429,6 +442,7 @@ export interface FileRoutesByFullPath {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
@@ -481,6 +495,7 @@ export interface FileRoutesByTo {
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
+  '/tokens': typeof TokensRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/admin/login': typeof AdminLoginRoute
@@ -491,6 +506,7 @@ export interface FileRoutesByTo {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
@@ -544,6 +560,7 @@ export interface FileRoutesById {
   '/streaming': typeof StreamingRoute
   '/streaming-outputs': typeof StreamingOutputsRoute
   '/sync-jobs': typeof SyncJobsRoute
+  '/tokens': typeof TokensRoute
   '/users': typeof UsersRoute
   '/voicetracks': typeof VoicetracksRoute
   '/admin/login': typeof AdminLoginRoute
@@ -554,6 +571,7 @@ export interface FileRoutesById {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
@@ -608,6 +626,7 @@ export interface FileRouteTypes {
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
+    | '/tokens'
     | '/users'
     | '/voicetracks'
     | '/admin/login'
@@ -618,6 +637,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
@@ -670,6 +690,7 @@ export interface FileRouteTypes {
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
+    | '/tokens'
     | '/users'
     | '/voicetracks'
     | '/admin/login'
@@ -680,6 +701,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
@@ -732,6 +754,7 @@ export interface FileRouteTypes {
     | '/streaming'
     | '/streaming-outputs'
     | '/sync-jobs'
+    | '/tokens'
     | '/users'
     | '/voicetracks'
     | '/admin/login'
@@ -742,6 +765,7 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
@@ -795,6 +819,7 @@ export interface RootRouteChildren {
   StreamingRoute: typeof StreamingRoute
   StreamingOutputsRoute: typeof StreamingOutputsRoute
   SyncJobsRoute: typeof SyncJobsRoute
+  TokensRoute: typeof TokensRoute
   UsersRoute: typeof UsersRoute
   VoicetracksRoute: typeof VoicetracksRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -805,6 +830,7 @@ export interface RootRouteChildren {
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
   ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
   ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
+  ApiPublicAgentHeartbeatRoute: typeof ApiPublicAgentHeartbeatRoute
   ApiPublicCronPodcastSyncRoute: typeof ApiPublicCronPodcastSyncRoute
   ApiPublicCronSyncWorkerRoute: typeof ApiPublicCronSyncWorkerRoute
   ApiPublicRadioNewsRoute: typeof ApiPublicRadioNewsRouteWithChildren
@@ -826,6 +852,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokens': {
+      id: '/tokens'
+      path: '/tokens'
+      fullPath: '/tokens'
+      preLoaderRoute: typeof TokensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sync-jobs': {
@@ -1199,6 +1232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronPodcastSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/agent/heartbeat': {
+      id: '/api/public/agent/heartbeat'
+      path: '/api/public/agent/heartbeat'
+      fullPath: '/api/public/agent/heartbeat'
+      preLoaderRoute: typeof ApiPublicAgentHeartbeatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stations/$stationId/podcasts': {
       id: '/api/public/stations/$stationId/podcasts'
       path: '/api/public/stations/$stationId/podcasts'
@@ -1317,6 +1357,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamingRoute: StreamingRoute,
   StreamingOutputsRoute: StreamingOutputsRoute,
   SyncJobsRoute: SyncJobsRoute,
+  TokensRoute: TokensRoute,
   UsersRoute: UsersRoute,
   VoicetracksRoute: VoicetracksRoute,
   AdminLoginRoute: AdminLoginRoute,
@@ -1327,6 +1368,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
   ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
   ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
+  ApiPublicAgentHeartbeatRoute: ApiPublicAgentHeartbeatRoute,
   ApiPublicCronPodcastSyncRoute: ApiPublicCronPodcastSyncRoute,
   ApiPublicCronSyncWorkerRoute: ApiPublicCronSyncWorkerRoute,
   ApiPublicRadioNewsRoute: ApiPublicRadioNewsRouteWithChildren,
@@ -1338,3 +1380,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

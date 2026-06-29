@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { exportStationSnapshot, importStationSnapshot } from "@/lib/backup.functions";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
@@ -28,7 +28,7 @@ function BackupPage() {
   const { data: stations } = useQuery({
     queryKey: ["stations-backup"],
     queryFn: async () =>
-      (await supabase.from("stations").select("id,name,slug").order("name")).data ?? [],
+      (await database.from("stations").select("id,name,slug").order("name")).data ?? [],
   });
 
   const exportFn = useServerFn(exportStationSnapshot);

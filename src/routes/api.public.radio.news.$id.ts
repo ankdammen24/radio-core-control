@@ -12,8 +12,8 @@ export const Route = createFileRoute("/api/public/radio/news/$id")({
         const auth = await authenticateStationByKey(request);
         if (!auth.ok) return Response.json({ error: auth.message }, { status: auth.status });
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin
+        const { adminDatabase } = await import("@/services/database/server");
+        const { data, error } = await adminDatabase
           .from("news_items").select("*").eq("id", params.id).maybeSingle();
         if (error) return Response.json({ error: error.message }, { status: 500 });
         if (!data) return Response.json({ error: "Not found" }, { status: 404 });

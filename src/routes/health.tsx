@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +40,7 @@ function HealthPage() {
     queryKey: ["service-health"],
     refetchInterval: 10_000,
     queryFn: async () => {
-      const { data, error } = await supabase.from("service_health").select("*, stations(name)").order("reported_at", { ascending: false }).limit(200);
+      const { data, error } = await database.from("service_health").select("*, stations(name)").order("reported_at", { ascending: false }).limit(200);
       if (error) throw error;
       return data ?? [];
     },
@@ -51,8 +51,8 @@ function HealthPage() {
     refetchInterval: 30_000,
     queryFn: async () => {
       const [t, s] = await Promise.all([
-        supabase.from("runtime_targets").select("*").order("name"),
-        supabase.from("stations").select("id,name"),
+        database.from("runtime_targets").select("*").order("name"),
+        database.from("stations").select("id,name"),
       ]);
       if (t.error) throw t.error;
       if (s.error) throw s.error;
@@ -65,7 +65,7 @@ function HealthPage() {
     queryKey: ["runtime-health-checks"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await database
         .from("runtime_health_checks")
         .select("*")
         .order("started_at", { ascending: false })
@@ -79,7 +79,7 @@ function HealthPage() {
     queryKey: ["storage-targets-health"],
     refetchInterval: 30_000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await database
         .from("storage_targets")
         .select("*, stations(name)")
         .order("name");

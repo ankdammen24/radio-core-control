@@ -11,12 +11,6 @@
  * 5. Returnerar reload_requested + config_version
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { createHash } from "crypto";
-import { resolveStackToken, touchStackToken } from "@/server/repositories/stackTokens.repository";
-import { findStationBySlug } from "@/server/repositories/stations.repository";
-import { findAgentById, upsertAgentInstance } from "@/server/repositories/agents.repository";
-import { db } from "@/server/db/client";
-import { auditLogs } from "@/server/db/schema";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -37,18 +31,36 @@ function isUuid(v: unknown): v is string {
   );
 }
 
-async function computeConfigVersion(stationUpdatedAt: Date | null, stationId: string): Promise<string> {
+async function computeConfigVersion(
+  stationUpdatedAt: Date | null,
+  stationId: string,
+): Promise<string> {
   const seed = stationUpdatedAt?.toISOString() ?? stationId;
-  return createHash("sha256").update(seed).digest("hex").slice(0, 16);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(seed));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 16);
 }
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
+export const Route = createFileRoute("/api/public/agent/heartbeat")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      POST: async ({ request }: { request: Request }) => {
+        const [tokenRepository, stationRepository, agentRepository, databaseModule, schemaModule] =
+          await Promise.all([
+            import("@/server/repositories/stackTokens.repository"),
+            import("@/server/repositories/stations.repository"),
+            import("@/server/repositories/agents.repository"),
+            import("@/server/db/client"),
+            import("@/server/db/schema"),
+          ]);
+        const { resolveStackToken, touchStackToken } = tokenRepository;
+        const { findStationBySlug } = stationRepository;
+        const { findAgentById, upsertAgentInstance } = agentRepository;
+        const { db } = databaseModule;
+        const { auditLogs } = schemaModule;
         // 1. Autentisera
         const raw = request.headers.get("x-stack-token") ?? "";
         if (!raw) {
@@ -61,7 +73,10 @@ export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
         }
         if (tok.purpose !== "runner" && tok.purpose !== "agent") {
           return Response.json(
-            { ok: false, error: `Token purpose '${tok.purpose}' not allowed (need runner or agent)` },
+            {
+              ok: false,
+              error: `Token purpose '${tok.purpose}' not allowed (need runner or agent)`,
+            },
             { status: 403 },
           );
         }
@@ -82,7 +97,10 @@ export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
         const metrics = safeObject(body.metrics);
 
         if (!agentId) {
-          return Response.json({ ok: false, error: "agent_id must be a valid UUID" }, { status: 400 });
+          return Response.json(
+            { ok: false, error: "agent_id must be a valid UUID" },
+            { status: 400 },
+          );
         }
         if (!stationSlug) {
           return Response.json({ ok: false, error: "station_slug is required" }, { status: 400 });
@@ -91,7 +109,10 @@ export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
         // 3. Löser upp station
         const station = await findStationBySlug(stationSlug);
         if (!station) {
-          return Response.json({ ok: false, error: `Station '${stationSlug}' not found` }, { status: 404 });
+          return Response.json(
+            { ok: false, error: `Station '${stationSlug}' not found` },
+            { status: 404 },
+          );
         }
 
         // 4. Cross-tenant guard
@@ -132,7 +153,12 @@ export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
               entityType: "agent_instances",
               entityId: agentId,
               stationId: station.id,
-              newValue: { hostname, version, station_slug: stationSlug, station_id: station.id } as never,
+              newValue: {
+                hostname,
+                version,
+                station_slug: stationSlug,
+                station_id: station.id,
+              } as never,
             })
             .catch(() => {});
         }

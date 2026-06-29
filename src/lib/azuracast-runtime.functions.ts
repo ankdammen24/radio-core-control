@@ -12,8 +12,8 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
+import { adminDatabase } from "@/services/database/server";
 import {
   buildAzuracastClient,
   type AzuracastConnectionRow,
@@ -33,7 +33,7 @@ async function requireRole(
 }
 
 async function clientFor(stationId: string) {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await adminDatabase
     .from("azuracast_connections")
     .select("id,station_id,base_url,azuracast_station_id,api_key_secret_name")
     .eq("station_id", stationId)

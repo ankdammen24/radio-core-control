@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/metadata/")({ component: MetadataIndex })
 function MetadataIndex() {
   const { data, isLoading } = useQuery({
     queryKey: ["metadata-index"],
-    queryFn: async () => (await supabase.from("media_files").select("id, file_name, status, track_metadata(artist, title, rights_status, is_local_music, is_ai_generated)").order("created_at", { ascending: false }).limit(300)).data ?? [],
+    queryFn: async () => (await database.from("media_files").select("id, file_name, status, track_metadata(artist, title, rights_status, is_local_music, is_ai_generated)").order("created_at", { ascending: false }).limit(300)).data ?? [],
   });
   return (
     <AppLayout title="Track Metadata" description="Edit artist, title, rights, and broadcast flags for each track.">

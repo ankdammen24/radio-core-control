@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ function DemoPage() {
 
   const stations = useQuery({
     queryKey: ["stations-demo"],
-    queryFn: async () => (await supabase.from("stations").select("id,name,slug,demo_mode,demo_stream_url,demo_artwork_url").order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name,slug,demo_mode,demo_stream_url,demo_artwork_url").order("name")).data ?? [],
   });
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function DemoPage() {
 
   const updateDemo = useMutation({
     mutationFn: async (patch: Partial<{ demo_mode: boolean; demo_stream_url: string | null; demo_artwork_url: string | null }>) => {
-      const { error } = await supabase.from("stations").update(patch).eq("id", stationId);
+      const { error } = await database.from("stations").update(patch).eq("id", stationId);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["stations-demo"] }); },
@@ -64,13 +64,13 @@ function DemoPage() {
   // Now playing
   const np = useQuery({
     queryKey: ["np", stationId], enabled: !!stationId, refetchInterval: 5000,
-    queryFn: async () => (await supabase.from("now_playing").select("*").eq("station_id", stationId).maybeSingle()).data,
+    queryFn: async () => (await database.from("now_playing").select("*").eq("station_id", stationId).maybeSingle()).data,
   });
 
   // Library for the simulator
   const media = useQuery({
     queryKey: ["media-for-demo", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase.from("media_files")
+    queryFn: async () => (await database.from("media_files")
       .select("id,file_name,original_file_name,duration_seconds,station_id")
       .or(`station_id.eq.${stationId},station_id.is.null`).limit(500)).data ?? [],
   });
@@ -87,16 +87,16 @@ function DemoPage() {
     const listeners = Math.floor(40 + Math.random() * 80);
     const dur = pick.duration_seconds ?? 180;
 
-    await supabase.from("now_playing").upsert({
+    await database.from("now_playing").upsert({
       station_id: stationId, media_file_id: pick.id, title, artist,
       album: "Demo Mode", listeners, duration_seconds: dur,
       mount_path: "/demo.mp3", started_at: new Date().toISOString(), updated_at: new Date().toISOString(),
     }, { onConflict: "station_id" });
-    await supabase.from("play_history").insert({
+    await database.from("play_history").insert({
       station_id: stationId, media_file_id: pick.id, title, artist, album: "Demo Mode",
       listeners, duration_seconds: dur,
     });
-    await supabase.from("listener_stats").insert({
+    await database.from("listener_stats").insert({
       station_id: stationId, mount_path: "/demo.mp3", listeners, peak_listeners: listeners + 5,
     });
     qc.invalidateQueries({ queryKey: ["np", stationId] });

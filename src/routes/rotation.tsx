@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -30,11 +30,11 @@ function RotationPage() {
   const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name:"", description:"", category:"heavy", min_minutes_between_same_artist:30, min_minutes_between_same_track:120, max_tracks_per_hour:12, priority:5, station_id:"" });
 
-  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
+  const { data: stations } = useQuery({ queryKey:["stations-list"], queryFn: async () => (await database.from("stations").select("id,name")).data ?? [] });
   const rules = useQuery({
     queryKey:["rotation_rules"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("rotation_rules").select("*, stations(name)").order("priority", { ascending: false });
+      const { data, error } = await database.from("rotation_rules").select("*, stations(name)").order("priority", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -45,18 +45,18 @@ function RotationPage() {
       const parsed = rotationRuleSchema.safeParse(form);
       if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
       setErrs(null);
-      const { error } = await supabase.from("rotation_rules").insert(parsed.data as any);
+      const { error } = await database.from("rotation_rules").insert(parsed.data as any);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Rule created"); setOpen(false); qc.invalidateQueries({ queryKey:["rotation_rules"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
-    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await supabase.from("rotation_rules").update({ is_active: val }).eq("id", id); if (error) throw error; },
+    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await database.from("rotation_rules").update({ is_active: val }).eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey:["rotation_rules"] }),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("rotation_rules").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("rotation_rules").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["rotation_rules"] }); },
     onError: (e: any) => toast.error(e.message),
   });

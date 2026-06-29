@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -24,19 +24,19 @@ function StoragePage() {
   const query = useQuery({
     queryKey: ["storage_locations"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("storage_locations").select("*").order("name");
+      const { data, error } = await database.from("storage_locations").select("*").order("name");
       if (error) throw error;
       return data ?? [];
     },
   });
 
   const create = useMutation({
-    mutationFn: async () => { const { error } = await supabase.from("storage_locations").insert(form); if (error) throw error; },
+    mutationFn: async () => { const { error } = await database.from("storage_locations").insert(form); if (error) throw error; },
     onSuccess: () => { toast.success("Location added"); setOpen(false); qc.invalidateQueries({ queryKey: ["storage_locations"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
-    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await supabase.from("storage_locations").update({ is_active: val }).eq("id", id); if (error) throw error; },
+    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await database.from("storage_locations").update({ is_active: val }).eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["storage_locations"] }),
   });
 

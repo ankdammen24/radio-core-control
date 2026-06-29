@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -40,11 +40,11 @@ function PlaylistsPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [form, setForm] = useState({ name:"", description:"", playlist_type:"rotation", priority: 5, station_id: "", azuracast_playlist_id: "" });
 
-  const { data: stations } = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await supabase.from("stations").select("id,name")).data ?? [] });
+  const { data: stations } = useQuery({ queryKey: ["stations-list"], queryFn: async () => (await database.from("stations").select("id,name")).data ?? [] });
   const playlists = useQuery({
     queryKey: ["playlists"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("playlists").select("*, stations(name), playlist_assignments(id)").order("priority", { ascending: false });
+      const { data, error } = await database.from("playlists").select("*, stations(name), playlist_assignments(id)").order("priority", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -63,19 +63,19 @@ function PlaylistsPage() {
       if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
       setErrs(null);
       const payload = { ...parsed.data, azuracast_playlist_id: form.azuracast_playlist_id || null };
-      const { error } = await supabase.from("playlists").insert(payload as any);
+      const { error } = await database.from("playlists").insert(payload as any);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Playlist created"); setOpen(false); setForm({ name:"", description:"", playlist_type:"rotation", priority: 5, station_id: "", azuracast_playlist_id: "" }); qc.invalidateQueries({ queryKey:["playlists"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
-    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await supabase.from("playlists").update({ is_active: val }).eq("id", id); if (error) throw error; },
+    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await database.from("playlists").update({ is_active: val }).eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey:["playlists"] }),
   });
   const sync = useMutation({
     mutationFn: async (p: any) => {
-      const { error } = await supabase.from("sync_jobs").insert({ station_id: p.station_id, job_type: "playlist_sync", status: "pending", payload: { playlist_id: p.id } });
+      const { error } = await database.from("sync_jobs").insert({ station_id: p.station_id, job_type: "playlist_sync", status: "pending", payload: { playlist_id: p.id } });
       if (error) throw error;
       await logAudit("sync.queue.playlist", "playlists", p.id);
     },
@@ -83,7 +83,7 @@ function PlaylistsPage() {
     onError: (e: any) => toast.error(e.message),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("playlists").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["playlists"] }); },
     onError: (e: any) => toast.error(e.message),
   });

@@ -1,7 +1,7 @@
 // System events server functions. Client-importable.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 
 const levelEnum = z.enum(["info", "warning", "error", "critical"]);
 

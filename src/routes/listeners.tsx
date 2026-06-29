@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ function ListenersPage() {
     queryKey: ["listener-stats"],
     refetchInterval: 10_000,
     queryFn: async () => {
-      const { data } = await supabase.from("listener_stats").select("*, stations(name,slug)").order("recorded_at", { ascending: false }).limit(200);
+      const { data } = await database.from("listener_stats").select("*, stations(name,slug)").order("recorded_at", { ascending: false }).limit(200);
       return data ?? [];
     },
   });
@@ -23,7 +23,7 @@ function ListenersPage() {
   const { data: stations } = useQuery({
     queryKey: ["stations-with-az-listeners"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("stations")
         .select("id,name,slug, azuracast_connections(id)")
         .order("name");

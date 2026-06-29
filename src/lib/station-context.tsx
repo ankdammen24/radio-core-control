@@ -9,7 +9,7 @@
  */
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 
 export type StationBrand = {
   id: string;
@@ -48,7 +48,7 @@ export function StationProvider({ children }: { children: ReactNode }) {
   const { data, isLoading } = useQuery({
     queryKey: ["station-context"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await database
         .from("stations")
         .select("id,name,slug,description,is_active, accounts(name)")
         .order("name");

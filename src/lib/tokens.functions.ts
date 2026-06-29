@@ -16,8 +16,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
+import { adminDatabase } from "@/services/database/server";
 
 // ─── Purpose values ──────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ export const listStackTokens = createServerFn({ method: "GET" })
     await requireAdmin(context);
 
     // IMPORTANT: never select token_hash — it must stay server-side only.
-    let q = supabaseAdmin
+    let q = adminDatabase
       .from("stack_tokens")
       .select("id,name,purpose,station_id,is_active,last_used_at,revoked_at,created_at")
       .order("created_at", { ascending: false });
@@ -100,7 +100,7 @@ export const createStackToken = createServerFn({ method: "POST" })
 
     const { raw, hash } = generateTokenSecret();
 
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await adminDatabase
       .from("stack_tokens")
       .insert({
         name: data.name,
@@ -116,7 +116,7 @@ export const createStackToken = createServerFn({ method: "POST" })
 
     // Audit log — best-effort, do not fail the creation if audit fails
     try {
-      await supabaseAdmin.from("audit_logs").insert({
+      await adminDatabase.from("audit_logs").insert({
         user_id: context.userId,
         action: "stack_token.created",
         entity_type: "stack_tokens",
@@ -146,7 +146,7 @@ export const revokeStackToken = createServerFn({ method: "POST" })
     await requireAdmin(context);
 
     const now = new Date().toISOString();
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await adminDatabase
       .from("stack_tokens")
       .update({ is_active: false, revoked_at: now })
       .eq("id", data.id)
@@ -156,14 +156,14 @@ export const revokeStackToken = createServerFn({ method: "POST" })
     if (error) throw error;
 
     // Also deactivate any agent_instances using this token
-    await supabaseAdmin
+    await adminDatabase
       .from("agent_instances")
       .update({ status: "offline" })
       .eq("stack_token_id", data.id);
 
     // Audit log
     try {
-      await supabaseAdmin.from("audit_logs").insert({
+      await adminDatabase.from("audit_logs").insert({
         user_id: context.userId,
         action: "stack_token.revoked",
         entity_type: "stack_tokens",

@@ -6,7 +6,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function requireRole(context: { supabase: any; userId: string | null }, roles: string[]) {

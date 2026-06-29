@@ -2,7 +2,7 @@
  * Internal server functions for the News module (admin UI).
  */
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { z } from "zod";
 import { randomBytes, createHash } from "crypto";
 

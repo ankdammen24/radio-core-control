@@ -1,7 +1,7 @@
 // Sync worker: dispatches sync_jobs to typed handlers.
 // Server-only. Imported by the cron-triggered server route.
 
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { adminDatabase } from "@/services/database/server";
 import { AzuracastError, buildAzuracastClient, type AzuracastConnectionRow } from "./azuracast-client.server";
 import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { readEnv } from "@/server/env.server";
@@ -98,7 +98,7 @@ export function resolveStorageTargetCredentials(
 // ---------- helpers ----------
 
 async function loadConnection(opts: { connection_id?: string; station_id?: string | null }): Promise<AzuracastConnectionRow> {
-  let q = supabaseAdmin.from("azuracast_connections").select("id,station_id,base_url,azuracast_station_id,api_key_secret_name").limit(1);
+  let q = adminDatabase.from("azuracast_connections").select("id,station_id,base_url,azuracast_station_id,api_key_secret_name").limit(1);
   if (opts.connection_id) q = q.eq("id", opts.connection_id);
   else if (opts.station_id) q = q.eq("station_id", opts.station_id);
   else throw new Error("connection_id or station_id required");
@@ -129,8 +129,8 @@ const handlers: Record<string, Handler> = {
     } | null;
     if (!np?.now_playing?.song || !conn.station_id) return { ok: true, no_data: true };
     const song = np.now_playing.song;
-    await supabaseAdmin.from("now_playing").delete().eq("station_id", conn.station_id);
-    await supabaseAdmin.from("now_playing").insert({
+    await adminDatabase.from("now_playing").delete().eq("station_id", conn.station_id);
+    await adminDatabase.from("now_playing").insert({
       station_id: conn.station_id,
       title: song.title ?? null,
       artist: song.artist ?? null,
@@ -149,7 +149,7 @@ const handlers: Record<string, Handler> = {
     const client = buildAzuracastClient(conn);
     const np = (await client.nowPlaying()) as { listeners?: { current?: number; unique?: number; total?: number } } | null;
     if (!conn.station_id) return { ok: true, skipped: "no station" };
-    await supabaseAdmin.from("listener_stats").insert({
+    await adminDatabase.from("listener_stats").insert({
       station_id: conn.station_id,
       listeners: np?.listeners?.current ?? 0,
       peak_listeners: np?.listeners?.total ?? np?.listeners?.unique ?? 0,
@@ -177,7 +177,7 @@ const handlers: Record<string, Handler> = {
       listeners: h.listeners_start ?? null,
       played_at: new Date((h.played_at ?? Date.now() / 1000) * 1000).toISOString(),
     }));
-    if (rows.length) await supabaseAdmin.from("play_history").insert(rows as Array<typeof rows[number] & { station_id: string }>);
+    if (rows.length) await adminDatabase.from("play_history").insert(rows as Array<typeof rows[number] & { station_id: string }>);
     return { ok: true, inserted: rows.length };
   },
 
@@ -215,7 +215,7 @@ const handlers: Record<string, Handler> = {
 
     // Resolve target storage bucket: explicit target_id OR the active media target for the station.
     // IMPORTANT: when running separate buckets (music/jingles/fx), provide target_id explicitly per job.
-    let targetQuery = supabaseAdmin
+    let targetQuery = adminDatabase
       .from("storage_targets")
       .select("id,bucket,endpoint_url,region,access_key_ref,secret_key_ref")
       .eq("is_active", true)
@@ -288,7 +288,7 @@ const handlers: Record<string, Handler> = {
         // Upsert media_files row keyed by azuracast_media_id
         if (conn.station_id) {
           const azId = String(row.id ?? row.unique_id ?? "");
-          await supabaseAdmin.from("media_files").upsert({
+          await adminDatabase.from("media_files").upsert({
             station_id: conn.station_id,
             azuracast_media_id: azId,
             file_name: path.split("/").pop() ?? path,
@@ -341,7 +341,7 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
   const limit = opts.limit ?? 10;
   const worker = opts.worker ?? "cron";
 
-  const { data: jobs, error } = await supabaseAdmin.rpc("claim_sync_jobs", { _limit: limit, _worker: worker });
+  const { data: jobs, error } = await adminDatabase.rpc("claim_sync_jobs", { _limit: limit, _worker: worker });
   if (error) throw error;
   const claimed = (jobs ?? []) as SyncJob[];
 
@@ -350,7 +350,7 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
   for (const job of claimed) {
     const handler = handlers[job.job_type];
     if (!handler) {
-      await supabaseAdmin.from("sync_jobs").update({
+      await adminDatabase.from("sync_jobs").update({
         status: "failed",
         finished_at: new Date().toISOString(),
         message: `Unknown job_type: ${job.job_type}`,
@@ -362,7 +362,7 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
 
     try {
       const out = await handler(job);
-      await supabaseAdmin.from("sync_jobs").update({
+      await adminDatabase.from("sync_jobs").update({
         status: "completed",
         finished_at: new Date().toISOString(),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -395,7 +395,7 @@ export async function runSyncWorker(opts: { limit?: number; worker?: string } = 
       });
       const willRetry = job.attempts < job.max_attempts;
       const backoffSec = Math.min(60 * Math.pow(2, job.attempts), 3600);
-      await supabaseAdmin.from("sync_jobs").update({
+      await adminDatabase.from("sync_jobs").update({
         status: willRetry ? "pending" : "failed",
         finished_at: willRetry ? null : new Date().toISOString(),
         scheduled_for: willRetry ? new Date(Date.now() + backoffSec * 1000).toISOString() : undefined,

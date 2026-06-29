@@ -1,12 +1,12 @@
 /**
  * Server-only helpers for storage targets.
  */
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { adminDatabase } from "@/services/database/server";
 import { buildStorageAdapter } from "./storage-adapters";
 import type { StorageTargetConfig, TestResult } from "./storage-adapters/types";
 
 export async function loadStorageTarget(id: string): Promise<StorageTargetConfig> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await adminDatabase
     .from("storage_targets")
     .select("*")
     .eq("id", id)
@@ -27,7 +27,7 @@ export async function runStorageHealthCheck(
   const finishedAt = new Date().toISOString();
 
   // Persist health-check row
-  await supabaseAdmin.from("storage_health_checks").insert({
+  await adminDatabase.from("storage_health_checks").insert({
     target_id: cfg.id,
     station_id: cfg.station_id,
     status: result.status,
@@ -41,7 +41,7 @@ export async function runStorageHealthCheck(
   });
 
   // Update target row
-  await supabaseAdmin
+  await adminDatabase
     .from("storage_targets")
     .update({
       status: result.status,
@@ -52,7 +52,7 @@ export async function runStorageHealthCheck(
 
   // Mirror into sync_jobs as a storage_check entry for the operations log.
   try {
-    await supabaseAdmin.from("sync_jobs").insert({
+    await adminDatabase.from("sync_jobs").insert({
       job_type: "storage_check",
       station_id: cfg.station_id,
       status: result.status === "online" ? "completed" : "failed",
@@ -68,7 +68,7 @@ export async function runStorageHealthCheck(
 
   // Mirror into service_health for the Health page summary.
   try {
-    await supabaseAdmin.from("service_health").insert({
+    await adminDatabase.from("service_health").insert({
       station_id: cfg.station_id,
       service: `storage:${cfg.provider}`,
       status: result.status,

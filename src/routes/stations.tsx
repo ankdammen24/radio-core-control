@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -31,11 +31,11 @@ function StationsPage() {
   const [errs, setErrs] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", slug: "", description: "", account_id: "", azuracast_station_id: "", is_active: true });
 
-  const { data: accounts } = useQuery({ queryKey: ["accounts-list"], queryFn: async () => (await supabase.from("accounts").select("id,name").order("name")).data ?? [] });
+  const { data: accounts } = useQuery({ queryKey: ["accounts-list"], queryFn: async () => (await database.from("accounts").select("id,name").order("name")).data ?? [] });
   const stations = useQuery({
     queryKey: ["stations"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("stations").select("*, accounts(name)").order("name");
+      const { data, error } = await database.from("stations").select("*, accounts(name)").order("name");
       if (error) throw error;
       return data ?? [];
     },
@@ -47,19 +47,19 @@ function StationsPage() {
       if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
       setErrs(null);
       const payload = { ...parsed.data, is_active: true, account_id: form.account_id || null, azuracast_station_id: form.azuracast_station_id || null };
-      const { error } = await supabase.from("stations").insert(payload as any);
+      const { error } = await database.from("stations").insert(payload as any);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Station created"); setOpen(false); setForm({ name:"", slug:"", description:"", account_id:"", azuracast_station_id:"", is_active:true }); qc.invalidateQueries({ queryKey:["stations"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const toggle = useMutation({
-    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await supabase.from("stations").update({ is_active: val }).eq("id", id); if (error) throw error; },
+    mutationFn: async ({ id, val }: { id: string; val: boolean }) => { const { error } = await database.from("stations").update({ is_active: val }).eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey:["stations"] }),
     onError: (e: any) => toast.error(e.message),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("stations").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("stations").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["stations"] }); },
     onError: (e: any) => toast.error(e.message),
   });

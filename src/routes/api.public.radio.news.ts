@@ -28,8 +28,8 @@ export const Route = createFileRoute("/api/public/radio/news")({
         const statusFilter = (status && ALLOWED_STATUS.has(status) ? status : "ready_for_radio") as
           "ready_for_radio" | "broadcasted";
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        let query = supabaseAdmin.from("news_items").select("*").eq("status", statusFilter);
+        const { adminDatabase } = await import("@/services/database/server");
+        let query = adminDatabase.from("news_items").select("*").eq("status", statusFilter);
 
         const region = q.get("region");
         if (region) query = query.eq("region", region);

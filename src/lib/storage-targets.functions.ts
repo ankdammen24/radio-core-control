@@ -3,7 +3,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { runStorageHealthCheck, loadStorageTarget } from "@/server/storage-targets.server";
 import { buildStorageAdapter } from "@/server/storage-adapters";
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -29,7 +29,7 @@ function AccountsPage() {
   const accounts = useQuery({
     queryKey: ["accounts"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("accounts").select("*, stations(id)").order("name");
+      const { data, error } = await database.from("accounts").select("*, stations(id)").order("name");
       if (error) throw error;
       return data ?? [];
     },
@@ -40,14 +40,14 @@ function AccountsPage() {
       const parsed = accountSchema.safeParse(form);
       if (!parsed.success) { const m = formatZodError(parsed.error); setErrs(m); throw new Error(m); }
       setErrs(null);
-      const { error } = await supabase.from("accounts").insert(parsed.data);
+      const { error } = await database.from("accounts").insert(parsed.data);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Account created"); setOpen(false); setForm({ name:"", type:"broadcaster", contact_email:"", notes:"" }); qc.invalidateQueries({ queryKey:["accounts"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   const del = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("accounts").delete().eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("accounts").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey:["accounts"] }); },
     onError: (e: any) => toast.error(e.message),
   });

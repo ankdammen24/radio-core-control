@@ -7,7 +7,7 @@
  * the Fablesh streaming URL passed through verbatim.
  */
 
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { adminDatabase } from "@/services/database/server";
 import {
   listFableshPodcasts,
   listFableshEpisodes,
@@ -72,7 +72,7 @@ function mapEpisode(podcast_id: string, e: FableshEpisode) {
 
 
 export async function syncSource(sourceId: string): Promise<SyncSummary> {
-  const { data: srcRow, error: srcErr } = await supabaseAdmin
+  const { data: srcRow, error: srcErr } = await adminDatabase
     .from("podcast_sources")
     .select("id, name, kind, base_url, auth_secret_name, is_active")
     .eq("id", sourceId)
@@ -84,7 +84,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
   }
 
   // Open run row
-  const { data: runRow } = await supabaseAdmin
+  const { data: runRow } = await adminDatabase
     .from("podcast_sync_runs")
     .insert({ source_id: src.id, status: "running" })
     .select("id")
@@ -109,7 +109,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
     podcastsSeen = remotePodcasts.length;
 
     // Index existing local podcasts by external_id for diff
-    const { data: localPods } = await supabaseAdmin
+    const { data: localPods } = await adminDatabase
       .from("podcasts")
       .select("id, external_id, checksum, last_updated_at")
       .eq("source_id", src.id);
@@ -125,7 +125,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
 
         let podcastId: string;
         if (!existing) {
-          const { data, error } = await supabaseAdmin
+          const { data, error } = await adminDatabase
             .from("podcasts")
             .insert(mapped)
             .select("id")
@@ -138,7 +138,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
             (mapped.checksum && mapped.checksum !== existing.checksum) ||
             (mapped.last_updated_at && mapped.last_updated_at !== existing.last_updated_at);
           if (changed) {
-            const { error } = await supabaseAdmin.from("podcasts").update(mapped).eq("id", podcastId);
+            const { error } = await adminDatabase.from("podcasts").update(mapped).eq("id", podcastId);
             if (error) throw error;
           }
         }
@@ -151,7 +151,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
         const remoteGuids = new Set(remoteEps.map((e) => e.id));
 
 
-        const { data: localEps } = await supabaseAdmin
+        const { data: localEps } = await adminDatabase
           .from("podcast_episodes")
           .select("id, guid, checksum, version, deleted_at")
           .eq("podcast_id", podcastId);
@@ -164,13 +164,13 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
           const mappedEp = mapEpisode(podcastId, re);
           const existingEp = localEpIdx.get(re.id);
           if (!existingEp) {
-            const { error } = await supabaseAdmin.from("podcast_episodes").insert(mappedEp);
+            const { error } = await adminDatabase.from("podcast_episodes").insert(mappedEp);
             if (error) throw error;
             episodesNew++;
           } else {
             // Fablesh has no per-episode checksum/version; always upsert
             // to keep metadata fresh. Volumes are small.
-            const { error } = await supabaseAdmin
+            const { error } = await adminDatabase
               .from("podcast_episodes")
               .update(mappedEp)
               .eq("id", existingEp.id);
@@ -183,7 +183,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
         // Mark removed episodes as deleted (soft)
         for (const [guid, le] of localEpIdx.entries()) {
           if (!remoteGuids.has(guid) && !le.deleted_at) {
-            const { error } = await supabaseAdmin
+            const { error } = await adminDatabase
               .from("podcast_episodes")
               .update({ deleted_at: new Date().toISOString() })
               .eq("id", le.id);
@@ -196,14 +196,14 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
       }
     }
 
-    await supabaseAdmin
+    await adminDatabase
       .from("podcast_sources")
       .update({ last_synced_at: new Date().toISOString() })
       .eq("id", src.id);
 
     const status: SyncSummary["status"] = errors.length === 0 ? "success" : "partial";
     if (runId) {
-      await supabaseAdmin
+      await adminDatabase
         .from("podcast_sync_runs")
         .update({
           finished_at: new Date().toISOString(),
@@ -220,7 +220,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
   } catch (e) {
     const msg = (e as Error).message;
     if (runId) {
-      await supabaseAdmin
+      await adminDatabase
         .from("podcast_sync_runs")
         .update({
           finished_at: new Date().toISOString(),
@@ -238,7 +238,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
 }
 
 export async function syncAllActiveSources(): Promise<SyncSummary[]> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await adminDatabase
     .from("podcast_sources")
     .select("id")
     .eq("is_active", true);
@@ -251,7 +251,7 @@ export async function syncAllActiveSources(): Promise<SyncSummary[]> {
 }
 
 export async function refreshPodcast(podcastId: string): Promise<SyncSummary> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await adminDatabase
     .from("podcasts")
     .select("source_id")
     .eq("id", podcastId)

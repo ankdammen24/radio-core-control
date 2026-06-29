@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { readEnv } from "@/server/env.server";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
@@ -53,7 +53,10 @@ export const generateStationConfig = createServerFn({ method: "POST" })
 
     const apiBaseUrl = process.env.PUBLIC_APP_URL
       ?? process.env.APP_BASE_URL
-      ?? `https://project--${process.env.SUPABASE_PROJECT_ID ?? ""}.lovable.app`;
+      ?? process.env.APP_URL;
+    if (!apiBaseUrl) {
+      throw new Error("PUBLIC_APP_URL (or APP_URL) is required to generate runtime callback URLs.");
+    }
     const stackToken = readEnv("STACK_TOKEN");
     if (!stackToken) {
       throw new Error("STACK_TOKEN is missing. Configure it server-side before generating runtime config.");

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,13 +26,13 @@ function FallbackPage() {
 
   const stations = useQuery({
     queryKey: ["fallback-stations"],
-    queryFn: async () => (await supabase.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
+    queryFn: async () => (await database.from("stations").select("id,name,slug").eq("is_active", true).order("name")).data ?? [],
   });
   if (!stationId && stations.data?.length) setStationId(stations.data[0].id);
 
   const tracks = useQuery({
     queryKey: ["fallback-tracks", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase
+    queryFn: async () => (await database
       .from("fallback_tracks")
       .select("*, media_files(file_name,file_path)")
       .eq("station_id", stationId)
@@ -41,14 +41,14 @@ function FallbackPage() {
 
   const media = useQuery({
     queryKey: ["fallback-media", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase
+    queryFn: async () => (await database
       .from("media_files").select("id,file_name,file_path,media_kind")
       .eq("station_id", stationId).order("file_name").limit(500)).data ?? [],
   });
 
   const liqCfg = useQuery({
     queryKey: ["fallback-liq", stationId], enabled: !!stationId,
-    queryFn: async () => (await supabase.from("liquidsoap_configs").select("fallback_track_path").eq("station_id", stationId).maybeSingle()).data,
+    queryFn: async () => (await database.from("liquidsoap_configs").select("fallback_track_path").eq("station_id", stationId).maybeSingle()).data,
   });
 
   const invalidate = () => {
@@ -58,7 +58,7 @@ function FallbackPage() {
 
   const reprioritize = useMutation({
     mutationFn: async ({ id, priority }: { id: string; priority: number }) => {
-      const { error } = await supabase.from("fallback_tracks").update({ priority }).eq("id", id);
+      const { error } = await database.from("fallback_tracks").update({ priority }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -66,7 +66,7 @@ function FallbackPage() {
 
   const toggleActive = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from("fallback_tracks").update({ is_active }).eq("id", id);
+      const { error } = await database.from("fallback_tracks").update({ is_active }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -74,7 +74,7 @@ function FallbackPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("fallback_tracks").delete().eq("id", id);
+      const { error } = await database.from("fallback_tracks").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Borttaget"); invalidate(); },
@@ -82,7 +82,7 @@ function FallbackPage() {
 
   const saveLastResort = useMutation({
     mutationFn: async (path: string) => {
-      const { error } = await supabase.from("liquidsoap_configs").update({ fallback_track_path: path || null }).eq("station_id", stationId);
+      const { error } = await database.from("liquidsoap_configs").update({ fallback_track_path: path || null }).eq("station_id", stationId);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Last-resort sparat"); invalidate(); },
@@ -190,7 +190,7 @@ function AddTrackCard({ stationId, canEdit, media, onAdded, nextPriority }: {
       if (!url) { toast.error("URL krävs"); return; }
       payload.external_url = url;
     }
-    const { error } = await supabase.from("fallback_tracks").insert(payload);
+    const { error } = await database.from("fallback_tracks").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success("Tillagd");
     setLabel(""); setMediaId(""); setUrl(""); setPriority(priority + 10);

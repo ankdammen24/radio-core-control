@@ -1,7 +1,7 @@
 // Server fns for sync-job control. Client-importable.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/services/database/auth-middleware";
 import { runSyncWorker } from "@/server/sync-worker.server";
 
 const enqueueSchema = z.object({

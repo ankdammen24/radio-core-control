@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,22 +15,22 @@ function InboxPage() {
   const qc = useQueryClient();
   const requests = useQuery({
     queryKey: ["song-requests"], refetchInterval: 15_000,
-    queryFn: async () => (await supabase.from("song_requests").select("*, stations(name)").order("created_at", { ascending: false }).limit(100)).data ?? [],
+    queryFn: async () => (await database.from("song_requests").select("*, stations(name)").order("created_at", { ascending: false }).limit(100)).data ?? [],
   });
   const messages = useQuery({
     queryKey: ["studio-messages"], refetchInterval: 15_000,
-    queryFn: async () => (await supabase.from("studio_messages").select("*, stations(name)").order("created_at", { ascending: false }).limit(100)).data ?? [],
+    queryFn: async () => (await database.from("studio_messages").select("*, stations(name)").order("created_at", { ascending: false }).limit(100)).data ?? [],
   });
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from("song_requests").update({ status }).eq("id", id);
+      const { error } = await database.from("song_requests").update({ status }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Updated"); qc.invalidateQueries({ queryKey: ["song-requests"] }); },
   });
   const handleMsg = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("studio_messages").update({ handled: true }).eq("id", id); if (error) throw error; },
+    mutationFn: async (id: string) => { const { error } = await database.from("studio_messages").update({ handled: true }).eq("id", id); if (error) throw error; },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["studio-messages"] }),
   });
 

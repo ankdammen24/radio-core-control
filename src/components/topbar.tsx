@@ -10,19 +10,27 @@ import { Link } from "@tanstack/react-router";
 import { Menu, Moon, Sun, LogOut, User, Settings, Activity, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StationSwitcher } from "@/components/station-switcher";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import { useStationScope } from "@/lib/station-context";
-import { supabase } from "@/integrations/supabase/client";
+import { database } from "@/services/database";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { checkBackendHealth } from "@/services/health";
 
 export function Topbar({
-  title, description, actions, onOpenMobileNav,
+  title,
+  description,
+  actions,
+  onOpenMobileNav,
 }: {
   title: string;
   description?: string;
@@ -44,9 +52,7 @@ export function Topbar({
 
         <div className="min-w-0 flex-1">
           <h1 className="text-base font-semibold tracking-tight truncate">{title}</h1>
-          {description && (
-            <p className="text-xs text-muted-foreground truncate">{description}</p>
-          )}
+          {description && <p className="text-xs text-muted-foreground truncate">{description}</p>}
         </div>
 
         <div className="hidden md:block w-56">
@@ -54,6 +60,7 @@ export function Topbar({
         </div>
 
         <RuntimeStatusPill />
+        <BackendStatusPill />
 
         {actions && <div className="hidden md:flex items-center gap-2">{actions}</div>}
 
@@ -67,6 +74,40 @@ export function Topbar({
         </div>
       )}
     </header>
+  );
+}
+
+function BackendStatusPill() {
+  const health = useQuery({
+    queryKey: ["radio-core-api-health"],
+    queryFn: checkBackendHealth,
+    refetchInterval: 30_000,
+    retry: 1,
+  });
+
+  if (health.isPending) return null;
+  const available = health.data?.available === true;
+  return (
+    <span
+      className={cn(
+        "inline-flex h-8 items-center gap-2 rounded-full border px-3 text-[11px] uppercase tracking-wider",
+        available
+          ? "border-border text-muted-foreground"
+          : "border-destructive/40 bg-destructive/5 text-destructive",
+      )}
+      title={
+        available
+          ? `Backend online (${health.data?.latencyMs ?? 0} ms)`
+          : (health.data?.message ?? health.error?.message ?? "Backend unavailable")
+      }
+      role="status"
+    >
+      <span
+        className={cn("h-2 w-2 rounded-full", available ? "bg-emerald-500" : "bg-destructive")}
+      />
+      <span className="hidden xl:inline">{available ? "API online" : "Backend unavailable"}</span>
+      <span className="xl:hidden">API</span>
+    </span>
   );
 }
 
@@ -138,7 +179,7 @@ function RuntimeStatusPill() {
   const { data } = useQuery({
     queryKey: ["topbar-runtime-status", stationId ?? "all"],
     queryFn: async () => {
-      let q = supabase.from("runtime_targets").select("status,is_active");
+      let q = database.from("runtime_targets").select("status,is_active");
       if (stationId) q = q.eq("station_id", stationId);
       const { data, error } = await q;
       if (error) return { total: 0, online: 0, degraded: 0, offline: 0 };
@@ -155,27 +196,40 @@ function RuntimeStatusPill() {
   });
 
   const tone =
-    !data || data.total === 0 ? "unknown" :
-    data.offline > 0 ? "offline" :
-    data.degraded > 0 ? "degraded" : "online";
+    !data || data.total === 0
+      ? "unknown"
+      : data.offline > 0
+        ? "offline"
+        : data.degraded > 0
+          ? "degraded"
+          : "online";
 
   const label =
-    tone === "online"   ? "On Air" :
-    tone === "degraded" ? "Degraded" :
-    tone === "offline"  ? "Offline" :
-    "No targets";
+    tone === "online"
+      ? "On Air"
+      : tone === "degraded"
+        ? "Degraded"
+        : tone === "offline"
+          ? "Offline"
+          : "No targets";
 
   const dotCls =
-    tone === "online"   ? "bg-onair onair-pulse" :
-    tone === "degraded" ? "bg-warning" :
-    tone === "offline"  ? "bg-destructive" :
-    "bg-muted-foreground/40";
+    tone === "online"
+      ? "bg-onair onair-pulse"
+      : tone === "degraded"
+        ? "bg-warning"
+        : tone === "offline"
+          ? "bg-destructive"
+          : "bg-muted-foreground/40";
 
   const wrapCls =
-    tone === "online"   ? "border-onair/40 text-onair" :
-    tone === "degraded" ? "border-warning/40 text-warning" :
-    tone === "offline"  ? "border-destructive/40 text-destructive" :
-    "border-border text-muted-foreground";
+    tone === "online"
+      ? "border-onair/40 text-onair"
+      : tone === "degraded"
+        ? "border-warning/40 text-warning"
+        : tone === "offline"
+          ? "border-destructive/40 text-destructive"
+          : "border-border text-muted-foreground";
 
   return (
     <Link
