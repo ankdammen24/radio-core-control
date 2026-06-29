@@ -121,7 +121,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
     for (const rp of remotePodcasts) {
       try {
         const mapped = mapPodcast(src.id, rp);
-        const existing = localIdx.get(rp.PodcastId);
+        const existing = localIdx.get(rp.id);
 
         let podcastId: string;
         if (!existing) {
@@ -146,9 +146,10 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
         // Episodes
         const remoteEps = await listFableshEpisodes(
           { baseUrl: src.base_url, authSecretName: src.auth_secret_name },
-          rp.PodcastId,
+          rp.id,
         );
-        const remoteGuids = new Set(remoteEps.map((e) => e.GUID));
+        const remoteGuids = new Set(remoteEps.map((e) => e.id));
+
 
         const { data: localEps } = await supabaseAdmin
           .from("podcast_episodes")
@@ -161,7 +162,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
 
         for (const re of remoteEps) {
           const mappedEp = mapEpisode(podcastId, re);
-          const existingEp = localEpIdx.get(re.GUID);
+          const existingEp = localEpIdx.get(re.id);
           if (!existingEp) {
             const { error } = await supabaseAdmin.from("podcast_episodes").insert(mappedEp);
             if (error) throw error;
@@ -194,7 +195,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
           }
         }
       } catch (e) {
-        errors.push(`podcast ${rp.PodcastId}: ${(e as Error).message}`);
+        errors.push(`podcast ${rp.id}: ${(e as Error).message}`);
       }
     }
 
