@@ -114,3 +114,21 @@ export const revokeAgentNow = createServerFn({ method: "POST" })
     if (error) throw error;
     return revokeAgent(agent as AgentRow);
   });
+
+/**
+ * Request a config reload for an agent.
+ * Sets reload_requested_at = now(). The next heartbeat from the runner will
+ * see reload_requested: true in the response and re-fetch its station config.
+ */
+export const requestAgentReload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { error } = await supabaseAdmin
+      .from("agent_instances")
+      .update({ reload_requested_at: new Date().toISOString() })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true as const };
+  });

@@ -119,7 +119,9 @@ export type Database = {
           last_error: string | null
           last_seen_at: string | null
           metadata: Json
+          metrics: Json
           name: string
+          reload_requested_at: string | null
           stack_token_id: string | null
           station_id: string | null
           status: Database["public"]["Enums"]["agent_status"]
@@ -134,7 +136,9 @@ export type Database = {
           last_error?: string | null
           last_seen_at?: string | null
           metadata?: Json
+          metrics?: Json
           name: string
+          reload_requested_at?: string | null
           stack_token_id?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
@@ -149,7 +153,9 @@ export type Database = {
           last_error?: string | null
           last_seen_at?: string | null
           metadata?: Json
+          metrics?: Json
           name?: string
+          reload_requested_at?: string | null
           stack_token_id?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
