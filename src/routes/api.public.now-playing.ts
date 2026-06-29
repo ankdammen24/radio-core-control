@@ -1,16 +1,21 @@
+/**
+ * GET  /api/public/now-playing?station=<slug>  — Publik (ingen auth)
+ * POST /api/public/now-playing                 — Kräver x-stack-token
+ *
+ * Migrerad från Supabase till Drizzle ORM.
+ */
 import { createFileRoute } from "@tanstack/react-router";
-import { createHash } from "crypto";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { resolveStackToken, touchStackToken } from "@/server/repositories/stackTokens.repository";
+import { findStationBySlug } from "@/server/repositories/stations.repository";
+import { upsertNowPlaying, getNowPlaying, insertPlayHistory } from "@/server/repositories/nowPlaying.repository";
 
-async function authStation(request: Request): Promise<{ stationId: string | null; tokenId: string } | null> {
-  const token = request.headers.get("x-stack-token") ?? "";
-  if (!token) return null;
-  const hash = createHash("sha256").update(token).digest("hex");
-  const { data } = await supabaseAdmin
-    .from("stack_tokens").select("id,station_id,is_active").eq("token_hash", hash).maybeSingle();
-  if (!data || !data.is_active) return null;
-  await supabaseAdmin.from("stack_tokens").update({ last_used_at: new Date().toISOString() }).eq("id", data.id);
-  return { stationId: data.station_id, tokenId: data.id };
+async function authStation(request: Request) {
+  const raw = request.headers.get("x-stack-token") ?? "";
+  if (!raw) return null;
+  const tok = await resolveStackToken(raw);
+  if (!tok) return null;
+  await touchStackToken(tok.id);
+  return { stationId: tok.stationId, tokenId: tok.id };
 }
 
 export const Route = createFileRoute("/api/public/now-playing")({
@@ -18,45 +23,49 @@ export const Route = createFileRoute("/api/public/now-playing")({
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const slug = url.searchParams.get("station");
-        let q = supabaseAdmin.from("now_playing").select("*, stations!inner(name,slug)");
-        if (slug) q = q.eq("stations.slug", slug);
-        const { data, error } = await q;
-        if (error) return Response.json({ error: error.message }, { status: 500 });
+        const slug = url.searchParams.get("station") ?? undefined;
+        const data = await getNowPlaying(slug);
         return Response.json({ data });
       },
+
       POST: async ({ request }) => {
         const auth = await authStation(request);
         if (!auth) return new Response("Unauthorized", { status: 401 });
+
         const body = await request.json().catch(() => ({} as any));
         const slug: string | undefined = body.station_slug;
         if (!slug) return Response.json({ error: "station_slug required" }, { status: 400 });
-        const { data: station } = await supabaseAdmin.from("stations").select("id").eq("slug", slug).maybeSingle();
+
+        const station = await findStationBySlug(slug);
         if (!station) return Response.json({ error: "Unknown station" }, { status: 404 });
-        // Cross-tenant guard: scoped tokens may only write to their own station.
+
         if (auth.stationId && auth.stationId !== station.id) {
           return new Response("Forbidden", { status: 403 });
         }
-        const cap = (v: unknown, n: number) =>
-          v == null ? null : String(v).slice(0, n);
+
+        const cap = (v: unknown, n: number) => v == null ? null : String(v).slice(0, n);
         const listenersRaw = Number(body.listeners ?? 0);
         const listeners = Number.isFinite(listenersRaw)
-          ? Math.max(0, Math.min(1_000_000, Math.trunc(listenersRaw)))
-          : 0;
-        const row = {
-          station_id: station.id,
+          ? Math.max(0, Math.min(1_000_000, Math.trunc(listenersRaw))) : 0;
+
+        await upsertNowPlaying({
+          stationId: station.id,
           title: cap(body.title, 500),
           artist: cap(body.artist, 500),
           album: cap(body.album, 500),
-          mount_path: cap(body.mount, 200),
+          mountPath: cap(body.mount, 200),
           listeners,
-          started_at: new Date().toISOString(),
-        };
-        await supabaseAdmin.from("now_playing").upsert(row, { onConflict: "station_id" });
-        await supabaseAdmin.from("play_history").insert({
-          station_id: station.id,
-          title: row.title, artist: row.artist, album: row.album, listeners: row.listeners,
+          startedAt: new Date(),
         });
+
+        await insertPlayHistory({
+          stationId: station.id,
+          title: cap(body.title, 500),
+          artist: cap(body.artist, 500),
+          album: cap(body.album, 500),
+          listeners,
+        });
+
         return Response.json({ ok: true });
       },
     },

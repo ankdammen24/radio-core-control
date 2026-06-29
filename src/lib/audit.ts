@@ -1,17 +1,17 @@
-import { supabase } from "@/integrations/supabase/client";
-
 /**
- * Manual audit log for application-level actions (e.g., "tested AzuraCast connection",
- * "queued sync job"). Database mutations are already audited automatically by triggers.
+ * Audit log helper
+ *
+ * TODO: migrera till Drizzle — skriver till audit_logs via db.insert(auditLogs)
+ * Tills vidare: no-op stub (audit logs skrivs direkt från server-routes).
  */
-export async function logAudit(action: string, entity_type?: string, entity_id?: string, payload?: Record<string, unknown>) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("audit_logs").insert({
-    user_id: user.id,
-    action,
-    entity_type: entity_type ?? null,
-    entity_id: entity_id ?? null,
-    new_value: (payload as any) ?? null,
-  });
+export async function logAudit(
+  _action: string,
+  _entity_type?: string,
+  _entity_id?: string,
+  _payload?: Record<string, unknown>,
+): Promise<void> {
+  // TODO: implement via Drizzle
+  // import { db } from "@/server/db/client";
+  // import { auditLogs } from "@/server/db/schema";
+  // await db.insert(auditLogs).values({ action, entityType, entityId, newValue: payload });
 }

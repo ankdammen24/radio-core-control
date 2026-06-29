@@ -1,12 +1,15 @@
-// Radio Core Agent client. Server-only.
-//
-// This is the typed contract the future Node.js agent will satisfy. Until a
-// real agent is paired, every call is mocked: it logs a system_event row so
-// the UI feed stays useful, and returns { ok: true, mocked: true }.
-//
-// To wire a real agent, replace the bodies of pingAgent/dispatchJob/
-// revokeAgent with real HTTP calls keyed by the linked stack_token.
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+/**
+ * Radio Core Agent client. Server-only.
+ *
+ * Migrerad från Supabase till Drizzle ORM.
+ * logEvent skriver till system_events-tabellen.
+ *
+ * TODO: ersätt pingAgent/dispatchJob/revokeAgent med riktiga HTTP-anrop
+ * när en riktig Radio Core Agent är ihopkopplad.
+ */
+import { eq } from "drizzle-orm";
+import { db } from "@/server/db/client";
+import { systemEvents, stackTokens, agentInstances } from "@/server/db/schema";
 
 export type AgentRow = {
   id: string;
@@ -29,11 +32,11 @@ async function logEvent(input: {
   message: string;
   details?: Record<string, unknown>;
 }) {
-  await supabaseAdmin.from("system_events").insert({
+  await db.insert(systemEvents).values({
     source: "agent",
-    station_id: input.station_id,
+    stationId: input.station_id,
     level: input.level,
-    event_type: input.event_type,
+    eventType: input.event_type,
     message: input.message,
     details: (input.details ?? {}) as never,
   });
@@ -63,15 +66,15 @@ export async function dispatchJob(agent: AgentRow, job: AgentJob) {
 
 export async function revokeAgent(agent: AgentRow) {
   if (agent.stack_token_id) {
-    await supabaseAdmin
-      .from("stack_tokens")
-      .update({ is_active: false })
-      .eq("id", agent.stack_token_id);
+    await db
+      .update(stackTokens)
+      .set({ isActive: false })
+      .where(eq(stackTokens.id, agent.stack_token_id));
   }
-  await supabaseAdmin
-    .from("agent_instances")
-    .update({ status: "offline", last_error: "Revoked by operator" })
-    .eq("id", agent.id);
+  await db
+    .update(agentInstances)
+    .set({ status: "offline", lastError: "Revoked by operator", updatedAt: new Date() })
+    .where(eq(agentInstances.id, agent.id));
   await logEvent({
     station_id: agent.station_id,
     level: "warning",

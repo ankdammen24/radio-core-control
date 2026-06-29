@@ -1,53 +1,24 @@
 /**
  * POST /api/public/agent/heartbeat
  *
- * Called by the runner daemon on each polling cycle (default: every 30 s).
- * Authenticates via x-stack-token (purpose: runner | agent).
+ * Migrerad från Supabase till Drizzle ORM.
+ * Autentiserar via x-stack-token (purpose: runner | agent).
  *
- * Responsibilities:
- *  1. Verify stack token (active, correct purpose)
- *  2. Resolve station from station_slug + cross-tenant guard
- *  3. Upsert agent_instances row (create on first heartbeat, update thereafter)
- *  4. Touch stack_tokens.last_used_at
- *  5. Return reload_requested flag + config_version hint
- *
- * See: docs/architecture/radio-core-v2.md §8 — Runner API contract
+ * 1. Verifierar stack token
+ * 2. Löser upp station från station_slug + cross-tenant guard
+ * 3. Upsertar agent_instances
+ * 4. Uppdaterar stack_tokens.last_used_at
+ * 5. Returnerar reload_requested + config_version
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { createHash } from "crypto";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { resolveStackToken, touchStackToken } from "@/server/repositories/stackTokens.repository";
+import { findStationBySlug } from "@/server/repositories/stations.repository";
+import { findAgentById, upsertAgentInstance } from "@/server/repositories/agents.repository";
+import { db } from "@/server/db/client";
+import { auditLogs } from "@/server/db/schema";
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
-
-type TokenRow = {
-  id: string;
-  station_id: string | null;
-  is_active: boolean;
-  purpose: string;
-};
-
-async function resolveToken(request: Request): Promise<TokenRow | null> {
-  const raw = request.headers.get("x-stack-token") ?? "";
-  if (!raw) return null;
-  const hash = createHash("sha256").update(raw, "utf8").digest("hex");
-  const { data } = await supabaseAdmin
-    .from("stack_tokens")
-    .select("id,station_id,is_active,purpose")
-    .eq("token_hash", hash)
-    .maybeSingle();
-  return data ?? null;
-}
-
-// ─── Body schema (manual validation — no Zod in route handlers) ───────────────
-
-type HeartbeatBody = {
-  agent_id?: unknown;
-  station_slug?: unknown;
-  hostname?: unknown;
-  version?: unknown;
-  capabilities?: unknown;
-  metrics?: unknown;
-};
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function safeString(v: unknown, max = 255): string | null {
   if (typeof v !== "string" || !v.trim()) return null;
@@ -60,21 +31,14 @@ function safeObject(v: unknown): Record<string, unknown> {
 }
 
 function isUuid(v: unknown): v is string {
-  return typeof v === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+  return (
+    typeof v === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+  );
 }
 
-// ─── config_version helper ────────────────────────────────────────────────────
-// A lightweight hash representing the "current" config epoch for a station.
-// In Fas 5+ this will reflect the actual rendered config hash so runners can
-// detect changes without a full reload. For now it's based on station updated_at.
-
-async function computeConfigVersion(stationId: string): Promise<string> {
-  const { data } = await supabaseAdmin
-    .from("stations")
-    .select("updated_at")
-    .eq("id", stationId)
-    .maybeSingle();
-  const seed = data?.updated_at ?? stationId;
+async function computeConfigVersion(stationUpdatedAt: Date | null, stationId: string): Promise<string> {
+  const seed = stationUpdatedAt?.toISOString() ?? stationId;
   return createHash("sha256").update(seed).digest("hex").slice(0, 16);
 }
 
@@ -84,42 +48,37 @@ export const Route = createFileRoute("/api/public/agent/heartbeat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // 1. Authenticate
-        const tok = await resolveToken(request);
-
-        if (!tok) {
-          return new Response(
-            JSON.stringify({ ok: false, error: "Missing or invalid token" }),
-            { status: 401, headers: { "Content-Type": "application/json" } },
-          );
+        // 1. Autentisera
+        const raw = request.headers.get("x-stack-token") ?? "";
+        if (!raw) {
+          return Response.json({ ok: false, error: "Missing token" }, { status: 401 });
         }
-        if (!tok.is_active) {
-          return new Response(
-            JSON.stringify({ ok: false, error: "Token revoked" }),
-            { status: 401, headers: { "Content-Type": "application/json" } },
-          );
+
+        const tok = await resolveStackToken(raw);
+        if (!tok) {
+          return Response.json({ ok: false, error: "Missing or invalid token" }, { status: 401 });
         }
         if (tok.purpose !== "runner" && tok.purpose !== "agent") {
-          return new Response(
-            JSON.stringify({ ok: false, error: `Token purpose '${tok.purpose}' not allowed for heartbeat (need runner or agent)` }),
-            { status: 403, headers: { "Content-Type": "application/json" } },
+          return Response.json(
+            { ok: false, error: `Token purpose '${tok.purpose}' not allowed (need runner or agent)` },
+            { status: 403 },
           );
         }
 
-        // 2. Parse body
-        let body: HeartbeatBody;
+        // 2. Parsa body
+        let body: Record<string, unknown>;
         try {
           body = await request.json();
         } catch {
           return Response.json({ ok: false, error: "Invalid JSON body" }, { status: 400 });
         }
 
-        const agentId   = isUuid(body.agent_id) ? body.agent_id : null;
+        const agentId = isUuid(body.agent_id) ? body.agent_id : null;
         const stationSlug = safeString(body.station_slug, 120);
-        const hostname  = safeString(body.hostname);
-        const version   = safeString(body.version, 50);
+        const hostname = safeString(body.hostname);
+        const version = safeString(body.version, 50);
         const capabilities = safeObject(body.capabilities);
-        const metrics      = safeObject(body.metrics);
+        const metrics = safeObject(body.metrics);
 
         if (!agentId) {
           return Response.json({ ok: false, error: "agent_id must be a valid UUID" }, { status: 400 });
@@ -128,88 +87,61 @@ export const Route = createFileRoute("/api/public/agent/heartbeat")({
           return Response.json({ ok: false, error: "station_slug is required" }, { status: 400 });
         }
 
-        // 3. Resolve station
-        const { data: station } = await supabaseAdmin
-          .from("stations")
-          .select("id,slug")
-          .eq("slug", stationSlug)
-          .maybeSingle();
-
+        // 3. Löser upp station
+        const station = await findStationBySlug(stationSlug);
         if (!station) {
           return Response.json({ ok: false, error: `Station '${stationSlug}' not found` }, { status: 404 });
         }
 
-        // 4. Cross-tenant guard: station-scoped token may only heartbeat for its own station
-        if (tok.station_id && tok.station_id !== station.id) {
+        // 4. Cross-tenant guard
+        if (tok.stationId && tok.stationId !== station.id) {
           return Response.json({ ok: false, error: "Token station mismatch" }, { status: 403 });
         }
 
-        const now = new Date().toISOString();
+        const now = new Date();
 
-        // 5. Upsert agent_instances
-        // Look up existing agent to detect first-ever heartbeat
-        const { data: existing } = await supabaseAdmin
-          .from("agent_instances")
-          .select("id,last_seen_at,reload_requested_at")
-          .eq("id", agentId)
-          .maybeSingle();
-
+        // 5. Kontrollera befintlig agent
+        const existing = await findAgentById(agentId);
         const isFirstHeartbeat = !existing;
-        const reloadRequestedAt = existing?.reload_requested_at ?? null;
+        const reloadRequestedAt = existing?.reloadRequestedAt ?? null;
         const reloadRequested = Boolean(reloadRequestedAt);
 
-        const agentPayload = {
+        // 6. Upsert agent_instances
+        await upsertAgentInstance({
           id: agentId,
-          station_id: station.id,
-          // Use hostname as name if no prior name exists; existing name is preserved via upsert
+          stationId: station.id,
           name: hostname ?? `agent-${agentId.slice(0, 8)}`,
           hostname,
           version,
-          status: "online" as const,
-          last_seen_at: now,
+          status: "online",
+          lastSeenAt: now,
           capabilities: capabilities as never,
           metrics: metrics as never,
-          // Clear reload_requested_at only if it was set (acknowledge the request)
-          ...(reloadRequested ? { reload_requested_at: null } : {}),
-        };
+          reloadRequestedAt: reloadRequested ? null : undefined,
+        });
 
-        const { error: upsertError } = await supabaseAdmin
-          .from("agent_instances")
-          .upsert(agentPayload, { onConflict: "id" });
+        // 7. Touch token last_used_at
+        await touchStackToken(tok.id);
 
-        if (upsertError) {
-          console.error("[heartbeat] upsert error:", upsertError);
-          return Response.json({ ok: false, error: "Database error" }, { status: 500 });
-        }
-
-        // 6. Touch stack_tokens.last_used_at
-        await supabaseAdmin
-          .from("stack_tokens")
-          .update({ last_used_at: now })
-          .eq("id", tok.id);
-
-        // 7. Audit log on first heartbeat (best-effort)
+        // 8. Audit log vid första heartbeat (best-effort)
         if (isFirstHeartbeat) {
-          supabaseAdmin.from("audit_logs").insert({
-            user_id: null,
-            action: "agent.first_heartbeat",
-            entity_type: "agent_instances",
-            entity_id: agentId,
-            new_value: {
-              hostname,
-              version,
-              station_slug: stationSlug,
-              station_id: station.id,
-            } as never,
-          }).then(() => {}).catch(() => {});
+          db.insert(auditLogs)
+            .values({
+              action: "agent.first_heartbeat",
+              entityType: "agent_instances",
+              entityId: agentId,
+              stationId: station.id,
+              newValue: { hostname, version, station_slug: stationSlug, station_id: station.id } as never,
+            })
+            .catch(() => {});
         }
 
-        // 8. Config version
-        const configVersion = await computeConfigVersion(station.id);
+        // 9. Config version
+        const configVersion = await computeConfigVersion(station.updatedAt, station.id);
 
         return Response.json({
           ok: true,
-          server_time: now,
+          server_time: now.toISOString(),
           station_slug: station.slug,
           reload_requested: reloadRequested,
           config_version: configVersion,

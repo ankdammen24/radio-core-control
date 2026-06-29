@@ -22,15 +22,15 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB:       ${POSTGRES_DB:-radio_core}
-      POSTGRES_USER:     ${POSTGRES_USER:-radio_core}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+      POSTGRES_DB:       ${POSTGRES_DB:-radiocore}
+      POSTGRES_USER:     ${POSTGRES_USER:-radiocore}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-radiocore}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-radio_core} -d ${POSTGRES_DB:-radio_core}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-radiocore} -d ${POSTGRES_DB:-radiocore}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL:    ${PGADMIN_EMAIL:-admin@radio-core.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-localdev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-radiocore}
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
     ports:

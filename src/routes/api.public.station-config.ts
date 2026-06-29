@@ -1,72 +1,132 @@
+/**
+ * GET /api/public/station-config?station=<slug>  med x-stack-token
+ *
+ * Returnerar icecast.xml, liquidsoap.liq och playlist-M3U-filer för Docker-stacken.
+ * Migrerad från Supabase till Drizzle ORM.
+ */
 import { createFileRoute } from "@tanstack/react-router";
-import { createHash } from "crypto";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { resolveStackToken } from "@/server/repositories/stackTokens.repository";
+import { findStationBySlug } from "@/server/repositories/stations.repository";
+import {
+  getIcecastConfig, getLiquidsoapConfig, getActiveStreamMounts,
+  getActivePlaylists, getPlaylistFiles, getActiveFallbacks, getLiveInput,
+} from "@/server/repositories/streaming.repository";
 import {
   renderIcecastXml, renderLiquidsoapLiq, renderM3u,
-  type StationRow, type IcecastRow, type MountRow, type LiqRow, type PlaylistEntry, type LiveInputRow, type FallbackEntry,
+  type StationRow, type IcecastRow, type MountRow, type LiqRow,
+  type PlaylistEntry, type LiveInputRow, type FallbackEntry,
 } from "@/server/streaming.server";
 
-// GET /api/public/station-config?station=<slug>  with x-stack-token header
-// Returns icecast.xml, liquidsoap.liq and playlist m3u contents — for the docker stack.
+// ─── Drizzle-till-streaming.server adapter ────────────────────────────────────
+// streaming.server.ts förväntar snake_case-kolumner (Supabase-convention).
+// Drizzle-repos returnerar camelCase. Adaptrarna mappar om.
+
+function toIcecastRow(r: NonNullable<Awaited<ReturnType<typeof getIcecastConfig>>>): IcecastRow {
+  return {
+    hostname: r.hostname,
+    port: r.port,
+    admin_user: r.adminUser,
+    admin_password: r.adminPassword,
+    source_password: r.sourcePassword,
+    relay_password: r.relayPassword,
+    max_clients: r.maxClients,
+    max_sources: r.maxSources,
+    location: r.location,
+    admin_email: r.adminEmail,
+  };
+}
+
+function toLiqRow(r: NonNullable<Awaited<ReturnType<typeof getLiquidsoapConfig>>>): LiqRow {
+  return {
+    crossfade_seconds: r.crossfadeSeconds,
+    normalize_audio: r.normalizeAudio,
+    fallback_track_path: r.fallbackTrackPath,
+    custom_liq: r.customLiq,
+    telnet_host: r.telnetHost,
+    telnet_port: r.telnetPort,
+  };
+}
+
+function toMountRow(r: Awaited<ReturnType<typeof getActiveStreamMounts>>[number]): MountRow {
+  return {
+    mount_path: r.mountPath,
+    format: r.format,
+    bitrate: r.bitrate,
+    is_default: r.isDefault,
+  };
+}
+
+function toLiveInputRow(r: NonNullable<Awaited<ReturnType<typeof getLiveInput>>>): LiveInputRow {
+  return {
+    mount_path: r.mountPath,
+    harbor_port: r.harbourPort,
+    source_user: r.sourceUser,
+    source_password: r.sourcePassword,
+    format: r.format,
+    bitrate: r.bitrate,
+    auto_takeover: r.autoTakeover,
+    forced_takeover: r.forcedTakeover,
+    fade_in_seconds: r.fadeInSeconds,
+    fade_out_seconds: r.fadeOutSeconds,
+    is_enabled: r.isEnabled,
+  };
+}
+
+// ─── Route ────────────────────────────────────────────────────────────────────
+
 export const Route = createFileRoute("/api/public/station-config")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const token = request.headers.get("x-stack-token") ?? "";
-        if (!token) return new Response("Unauthorized", { status: 401 });
-        const hash = createHash("sha256").update(token).digest("hex");
-        const { data: tok } = await supabaseAdmin.from("stack_tokens").select("station_id,is_active").eq("token_hash", hash).maybeSingle();
-        if (!tok || !tok.is_active) return new Response("Unauthorized", { status: 401 });
+        const raw = request.headers.get("x-stack-token") ?? "";
+        if (!raw) return new Response("Unauthorized", { status: 401 });
+
+        const tok = await resolveStackToken(raw);
+        if (!tok) return new Response("Unauthorized", { status: 401 });
 
         const url = new URL(request.url);
         const slug = url.searchParams.get("station");
         if (!slug) return Response.json({ error: "station required" }, { status: 400 });
 
-        const { data: station } = await supabaseAdmin.from("stations").select("id,name,slug").eq("slug", slug).maybeSingle();
+        const station = await findStationBySlug(slug);
         if (!station) return new Response("Not found", { status: 404 });
 
-        // Cross-tenant guard: station-scoped tokens may only read their own station's config.
-        // Tokens with NULL station_id are treated as global/admin-issued and may read any station.
-        if (tok.station_id && tok.station_id !== station.id) {
+        // Cross-tenant guard
+        if (tok.stationId && tok.stationId !== station.id) {
           return new Response("Forbidden", { status: 403 });
         }
 
-        const [{ data: ic }, { data: mounts }, { data: liq }, { data: pls }, { data: live }, { data: fbRows }] = await Promise.all([
-          supabaseAdmin.from("icecast_configs").select("*").eq("station_id", station.id).maybeSingle(),
-          supabaseAdmin.from("stream_mounts").select("mount_path,format,bitrate,is_default").eq("station_id", station.id).eq("is_active", true),
-          supabaseAdmin.from("liquidsoap_configs").select("*").eq("station_id", station.id).maybeSingle(),
-          supabaseAdmin.from("playlists").select("id,name,priority,is_active").eq("station_id", station.id).eq("is_active", true),
-          supabaseAdmin.from("live_inputs").select("*").eq("station_id", station.id).maybeSingle(),
-          supabaseAdmin.from("fallback_tracks")
-            .select("label,priority,external_url,media_files(file_path,file_name)")
-            .eq("station_id", station.id).eq("is_active", true).order("priority"),
+        // Hämta all konfigurationsdata parallellt
+        const [ic, liq, mountRows, playlists, liveInput, fallbacks] = await Promise.all([
+          getIcecastConfig(station.id),
+          getLiquidsoapConfig(station.id),
+          getActiveStreamMounts(station.id),
+          getActivePlaylists(station.id),
+          getLiveInput(station.id),
+          getActiveFallbacks(station.id, station.slug),
         ]);
-        if (!ic || !liq || !mounts?.length) return Response.json({ error: "Station not fully configured" }, { status: 409 });
 
-        const playlists: PlaylistEntry[] = [];
-        for (const p of pls ?? []) {
-          const { data: assigns } = await supabaseAdmin
-            .from("playlist_assignments")
-            .select("weight,is_active,media_files(file_path,file_name)")
-            .eq("playlist_id", (p as any).id).eq("is_active", true);
-          const files = (assigns ?? [])
-            .map((a: any) => a.media_files?.file_path ?? a.media_files?.file_name)
-            .filter((x: any): x is string => !!x)
-            .map((rel: string) => rel.startsWith("/") ? rel : `/data/stations/${station.slug}/media/${rel}`);
-          playlists.push({ name: (p as any).name, weight: (p as any).priority ?? 1, files });
+        if (!ic || !liq || !mountRows.length) {
+          return Response.json({ error: "Station not fully configured" }, { status: 409 });
         }
 
-        const fallbacks: FallbackEntry[] = (fbRows ?? []).map((r: any) => {
-          const rel = r.media_files?.file_path ?? r.media_files?.file_name ?? null;
-          const path = r.external_url
-            ?? (rel ? (rel.startsWith("/") ? rel : `/data/stations/${station.slug}/media/${rel}`) : "");
-          return { label: r.label, path, priority: r.priority ?? 10 };
-        }).filter((f) => !!f.path);
+        // Hämta filer för varje aktiv playlist
+        const playlistEntries: PlaylistEntry[] = [];
+        for (const pl of playlists) {
+          const entry = await getPlaylistFiles(pl.id, station.slug);
+          if (entry) playlistEntries.push(entry);
+        }
 
-        const defaultMount = (mounts as MountRow[]).find((m) => m.is_default) ?? (mounts as MountRow[])[0];
+        const mounts = mountRows.map(toMountRow);
+        const defaultMount = mounts.find((m) => m.is_default) ?? mounts[0];
         const apiBaseUrl = `${url.protocol}//${url.host}`;
 
-        const playlistFiles = playlists.map((p, i) => ({
+        const stationRow: StationRow = { id: station.id, name: station.name, slug: station.slug };
+        const icecastRow = toIcecastRow(ic);
+        const liqRow = toLiqRow(liq);
+        const liveInputRow = liveInput ? toLiveInputRow(liveInput) : null;
+
+        const playlistFiles = playlistEntries.map((p, i) => ({
           file: `pl_${i}_${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.m3u`,
           content: renderM3u(p.files),
         }));
@@ -75,9 +135,12 @@ export const Route = createFileRoute("/api/public/station-config")({
         }
 
         return Response.json({
-          station,
-          icecast_xml: renderIcecastXml(station as StationRow, ic as IcecastRow, mounts as MountRow[]),
-          liquidsoap_liq: renderLiquidsoapLiq(station as StationRow, ic as IcecastRow, defaultMount, liq as LiqRow, playlists, apiBaseUrl, token, live as LiveInputRow | null, fallbacks),
+          station: stationRow,
+          icecast_xml: renderIcecastXml(stationRow, icecastRow, mounts),
+          liquidsoap_liq: renderLiquidsoapLiq(
+            stationRow, icecastRow, defaultMount, liqRow,
+            playlistEntries, apiBaseUrl, raw, liveInputRow, fallbacks,
+          ),
           playlists: playlistFiles,
         });
       },

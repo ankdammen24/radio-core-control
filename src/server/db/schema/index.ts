@@ -10,3 +10,5 @@ export * from "./agents";
 export * from "./health";
 export * from "./streaming";
 export * from "./media";
+export * from "./users";
+export * from "./runtime";

@@ -1,11 +1,15 @@
 /**
- * Shared helpers for authenticating distribution-API calls from radio stations.
+ * Shared helpers för att autentisera distribution-API-anrop från radiostationer.
  *
- * A station presents `Authorization: Bearer <key>`; we compare against the
- * SHA-256 hash stored on `stations.api_key_hash` using timing-safe compare.
+ * En station presenterar `Authorization: Bearer <key>`; vi jämför mot den
+ * SHA-256-hash som är lagrad i `stations.api_key_hash` med timing-safe compare.
+ *
+ * Migrerad från Supabase till Drizzle ORM.
  */
 import { createHash, timingSafeEqual } from "crypto";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { eq } from "drizzle-orm";
+import { db } from "@/server/db/client";
+import { stations } from "@/server/db/schema";
 
 export function hashStationKey(key: string): string {
   return createHash("sha256").update(key, "utf8").digest("hex");
@@ -21,13 +25,12 @@ function readBearer(request: Request): string | null {
   const auth = request.headers.get("authorization") ?? "";
   const m = auth.match(/^Bearer\s+(.+)$/i);
   if (m) return m[1].trim() || null;
-  // Allow X-API-Key as alternative for compatibility
   const x = request.headers.get("x-api-key");
   return x ? x.trim() || null : null;
 }
 
 /**
- * Validate the bearer key against a specific station's stored hash.
+ * Validerar bearer-nyckeln mot en specifik stations lagrade hash.
  */
 export async function authenticateStationRequest(
   request: Request,
@@ -36,17 +39,19 @@ export async function authenticateStationRequest(
   const presented = readBearer(request);
   if (!presented) return { ok: false, status: 401, message: "Missing API key" };
 
-  const { data, error } = await supabaseAdmin
-    .from("stations")
-    .select("id, name, slug, api_key_hash, is_active")
-    .eq("id", stationId)
-    .single();
-  if (error || !data) return { ok: false, status: 404, message: "Station not found" };
-  if (!data.is_active) return { ok: false, status: 403, message: "Station inactive" };
-  if (!data.api_key_hash) return { ok: false, status: 403, message: "Station has no API key configured" };
+  const rows = await db
+    .select({ id: stations.id, name: stations.name, slug: stations.slug, apiKeyHash: stations.apiKeyHash, isActive: stations.isActive })
+    .from(stations)
+    .where(eq(stations.id, stationId))
+    .limit(1);
+
+  const data = rows[0] ?? null;
+  if (!data) return { ok: false, status: 404, message: "Station not found" };
+  if (!data.isActive) return { ok: false, status: 403, message: "Station inactive" };
+  if (!data.apiKeyHash) return { ok: false, status: 403, message: "Station has no API key configured" };
 
   const presentedHash = Buffer.from(hashStationKey(presented), "hex");
-  const expectedHash = Buffer.from(data.api_key_hash, "hex");
+  const expectedHash = Buffer.from(data.apiKeyHash, "hex");
   if (
     presentedHash.length !== expectedHash.length ||
     !timingSafeEqual(presentedHash, expectedHash)
@@ -57,20 +62,22 @@ export async function authenticateStationRequest(
 }
 
 /**
- * Resolve which station the presented bearer key belongs to.
- * Used when the URL is not station-scoped (e.g. /api/radio/news).
+ * Löser upp vilken station en given bearer-nyckel tillhör.
+ * Används när URL:en inte är stationsscoped (t.ex. /api/radio/news).
  */
 export async function authenticateStationByKey(request: Request): Promise<StationAuthResult> {
   const presented = readBearer(request);
   if (!presented) return { ok: false, status: 401, message: "Missing API key" };
   const hash = hashStationKey(presented);
-  const { data, error } = await supabaseAdmin
-    .from("stations")
-    .select("id, name, slug, is_active, api_key_hash")
-    .eq("api_key_hash", hash)
-    .maybeSingle();
-  if (error) return { ok: false, status: 500, message: error.message };
+
+  const rows = await db
+    .select({ id: stations.id, name: stations.name, slug: stations.slug, isActive: stations.isActive })
+    .from(stations)
+    .where(eq(stations.apiKeyHash, hash))
+    .limit(1);
+
+  const data = rows[0] ?? null;
   if (!data) return { ok: false, status: 401, message: "Invalid API key" };
-  if (!data.is_active) return { ok: false, status: 403, message: "Station inactive" };
+  if (!data.isActive) return { ok: false, status: 403, message: "Station inactive" };
   return { ok: true, station: { id: data.id, name: data.name, slug: data.slug } };
 }
