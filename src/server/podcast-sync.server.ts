@@ -37,38 +37,39 @@ type SourceRow = {
 function mapPodcast(source_id: string, p: FableshPodcast) {
   return {
     source_id,
-    external_id: p.PodcastId,
-    title: p.Title,
-    description: p.Description ?? null,
-    language: p.Language ?? null,
-    categories: p.Categories ?? [],
-    artwork_url: p.Artwork ?? null,
-    owner: p.Owner ?? null,
-    last_updated_at: p.LastUpdated ?? null,
-    checksum: p.Checksum ?? null,
+    external_id: p.id,
+    title: p.title,
+    description: p.long_description ?? p.short_description ?? null,
+    language: p.language ?? null,
+    categories: [p.primary_category, p.primary_subcategory].filter(Boolean) as string[],
+    artwork_url: p.artwork_url ?? null,
+    owner: p.author ?? null,
+    last_updated_at: p.feed_last_build_at ?? null,
+    checksum: null as string | null,
   };
 }
 
 function mapEpisode(podcast_id: string, e: FableshEpisode) {
   return {
     podcast_id,
-    guid: e.GUID,
-    title: e.Title,
-    description: e.Description ?? null,
-    publish_date: e.PublishDate ?? null,
-    duration_seconds: e.Duration ?? null,
-    explicit: !!e.Explicit,
-    season: e.Season ?? null,
-    episode_number: e.EpisodeNumber ?? null,
-    audio_url: e.AudioUrl,
-    audio_format: e.AudioFormat ?? null,
-    artwork_url: e.Artwork ?? null,
-    transcript_url: e.TranscriptUrl ?? null,
-    checksum: e.Checksum ?? null,
-    version: e.Version ?? 1,
+    guid: e.id,
+    title: e.title,
+    description: e.description ?? null,
+    publish_date: e.published_at ?? null,
+    duration_seconds: e.duration_seconds ?? null,
+    explicit: !!e.explicit,
+    season: e.season ?? null,
+    episode_number: e.episode_number ?? null,
+    audio_url: e.audio_url,
+    audio_format: e.audio_mime ?? null,
+    artwork_url: e.artwork_url ?? null,
+    transcript_url: e.transcript_url ?? null,
+    checksum: null as string | null,
+    version: 1,
     deleted_at: null as string | null,
   };
 }
+
 
 export async function syncSource(sourceId: string): Promise<SyncSummary> {
   const { data: srcRow, error: srcErr } = await supabaseAdmin
@@ -120,7 +121,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
     for (const rp of remotePodcasts) {
       try {
         const mapped = mapPodcast(src.id, rp);
-        const existing = localIdx.get(rp.PodcastId);
+        const existing = localIdx.get(rp.id);
 
         let podcastId: string;
         if (!existing) {
@@ -145,9 +146,10 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
         // Episodes
         const remoteEps = await listFableshEpisodes(
           { baseUrl: src.base_url, authSecretName: src.auth_secret_name },
-          rp.PodcastId,
+          rp.id,
         );
-        const remoteGuids = new Set(remoteEps.map((e) => e.GUID));
+        const remoteGuids = new Set(remoteEps.map((e) => e.id));
+
 
         const { data: localEps } = await supabaseAdmin
           .from("podcast_episodes")
@@ -160,24 +162,21 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
 
         for (const re of remoteEps) {
           const mappedEp = mapEpisode(podcastId, re);
-          const existingEp = localEpIdx.get(re.GUID);
+          const existingEp = localEpIdx.get(re.id);
           if (!existingEp) {
             const { error } = await supabaseAdmin.from("podcast_episodes").insert(mappedEp);
             if (error) throw error;
             episodesNew++;
           } else {
-            const changed =
-              (mappedEp.checksum && mappedEp.checksum !== existingEp.checksum) ||
-              mappedEp.version > (existingEp.version ?? 0) ||
-              existingEp.deleted_at !== null;
-            if (changed) {
-              const { error } = await supabaseAdmin
-                .from("podcast_episodes")
-                .update(mappedEp)
-                .eq("id", existingEp.id);
-              if (error) throw error;
-              episodesUpdated++;
-            }
+            // Fablesh has no per-episode checksum/version; always upsert
+            // to keep metadata fresh. Volumes are small.
+            const { error } = await supabaseAdmin
+              .from("podcast_episodes")
+              .update(mappedEp)
+              .eq("id", existingEp.id);
+            if (error) throw error;
+            episodesUpdated++;
+
           }
         }
 
@@ -193,7 +192,7 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
           }
         }
       } catch (e) {
-        errors.push(`podcast ${rp.PodcastId}: ${(e as Error).message}`);
+        errors.push(`podcast ${rp.id}: ${(e as Error).message}`);
       }
     }
 

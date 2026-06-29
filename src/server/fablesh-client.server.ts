@@ -1,39 +1,53 @@
 /**
- * Fablesh REST client. Server-only.
+ * Fablesh public REST client. Server-only.
  *
- * Talks to a Fablesh instance over HTTPS using a Bearer token whose value is
- * looked up from process.env using the secret name configured per source.
+ * Talks to a Fablesh instance over HTTPS. The public catalog endpoints
+ * (`/api/public/podcasts`, `/api/public/podcasts/{id}/episodes`) do not
+ * require authentication, but a Bearer token may be attached when configured
+ * via `authSecretName` for future private endpoints.
  */
 
 export type FableshPodcast = {
-  PodcastId: string;
-  Title: string;
-  Description?: string | null;
-  Language?: string | null;
-  Categories?: string[] | null;
-  Artwork?: string | null;
-  Owner?: string | null;
-  LastUpdated?: string | null;
-  Checksum?: string | null;
+  id: string;
+  slug?: string | null;
+  title: string;
+  subtitle?: string | null;
+  short_description?: string | null;
+  long_description?: string | null;
+  author?: string | null;
+  language?: string | null;
+  country?: string | null;
+  website_url?: string | null;
+  artwork_url?: string | null;
+  primary_category?: string | null;
+  primary_subcategory?: string | null;
+  keywords?: string[] | null;
+  podcast_type?: string | null;
+  explicit?: boolean | null;
+  total_episodes?: number | null;
+  feed_last_build_at?: string | null;
 };
 
 export type FableshEpisode = {
-  EpisodeId: string;
-  GUID: string;
-  Title: string;
-  Description?: string | null;
-  PublishDate?: string | null;
-  Duration?: number | null;
-  Explicit?: boolean | null;
-  Season?: number | null;
-  EpisodeNumber?: number | null;
-  AudioUrl: string;
-  AudioFormat?: string | null;
-  Artwork?: string | null;
-  TranscriptAvailable?: boolean | null;
-  TranscriptUrl?: string | null;
-  Checksum?: string | null;
-  Version?: number | null;
+  id: string;
+  podcast_id: string;
+  title: string;
+  subtitle?: string | null;
+  description?: string | null;
+  shownotes?: string | null;
+  season?: number | null;
+  episode_number?: number | null;
+  episode_type?: string | null;
+  duration_seconds?: number | null;
+  explicit?: boolean | null;
+  published_at?: string | null;
+  audio_url: string;
+  audio_mime?: string | null;
+  audio_size_bytes?: number | null;
+  artwork_url?: string | null;
+  chapters_url?: string | null;
+  transcript_url?: string | null;
+  waveform_url?: string | null;
 };
 
 export type FableshClientOptions = {
@@ -54,7 +68,9 @@ function joinUrl(base: string, path: string): string {
   return `${b}${p}`;
 }
 
-async function call<T>(opts: FableshClientOptions, path: string): Promise<T> {
+type Envelope<T> = { data: T[] } | T[];
+
+async function call<T>(opts: FableshClientOptions, path: string): Promise<T[]> {
   const token = readToken(opts.authSecretName);
   const headers: Record<string, string> = {
     Accept: "application/json",
@@ -68,23 +84,26 @@ async function call<T>(opts: FableshClientOptions, path: string): Promise<T> {
   });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`Fablesh ${path} failed: ${res.status} ${res.statusText} ${body.slice(0, 200)}`);
+    throw new Error(
+      `Fablesh ${path} failed: ${res.status} ${res.statusText} ${body.slice(0, 200)}`,
+    );
   }
-  return (await res.json()) as T;
+  const json = (await res.json()) as Envelope<T>;
+  return Array.isArray(json) ? json : json.data ?? [];
 }
 
-export async function listFableshPodcasts(opts: FableshClientOptions): Promise<FableshPodcast[]> {
-  const data = await call<FableshPodcast[] | { podcasts: FableshPodcast[] }>(opts, "/api/podcasts");
-  return Array.isArray(data) ? data : data.podcasts ?? [];
+export async function listFableshPodcasts(
+  opts: FableshClientOptions,
+): Promise<FableshPodcast[]> {
+  return call<FableshPodcast>(opts, "/api/public/podcasts");
 }
 
 export async function listFableshEpisodes(
   opts: FableshClientOptions,
   podcastId: string,
 ): Promise<FableshEpisode[]> {
-  const data = await call<FableshEpisode[] | { episodes: FableshEpisode[] }>(
+  return call<FableshEpisode>(
     opts,
-    `/api/podcasts/${encodeURIComponent(podcastId)}/episodes`,
+    `/api/public/podcasts/${encodeURIComponent(podcastId)}/episodes`,
   );
-  return Array.isArray(data) ? data : data.episodes ?? [];
 }
