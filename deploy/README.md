@@ -1,4 +1,20 @@
-# Radio Core – Reference deployment
+# Radio Core – Reference Deployment (Runtime VPS)
+
+## Architecture layer
+
+This directory contains the **Runtime / Broadcast Engine** layer of Radio Core.
+It deploys as a self-contained Docker Compose stack on a broadcast VPS. The
+only external dependency is a reachable Radio Core control plane URL.
+
+Components:
+- **Icecast-KH** — streaming server (listener-facing)
+- **Liquidsoap** — audio engine (fetches media via HTTP from R2/CDN in Fas 5+)
+- **Runner** — stateless agent (polls config, writes files, reports health)
+- **Stereo Tool** — optional audio processor (requires license)
+
+See: `docs/architecture/radio-core-v2.md` §2.3 and Fas 6 for the full runtime spec.
+
+---
 
 A complete "radio in a box" stack driven entirely by the Radio Core control
 plane. Everything (Icecast config, Liquidsoap script, playlists, schedule) is

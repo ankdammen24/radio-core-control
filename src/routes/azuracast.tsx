@@ -1,3 +1,13 @@
+/**
+ * @legacy AzuraCast integration UI
+ *
+ * STATUS: Hidden from navigation. Do not extend or add features here.
+ * PLAN:   Remove in Fas 1 cleanup after azuracast_connections table is retired.
+ * SEE:    docs/architecture/radio-core-v2.md §3 — AzuraCast phase-out plan
+ *
+ * This route still exists so that existing azuracast_connections data can be
+ * viewed and cleaned up manually if needed. It is no longer linked in the sidebar.
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,6 +1,13 @@
-// Typed Azuracast REST API client. Server-only.
-// Wraps the full Azuracast public + admin API surface used by Radio Core.
-// Docs: https://www.azuracast.com/docs/developers/apis/
+/**
+ * @legacy AzuraCast REST API client (server-only)
+ *
+ * STATUS: Do not import in new code.
+ * PLAN:   Remove when azuracast-runtime.functions.ts and runtime-adapters/azuracast.ts are removed.
+ * SEE:    docs/architecture/radio-core-v2.md §3 — AzuraCast phase-out plan
+ *
+ * Wraps the Azuracast public + admin API surface used by Radio Core.
+ * Docs: https://www.azuracast.com/docs/developers/apis/
+ */
 import { readEnv } from "@/server/env.server";
 
 export interface AzuracastConnectionConfig {

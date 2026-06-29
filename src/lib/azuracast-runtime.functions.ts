@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Server fns for AzuraCast runtime control (skip, queue, restart, status, listeners).
-// Client-importable. Calls AzuraCast directly (best-effort) instead of going through sync_jobs,
-// because these are interactive actions where the user wants immediate feedback.
+/**
+ * @legacy AzuraCast runtime control server functions
+ *
+ * STATUS: Do not import in new code. No new functions should be added here.
+ * PLAN:   Remove when azuracast_connections table and azuracast.tsx UI are retired.
+ * SEE:    docs/architecture/radio-core-v2.md §3 — AzuraCast phase-out plan
+ *
+ * Server fns for AzuraCast runtime control (skip, queue, restart, status, listeners).
+ * Client-importable. Calls AzuraCast directly (best-effort) instead of going through sync_jobs,
+ * because these are interactive actions where the user wants immediate feedback.
+ */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";

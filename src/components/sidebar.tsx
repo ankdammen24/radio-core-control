@@ -86,7 +86,7 @@ const GROUPS: Group[] = [
     label: "Integrations",
     items: [
       { label: "Runtime Targets", icon: Plug, to: "/runtime-targets" },
-      { label: "AzuraCast", icon: Plug,    to: "/azuracast" },
+      // AzuraCast hidden — legacy integration, phasing out per radio-core-v2.md §3
       { label: "Agents",    icon: Cpu,     to: "/agents" },
       { label: "Webhooks",  icon: Webhook, disabled: true },
       { label: "Sync Jobs", icon: RefreshCw, to: "/sync-jobs" },

@@ -1,5 +1,8 @@
 // Runtime adapter registry. Server-only.
 // Add new runtime types here (Icecast, Liquidsoap, Stereo Tool, custom).
+//
+// NOTE: AzuraCast case is @legacy — kept for existing runtime_targets rows of
+// type 'azuracast'. Do not add new AzuraCast features. See radio-core-v2.md §3.
 import { AzuracastAdapter } from "./azuracast";
 import { IcecastAdapter } from "./icecast";
 import { LiquidsoapAdapter } from "./liquidsoap";

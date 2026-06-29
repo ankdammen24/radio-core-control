@@ -1,3 +1,11 @@
+/**
+ * @legacy AzuraCast runtime adapter (server-only)
+ *
+ * STATUS: Do not extend. Only handles type:'azuracast' runtime_targets rows.
+ * PLAN:   Remove when existing azuracast_connections and runtime_targets of type
+ *         'azuracast' are cleaned from the database.
+ * SEE:    docs/architecture/radio-core-v2.md §3 — AzuraCast phase-out plan
+ */
 // AzuraCast runtime adapter. Server-only.
 import { AzuracastClient, AzuracastError } from "@/server/azuracast-client.server";
 import type {

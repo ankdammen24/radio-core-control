@@ -1,4 +1,23 @@
-# Radio Core Runner
+# Radio Core Runner — Runtime Agent
+
+## Architecture layer
+
+The runner is the **Runtime** layer of Radio Core. It is the only component
+that runs on the broadcast VPS and the only component that communicates with
+the Radio Core control plane. It does not know about Supabase, R2, or any
+internal Radio Core systems. Its sole interface is the public HTTP API.
+
+```
+Radio Core Web (control plane)
+  └─ GET /api/public/station-config  →  Runner  →  Icecast / Liquidsoap / Stereo Tool
+     POST /api/public/health         ←
+     POST /api/public/listener-stats ←
+     POST /api/public/now-playing    ← (sent by Liquidsoap directly)
+```
+
+See: `docs/architecture/radio-core-v2.md` for the full architecture.
+
+---
 
 A small, stateless agent that turns a Radio Core control plane (`/api/public/*`)
 into a running radio stack (Icecast-KH + Liquidsoap, with optional Stereo Tool).

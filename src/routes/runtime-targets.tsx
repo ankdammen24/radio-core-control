@@ -27,18 +27,23 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/runtime-targets")({ component: RuntimeTargetsPage });
 
 const TYPES = [
-  { value: "azuracast",   label: "AzuraCast" },
+  // azuracast intentionally omitted — legacy, phasing out per radio-core-v2.md §3
   { value: "icecast",     label: "Icecast" },
   { value: "liquidsoap",  label: "Liquidsoap" },
   { value: "stereo_tool", label: "Stereo Tool" },
   { value: "custom",      label: "Custom" },
 ] as const;
 
+// "azuracast" included as a legacy value — existing DB rows may have this type.
+// It is not selectable in the creation form (hidden from TYPES), but must be
+// representable in FormState so we can display and edit existing legacy targets.
+type FormType = typeof TYPES[number]["value"] | "azuracast";
+
 type FormState = {
   id?: string;
   station_id: string;
   name: string;
-  type: typeof TYPES[number]["value"];
+  type: FormType;
   base_url: string;
   api_key_secret_name: string;
   external_station_id: string;
@@ -46,7 +51,7 @@ type FormState = {
 };
 
 const EMPTY_FORM = (station_id = ""): FormState => ({
-  station_id, name: "", type: "azuracast", base_url: "",
+  station_id, name: "", type: "icecast", base_url: "",
   api_key_secret_name: "", external_station_id: "", is_active: true,
 });
 
@@ -158,7 +163,7 @@ function RuntimeTargetsPage() {
     visible.length === 0 ? {
       kind: "empty" as const,
       title: "No runtime targets",
-      hint: "Register a runtime service (AzuraCast, Icecast, …) to start managing it from Radio Core.",
+      hint: "Register a runtime service (Icecast, Liquidsoap, Stereo Tool, …) to start managing it from Radio Core.",
       action: isEditor ? <Button onClick={openCreate}><Plus className="w-4 h-4 mr-1" />New target</Button> : undefined,
     } :
     { kind: "ready" as const };
@@ -193,7 +198,14 @@ function RuntimeTargetsPage() {
                 <div className="flex items-center gap-2"><Plug className="w-3.5 h-3.5 text-muted-foreground" />{t.name}</div>
                 {t.last_error && <div className="text-[11px] text-destructive truncate max-w-[260px]" title={t.last_error}>{t.last_error}</div>}
               </TableCell>
-              <TableCell><Badge variant="outline" className="text-[10px] uppercase">{t.type}</Badge></TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1.5">
+                  <Badge variant="outline" className="text-[10px] uppercase">{t.type}</Badge>
+                  {t.type === "azuracast" && (
+                    <Badge variant="outline" className="text-[9px] uppercase bg-muted/40 text-muted-foreground border-border">Legacy</Badge>
+                  )}
+                </div>
+              </TableCell>
               <TableCell className="text-sm text-muted-foreground">{t.stations?.name ?? "—"}</TableCell>
               <TableCell>
                 <Badge variant="outline" className={cn("text-[10px] uppercase", statusClass(t.status))}>{t.status}</Badge>
@@ -247,13 +259,17 @@ function RuntimeTargetsPage() {
             </div>
             <div>
               <Label>Name *</Label>
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Main AzuraCast" />
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Main Icecast" />
             </div>
             <div>
               <Label>Type *</Label>
-              <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as FormState["type"] })}>
+              <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as FormType })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  {/* Show legacy option only when editing an existing azuracast target */}
+                  {form.type === "azuracast" && (
+                    <SelectItem value="azuracast" disabled>AzuraCast (legacy — migrating out)</SelectItem>
+                  )}
                   {TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                 </SelectContent>
               </Select>
