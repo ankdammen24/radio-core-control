@@ -1,0 +1,21 @@
+{
+  "name": "@radio-core/workers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Radio Core background workers — jobb-kö, event-processning",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "bullmq": "^5.13.0",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

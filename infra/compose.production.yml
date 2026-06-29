@@ -1,0 +1,87 @@
+# Radio Core — Docker Compose (produktion-override)
+#
+# Produktionsinställningar: resursgränser, logghantering, hälsokontroller.
+# Kombineras alltid med compose.yml.
+#
+# Starta: docker compose -f infra/compose.yml -f infra/compose.production.yml up -d
+# Deploy: se scripts/deploy.sh
+
+name: radio-core
+
+services:
+
+  nginx-proxy:
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  radio-core-api:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  radio-core-media:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  radio-core-worker:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  scheduler:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  redis:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  mongodb:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
