@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
 import { toast } from "sonner";
-import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({ component: AuthPage });
 
@@ -44,23 +43,21 @@ function AuthPage() {
 
   const signInWithGoogle = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
     });
     setBusy(false);
-    if (result.error) toast.error(result.error.message || "Google sign-in failed");
-    if (result.redirected) return;
-    toast.success("Welcome back");
+    if (error) toast.error(error.message || "Google sign-in failed");
   };
   const signInWithApple = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("apple", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
+      options: { redirectTo: window.location.origin },
     });
     setBusy(false);
-    if (result.error) toast.error(result.error.message || "Apple sign-in failed");
-    if (result.redirected) return;
-    toast.success("Welcome back");
+    if (error) toast.error(error.message || "Apple sign-in failed");
   };
   const signInWithSSO = async (e: React.FormEvent) => {
     e.preventDefault();
