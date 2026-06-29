@@ -168,18 +168,15 @@ export async function syncSource(sourceId: string): Promise<SyncSummary> {
             if (error) throw error;
             episodesNew++;
           } else {
-            const changed =
-              (mappedEp.checksum && mappedEp.checksum !== existingEp.checksum) ||
-              mappedEp.version > (existingEp.version ?? 0) ||
-              existingEp.deleted_at !== null;
-            if (changed) {
-              const { error } = await supabaseAdmin
-                .from("podcast_episodes")
-                .update(mappedEp)
-                .eq("id", existingEp.id);
-              if (error) throw error;
-              episodesUpdated++;
-            }
+            // Fablesh has no per-episode checksum/version; always upsert
+            // to keep metadata fresh. Volumes are small.
+            const { error } = await supabaseAdmin
+              .from("podcast_episodes")
+              .update(mappedEp)
+              .eq("id", existingEp.id);
+            if (error) throw error;
+            episodesUpdated++;
+
           }
         }
 
