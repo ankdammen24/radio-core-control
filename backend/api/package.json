@@ -2,14 +2,13 @@
   "name": "@radio-core/api",
   "version": "0.1.0",
   "private": true,
-  "description": "Radio Core API server",
+  "description": "Radio Core API server — Express, Drizzle, MongoDB",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "express": "^4.19.2",
@@ -17,6 +16,7 @@
     "helmet": "^7.1.0",
     "compression": "^1.7.4",
     "morgan": "^1.10.0",
+    "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.44.0",
     "postgres": "^3.4.5"
   },
@@ -25,9 +25,9 @@
     "@types/cors": "^2.8.17",
     "@types/compression": "^1.7.5",
     "@types/morgan": "^1.9.9",
+    "@types/cookie-parser": "^1.4.7",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
-    "vitest": "^2.0.0"
+    "typescript": "^5.7.0"
   }
 }

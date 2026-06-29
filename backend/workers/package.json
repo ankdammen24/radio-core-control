@@ -2,7 +2,8 @@
   "name": "@radio-core/workers",
   "version": "0.1.0",
   "private": true,
-  "description": "Radio Core background workers — jobb-kö, event-processning",
+  "description": "Radio Core background workers — BullMQ, media processing, podcast import",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -11,7 +12,8 @@
   },
   "dependencies": {
     "bullmq": "^5.13.0",
-    "ioredis": "^5.4.1"
+    "ioredis": "^5.4.1",
+    "mongodb": "^6.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

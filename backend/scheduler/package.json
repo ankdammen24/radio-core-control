@@ -2,7 +2,8 @@
   "name": "@radio-core/scheduler",
   "version": "0.1.0",
   "private": true,
-  "description": "Radio Core scheduler — återkommande cron-jobb",
+  "description": "Radio Core scheduler — återkommande cron-jobb via node-cron",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -11,7 +12,8 @@
   },
   "dependencies": {
     "node-cron": "^3.0.3",
-    "ioredis": "^5.4.1"
+    "ioredis": "^5.4.1",
+    "mongodb": "^6.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
