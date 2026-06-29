@@ -108,4 +108,18 @@ export const supabase = {
       list: async () => ({ data: [], error: null }),
     }),
   },
+  // Realtime stub — channel/removeChannel används av audit.tsx och liknande
+  channel: (_name: string) => {
+    const ch: any = {
+      on: () => ch,
+      subscribe: () => ch,
+      unsubscribe: async () => {},
+    };
+    return ch;
+  },
+  removeChannel: async (_ch: unknown) => {},
+  // Edge Functions stub
+  functions: {
+    invoke: async (_name: string, _opts?: unknown) => ({ data: null, error: null }),
+  },
 };

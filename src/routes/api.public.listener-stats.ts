@@ -45,8 +45,12 @@ export const Route = createFileRoute("/api/public/listener-stats")({
           return Math.max(0, Math.min(1_000_000, Math.trunc(n)));
         };
 
+        if (!targetStationId) {
+          return Response.json({ ok: false, error: "No station resolved from token" }, { status: 400 });
+        }
+
         await insertListenerStat({
-          stationId: targetStationId ?? undefined,
+          stationId: targetStationId,
           mountPath: body.mount == null ? null : String(body.mount).slice(0, 200),
           listeners: clampInt(body.listeners),
           peakListeners: clampInt(body.peak ?? body.listeners),

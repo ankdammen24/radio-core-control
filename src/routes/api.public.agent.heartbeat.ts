@@ -44,7 +44,8 @@ async function computeConfigVersion(stationUpdatedAt: Date | null, stationId: st
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
-export const Route = createFileRoute("/api/public/agent/heartbeat")({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const Route = (createFileRoute as any)("/api/public/agent/heartbeat")({
   server: {
     handlers: {
       POST: async ({ request }) => {

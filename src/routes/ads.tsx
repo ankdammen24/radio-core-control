@@ -78,7 +78,7 @@ function AdsPage() {
           <div><Label>Station *</Label>
             <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
               <SelectTrigger><SelectValue placeholder="Station" /></SelectTrigger>
-              <SelectContent>{(stations.data ?? []).map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+              <SelectContent>{(stations.data ?? []).map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">

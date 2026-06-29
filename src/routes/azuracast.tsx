@@ -105,7 +105,7 @@ function AzuraPage() {
             <div><Label>Station *</Label>
               <Select value={form.station_id} onValueChange={(v) => setForm({ ...form, station_id: v })}>
                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent>{stations?.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{stations?.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div><Label>AzuraCast base URL *</Label><Input placeholder="https://radio.example.com" value={form.base_url} onChange={(e) => setForm({ ...form, base_url: e.target.value })} /></div>

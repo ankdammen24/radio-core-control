@@ -270,7 +270,7 @@ function AgentsPage() {
           <TableBody>
             {rows.map((a: any) => {
               const live   = effectiveStatus(a);
-              const sName  = (stations.data ?? []).find((s) => s.id === a.station_id)?.name ?? "—";
+              const sName  = (stations.data ?? []).find((s: any) => s.id === a.station_id)?.name ?? "—";
               const hasPendingReload = Boolean(a.reload_requested_at);
               return (
                 <TableRow key={a.id}>
@@ -431,7 +431,7 @@ function AgentsPage() {
                 <SelectTrigger><SelectValue placeholder="Account-wide" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">Account-wide (no station)</SelectItem>
-                  {(stations.data ?? []).map((s) => (
+                  {(stations.data ?? []).map((s: any) => (
                     <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                   ))}
                 </SelectContent>

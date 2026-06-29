@@ -58,14 +58,14 @@ function Dashboard() {
       const targets = (runtimeTargets.data ?? []).filter((r) => r.is_active);
       const tStat = (s: string) => targets.filter((t) => t.status === s).length;
 
-      const objs = storage.data ?? [];
+      const objs = (storage.data ?? []) as Array<{ size_bytes?: number; bucket_type: string }>;
       const totalBytes = objs.reduce((a, o) => a + (o.size_bytes ?? 0), 0);
-      const byBucket = objs.reduce<Record<string, number>>((acc, o) => {
+      const byBucket = objs.reduce((acc: Record<string, number>, o) => {
         acc[o.bucket_type] = (acc[o.bucket_type] ?? 0) + (o.size_bytes ?? 0);
         return acc;
-      }, {});
+      }, {} as Record<string, number>);
 
-      const agentRows = agents.data ?? [];
+      const agentRows = (agents.data ?? []) as Array<{ id: string; name: string; status: string; hostname: string; station_id: string; last_seen_at: string }>;
       const agentStat = (s: string) => agentRows.filter((a) => a.status === s).length;
 
       return {
@@ -201,7 +201,7 @@ function Dashboard() {
             <div className="text-sm text-muted-foreground">No system events recorded.</div>
           ) : (
             <ul className="divide-y divide-border">
-              {data!.events.map((e) => {
+              {data!.events.map((e: any) => {
                 const tone =
                   e.level === "critical" || e.level === "error" ? "bg-destructive" :
                   e.level === "warning" ? "bg-warning" : "bg-info";
@@ -232,7 +232,7 @@ function Dashboard() {
             <EmptyHint label="No targets configured." actionTo="/runtime-targets" actionLabel="Add target" />
           ) : (
             <ul className="space-y-2">
-              {data!.targets.slice(0, 5).map((t) => (
+              {data!.targets.slice(0, 5).map((t: any) => (
                 <li key={t.id} className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{t.name}</div>
@@ -266,7 +266,7 @@ function Dashboard() {
                 <div className="text-2xl font-semibold tabular-nums">{formatBytes(data!.storageBytes)}</div>
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{data!.objectCount} objects</div>
               </div>
-              {Object.entries(data!.storageByBucket).map(([k, v]) => {
+              {Object.entries(data!.storageByBucket).map(([k, v]: [string, number]) => {
                 const pct = data!.storageBytes ? Math.round((v / data!.storageBytes) * 100) : 0;
                 return (
                   <div key={k} className="space-y-1">
@@ -292,7 +292,7 @@ function Dashboard() {
               <div className="text-sm text-muted-foreground">No recent activity.</div>
             ) : (
               <ul className="divide-y divide-border">
-                {data!.audit.map((a) => (
+                {data!.audit.map((a: any) => (
                   <li key={a.id} className="flex items-start justify-between gap-3 py-2.5">
                     <div className="min-w-0">
                       <div className="text-sm font-medium truncate">{a.action}</div>

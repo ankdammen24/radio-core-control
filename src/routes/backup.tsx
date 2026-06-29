@@ -91,7 +91,7 @@ function BackupPage() {
           <Select value={exportStation} onValueChange={setExportStation}>
             <SelectTrigger><SelectValue placeholder="Select a station" /></SelectTrigger>
             <SelectContent>
-              {(stations ?? []).map((s) => (
+              {(stations ?? []).map((s: any) => (
                 <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
               ))}
             </SelectContent>
