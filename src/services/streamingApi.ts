@@ -49,7 +49,7 @@ export interface ApiLiveInput {
   id: string;
   stationId: string;
   mountPath: string;
-  harborPort: number;
+  harbourPort: number;
   sourceUser: string;
   sourcePassword: string;
   format: string;
