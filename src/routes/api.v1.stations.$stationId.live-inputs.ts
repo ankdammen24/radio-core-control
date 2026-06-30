@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/v1/stations/$stationId/live-inputs")(
         const input = await createLiveInput({
           stationId: params.stationId,
           mountPath: typeof body.mountPath === "string" ? body.mountPath : undefined,
-          harborPort: typeof body.harborPort === "number" ? body.harborPort : undefined,
+          harbourPort: typeof body.harbourPort === "number" ? body.harbourPort : undefined,
           sourceUser: typeof body.sourceUser === "string" ? body.sourceUser : undefined,
           sourcePassword: typeof body.sourcePassword === "string" ? body.sourcePassword : undefined,
           format: typeof body.format === "string" ? body.format : undefined,

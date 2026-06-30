@@ -9,7 +9,7 @@ export const Route = createFileRoute("/api/v1/live-inputs/$id")({
         const { updateLiveInput } = await import("@/server/repositories/streaming.repository");
         const input = await updateLiveInput(params.id, {
           ...(typeof body.mountPath === "string" ? { mountPath: body.mountPath } : {}),
-          ...(typeof body.harborPort === "number" ? { harborPort: body.harborPort } : {}),
+          ...(typeof body.harbourPort === "number" ? { harbourPort: body.harbourPort } : {}),
           ...(typeof body.sourceUser === "string" ? { sourceUser: body.sourceUser } : {}),
           ...(typeof body.sourcePassword === "string" ? { sourcePassword: body.sourcePassword } : {}),
           ...(typeof body.format === "string" ? { format: body.format } : {}),
