@@ -1,0 +1,77 @@
+name: Radio Core API
+
+on:
+  pull_request:
+    paths:
+      - "backend/api/**"
+      - "infra/compose.yml"
+      - "infra/nginx/**"
+      - ".github/workflows/api-docker.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/api/**"
+      - "infra/compose.yml"
+      - "infra/nginx/**"
+      - ".github/workflows/api-docker.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radio-core-api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/api/package-lock.json
+
+      - name: Install API dependencies
+        working-directory: backend/api
+        run: npm ci
+
+      - name: Build API
+        working-directory: backend/api
+        run: npm run build
+
+      - name: Verify minimal Compose services
+        run: |
+          services="$(docker compose -f infra/compose.yml config --services | sort | tr '\n' ' ')"
+          test "$services" = "mongodb nginx-proxy radio-core-api redis "
+
+      - name: Build API image
+        run: docker build --tag radio-core-api:test backend/api
+
+      - name: Start API image
+        run: docker run --detach --name radio-core-api-test --publish 3100:3000 radio-core-api:test
+
+      - name: Verify health endpoints
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3100/health >/tmp/health.json \
+              && curl --fail --silent http://127.0.0.1:3100/api/health >/tmp/api-health.json; then
+              break
+            fi
+            sleep 1
+          done
+          jq -e '.ok == true and .service == "radio-core-api"' /tmp/health.json
+          jq -e '.ok == true and .service == "radio-core-api"' /tmp/api-health.json
+
+      - name: Show container logs
+        if: always()
+        run: docker logs radio-core-api-test || true
+
+      - name: Remove test container
+        if: always()
+        run: docker rm --force radio-core-api-test || true
