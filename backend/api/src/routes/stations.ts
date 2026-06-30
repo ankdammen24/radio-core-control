@@ -15,7 +15,11 @@ router.get("/", async (_req, res, next) => {
       .sort({ name: 1 })
       .toArray();
     res.set("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
-    res.json({ data: stations.map(serializeStation), source: "radio-core", count: stations.length });
+    res.json({
+      data: stations.map(serializeStation),
+      source: "radio-core",
+      count: stations.length,
+    });
   } catch (error) {
     next(error);
   }

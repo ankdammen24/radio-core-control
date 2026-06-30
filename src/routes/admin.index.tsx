@@ -15,8 +15,21 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useStationScope } from "@/lib/station-context";
 import {
-  Radio, Music, ListMusic, RefreshCw, Activity, ScrollText, AlertTriangle,
-  HardDrive, Plus, Mic, Server, ArrowUpRight, Headphones, Cpu, Bell,
+  Radio,
+  Music,
+  ListMusic,
+  RefreshCw,
+  Activity,
+  ScrollText,
+  AlertTriangle,
+  HardDrive,
+  Plus,
+  Mic,
+  Server,
+  ArrowUpRight,
+  Headphones,
+  Cpu,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
@@ -37,23 +50,67 @@ function Dashboard() {
         stationId ? q.eq("station_id", stationId) : q;
 
       const [
-        stationResult, mediaStatusResult, playlists, voicetracks, ads,
-        runtimeTargets, syncFailed, syncSucceeded, syncQueued,
-        storage, audit, agents, events,
+        stationResult,
+        mediaStatusResult,
+        playlists,
+        voicetracks,
+        ads,
+        runtimeTargets,
+        syncFailed,
+        syncSucceeded,
+        syncQueued,
+        storage,
+        audit,
+        agents,
+        events,
       ] = await Promise.all([
         listStations(),
         getMediaStatus(stationId),
-        sFilter(database.from("playlists").select("*", { count: "exact", head: true }).eq("is_active", true)),
+        sFilter(
+          database
+            .from("playlists")
+            .select("*", { count: "exact", head: true })
+            .eq("is_active", true),
+        ),
         sFilter(database.from("voicetracks").select("*", { count: "exact", head: true })),
         sFilter(database.from("ad_spots").select("*", { count: "exact", head: true })),
-        sFilter(database.from("runtime_targets").select("id,name,type,status,is_active,last_checked_at,station_id")),
-        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "failed")),
-        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).eq("status", "completed")),
-        sFilter(database.from("sync_jobs").select("*", { count: "exact", head: true }).in("status", ["pending", "running"])),
+        sFilter(
+          database
+            .from("runtime_targets")
+            .select("id,name,type,status,is_active,last_checked_at,station_id"),
+        ),
+        sFilter(
+          database
+            .from("sync_jobs")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "failed"),
+        ),
+        sFilter(
+          database
+            .from("sync_jobs")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "completed"),
+        ),
+        sFilter(
+          database
+            .from("sync_jobs")
+            .select("*", { count: "exact", head: true })
+            .in("status", ["pending", "running"]),
+        ),
         sFilter(database.from("storage_objects").select("size_bytes,bucket_type")),
         database.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(8),
-        sFilter(database.from("agent_instances").select("id,name,status,hostname,station_id,last_seen_at")),
-        sFilter(database.from("system_events").select("id,level,event_type,message,source,created_at,station_id").order("created_at", { ascending: false }).limit(10)),
+        sFilter(
+          database
+            .from("agent_instances")
+            .select("id,name,status,hostname,station_id,last_seen_at"),
+        ),
+        sFilter(
+          database
+            .from("system_events")
+            .select("id,level,event_type,message,source,created_at,station_id")
+            .order("created_at", { ascending: false })
+            .limit(10),
+        ),
       ]);
 
       const targets = (runtimeTargets.data ?? []).filter((r) => r.is_active);
@@ -61,12 +118,22 @@ function Dashboard() {
 
       const objs = (storage.data ?? []) as Array<{ size_bytes?: number; bucket_type: string }>;
       const totalBytes = objs.reduce((a, o) => a + (o.size_bytes ?? 0), 0);
-      const byBucket = objs.reduce((acc: Record<string, number>, o) => {
-        acc[o.bucket_type] = (acc[o.bucket_type] ?? 0) + (o.size_bytes ?? 0);
-        return acc;
-      }, {} as Record<string, number>);
+      const byBucket = objs.reduce(
+        (acc: Record<string, number>, o) => {
+          acc[o.bucket_type] = (acc[o.bucket_type] ?? 0) + (o.size_bytes ?? 0);
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
 
-      const agentRows = (agents.data ?? []) as Array<{ id: string; name: string; status: string; hostname: string; station_id: string; last_seen_at: string }>;
+      const agentRows = (agents.data ?? []) as Array<{
+        id: string;
+        name: string;
+        status: string;
+        hostname: string;
+        station_id: string;
+        last_seen_at: string;
+      }>;
       const agentStat = (s: string) => agentRows.filter((a) => a.status === s).length;
 
       return {
@@ -125,30 +192,39 @@ function Dashboard() {
               <div
                 className={cn(
                   "w-14 h-14 rounded-xl flex items-center justify-center shrink-0",
-                  onAir   ? "bg-onair text-onair-foreground onair-pulse" :
-                  degraded ? "bg-warning text-warning-foreground" :
-                  offAir  ? "bg-destructive text-destructive-foreground" :
-                            "bg-muted text-muted-foreground",
+                  onAir
+                    ? "bg-onair text-onair-foreground onair-pulse"
+                    : degraded
+                      ? "bg-warning text-warning-foreground"
+                      : offAir
+                        ? "bg-destructive text-destructive-foreground"
+                        : "bg-muted text-muted-foreground",
                 )}
               >
                 <Radio className="w-7 h-7" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Broadcast</div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                    Broadcast
+                  </div>
                   <SignalBars active={onAir} tone={onAir ? "success" : "signal"} />
                 </div>
                 <div className="text-2xl font-semibold tracking-tight mt-0.5">
-                  {isLoading ? "Checking…" :
-                    data!.targetsTotal === 0 ? "No runtime targets" :
-                    onAir   ? "ON AIR" :
-                    degraded ? "Degraded broadcast" :
-                    offAir  ? "OFF AIR" : "Unknown"}
+                  {isLoading
+                    ? "Checking…"
+                    : data!.targetsTotal === 0
+                      ? "No runtime targets"
+                      : onAir
+                        ? "ON AIR"
+                        : degraded
+                          ? "Degraded broadcast"
+                          : offAir
+                            ? "OFF AIR"
+                            : "Unknown"}
                 </div>
                 <div className="text-sm text-muted-foreground mt-0.5">
-                  {data
-                    ? `${data.targetsOk}/${data.targetsTotal} runtime targets healthy`
-                    : "—"}
+                  {data ? `${data.targetsOk}/${data.targetsTotal} runtime targets healthy` : "—"}
                 </div>
               </div>
             </div>
@@ -171,7 +247,9 @@ function Dashboard() {
         <Card className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Now Playing</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Now Playing
+              </div>
               <div className="text-sm font-semibold tracking-tight">Live metadata</div>
             </div>
             <Activity className="w-4 h-4 text-muted-foreground" />
@@ -179,7 +257,9 @@ function Dashboard() {
           <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
             Live now-playing data appears here once a runtime target reports it.
             <div className="mt-2">
-              <Link to={"/runtime-targets" as "/"} className="text-primary hover:underline">Configure targets →</Link>
+              <Link to={"/runtime-targets" as "/"} className="text-primary hover:underline">
+                Configure targets →
+              </Link>
             </div>
           </div>
         </Card>
@@ -187,27 +267,47 @@ function Dashboard() {
 
       {/* KPI strip */}
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        <Kpi icon={Radio}    label="Stations"    value={isLoading ? "—" : data!.stations} />
-        <Kpi icon={Music}    label="Media"       value={isLoading ? "—" : data!.media} />
-        <Kpi icon={ListMusic} label="Playlists"  value={isLoading ? "—" : data!.playlists} />
-        <Kpi icon={Mic}      label="Voicetracks" value={isLoading ? "—" : data!.voicetracks} />
-        <Kpi icon={Cpu}      label="Agents online" value={isLoading ? "—" : `${data!.agentsOnline}/${data!.agents.length}`} tone={data?.agentsOffline ? "warn" : "ok"} />
-        <Kpi icon={AlertTriangle} label="Missing meta" value={isLoading ? "—" : data!.missing} tone={data?.missing ? "warn" : "ok"} />
-        <Kpi icon={RefreshCw} label="Failed jobs" value={isLoading ? "—" : data!.syncFailed} tone={data?.syncFailed ? "error" : "ok"} />
+        <Kpi icon={Radio} label="Stations" value={isLoading ? "—" : data!.stations} />
+        <Kpi icon={Music} label="Media" value={isLoading ? "—" : data!.media} />
+        <Kpi icon={ListMusic} label="Playlists" value={isLoading ? "—" : data!.playlists} />
+        <Kpi icon={Mic} label="Voicetracks" value={isLoading ? "—" : data!.voicetracks} />
+        <Kpi
+          icon={Cpu}
+          label="Agents online"
+          value={isLoading ? "—" : `${data!.agentsOnline}/${data!.agents.length}`}
+          tone={data?.agentsOffline ? "warn" : "ok"}
+        />
+        <Kpi
+          icon={AlertTriangle}
+          label="Missing meta"
+          value={isLoading ? "—" : data!.missing}
+          tone={data?.missing ? "warn" : "ok"}
+        />
+        <Kpi
+          icon={RefreshCw}
+          label="Failed jobs"
+          value={isLoading ? "—" : data!.syncFailed}
+          tone={data?.syncFailed ? "error" : "ok"}
+        />
       </div>
 
       {/* System Events feed */}
       <div className="mt-4">
         <Card className="p-5">
           <SectionHeader icon={Bell} title="System Events" linkTo="/audit" />
-          {isLoading ? <Skel rows={3} /> : data!.events.length === 0 ? (
+          {isLoading ? (
+            <Skel rows={3} />
+          ) : data!.events.length === 0 ? (
             <div className="text-sm text-muted-foreground">No system events recorded.</div>
           ) : (
             <ul className="divide-y divide-border">
               {data!.events.map((e: any) => {
                 const tone =
-                  e.level === "critical" || e.level === "error" ? "bg-destructive" :
-                  e.level === "warning" ? "bg-warning" : "bg-info";
+                  e.level === "critical" || e.level === "error"
+                    ? "bg-destructive"
+                    : e.level === "warning"
+                      ? "bg-warning"
+                      : "bg-info";
                 return (
                   <li key={e.id} className="flex items-start gap-3 py-2">
                     <span className={cn("mt-1.5 w-1.5 h-1.5 rounded-full shrink-0", tone)} />
@@ -232,14 +332,23 @@ function Dashboard() {
           {isLoading ? (
             <Skel rows={3} />
           ) : data!.targets.length === 0 ? (
-            <EmptyHint label="No targets configured." actionTo="/runtime-targets" actionLabel="Add target" />
+            <EmptyHint
+              label="No targets configured."
+              actionTo="/runtime-targets"
+              actionLabel="Add target"
+            />
           ) : (
             <ul className="space-y-2">
               {data!.targets.slice(0, 5).map((t: any) => (
-                <li key={t.id} className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/20 px-3 py-2"
+                >
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{t.name}</div>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.type}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      {t.type}
+                    </div>
                   </div>
                   <RuntimeBadge state={toRuntimeState(String(t.status ?? ""))} />
                 </li>
@@ -250,24 +359,36 @@ function Dashboard() {
 
         <Card className="p-5">
           <SectionHeader icon={RefreshCw} title="Sync Jobs" linkTo="/sync-jobs" />
-          {isLoading ? <Skel rows={3} /> : (
+          {isLoading ? (
+            <Skel rows={3} />
+          ) : (
             <div className="space-y-3">
               <SyncRow label="Queued / running" value={data!.syncQueued} tone="info" />
               <SyncRow label="Succeeded" value={data!.syncSucceeded} tone="success" />
-              <SyncRow label="Failed" value={data!.syncFailed} tone={data!.syncFailed ? "error" : "muted"} />
+              <SyncRow
+                label="Failed"
+                value={data!.syncFailed}
+                tone={data!.syncFailed ? "error" : "muted"}
+              />
             </div>
           )}
         </Card>
 
         <Card className="p-5">
           <SectionHeader icon={HardDrive} title="Storage" linkTo="/r2-storage" />
-          {isLoading ? <Skel rows={3} /> : data!.objectCount === 0 ? (
+          {isLoading ? (
+            <Skel rows={3} />
+          ) : data!.objectCount === 0 ? (
             <EmptyHint label="No objects stored yet." actionTo="/r2-storage" actionLabel="Upload" />
           ) : (
             <div className="space-y-3">
               <div className="flex items-baseline justify-between">
-                <div className="text-2xl font-semibold tabular-nums">{formatBytes(data!.storageBytes)}</div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{data!.objectCount} objects</div>
+                <div className="text-2xl font-semibold tabular-nums">
+                  {formatBytes(data!.storageBytes)}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {data!.objectCount} objects
+                </div>
               </div>
               {Object.entries(data!.storageByBucket).map(([k, v]: [string, number]) => {
                 const pct = data!.storageBytes ? Math.round((v / data!.storageBytes) * 100) : 0;
@@ -290,26 +411,28 @@ function Dashboard() {
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="p-5 lg:col-span-2">
           <SectionHeader icon={ScrollText} title="Recent Activity" linkTo="/audit" />
-          {isLoading ? <Skel rows={4} /> :
-            data!.audit.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No recent activity.</div>
-            ) : (
-              <ul className="divide-y divide-border">
-                {data!.audit.map((a: any) => (
-                  <li key={a.id} className="flex items-start justify-between gap-3 py-2.5">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">{a.action}</div>
-                      <div className="text-[11px] text-muted-foreground truncate">
-                        {a.entity_type ?? "system"} · {a.user_id ? `by ${String(a.user_id).slice(0, 8)}…` : "system"}
-                      </div>
+          {isLoading ? (
+            <Skel rows={4} />
+          ) : data!.audit.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No recent activity.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {data!.audit.map((a: any) => (
+                <li key={a.id} className="flex items-start justify-between gap-3 py-2.5">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{a.action}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {a.entity_type ?? "system"} ·{" "}
+                      {a.user_id ? `by ${String(a.user_id).slice(0, 8)}…` : "system"}
                     </div>
-                    <div className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {new Date(a.created_at).toLocaleString()}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground whitespace-nowrap">
+                    {new Date(a.created_at).toLocaleString()}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <Card className="p-5">
@@ -333,11 +456,19 @@ function Dashboard() {
 
 /* ──────────────────────────────────────────────────────────── helpers ── */
 
-function Kpi({ icon: Icon, label, value, tone }: { icon: any; label: string; value: number | string; tone?: "ok" | "warn" | "error" }) {
+function Kpi({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: any;
+  label: string;
+  value: number | string;
+  tone?: "ok" | "warn" | "error";
+}) {
   const cls =
-    tone === "error" ? "text-destructive" :
-    tone === "warn"  ? "text-warning" :
-    "text-foreground";
+    tone === "error" ? "text-destructive" : tone === "warn" ? "text-warning" : "text-foreground";
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between">
@@ -349,14 +480,25 @@ function Kpi({ icon: Icon, label, value, tone }: { icon: any; label: string; val
   );
 }
 
-function SectionHeader({ icon: Icon, title, linkTo }: { icon: any; title: string; linkTo: string }) {
+function SectionHeader({
+  icon: Icon,
+  title,
+  linkTo,
+}: {
+  icon: any;
+  title: string;
+  linkTo: string;
+}) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
         <Icon className="w-4 h-4 text-muted-foreground" />
         <div className="text-sm font-semibold">{title}</div>
       </div>
-      <Link to={linkTo as "/"} className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+      <Link
+        to={linkTo as "/"}
+        className="text-[11px] uppercase tracking-wider text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+      >
         View <ArrowUpRight className="w-3 h-3" />
       </Link>
     </div>
@@ -373,12 +515,22 @@ function Skel({ rows = 3 }: { rows?: number }) {
   );
 }
 
-function EmptyHint({ label, actionTo, actionLabel }: { label: string; actionTo: string; actionLabel: string }) {
+function EmptyHint({
+  label,
+  actionTo,
+  actionLabel,
+}: {
+  label: string;
+  actionTo: string;
+  actionLabel: string;
+}) {
   return (
     <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
       {label}
       <div className="mt-2">
-        <Link to={actionTo as "/"} className="text-primary hover:underline">{actionLabel} →</Link>
+        <Link to={actionTo as "/"} className="text-primary hover:underline">
+          {actionLabel} →
+        </Link>
       </div>
     </div>
   );
@@ -386,16 +538,23 @@ function EmptyHint({ label, actionTo, actionLabel }: { label: string; actionTo: 
 
 function StatusDot({ status }: { status: string }) {
   const tone =
-    status === "ok" ? "bg-success" :
-    status === "degraded" ? "bg-warning" :
-    status === "down" || status === "error" ? "bg-destructive" :
-    "bg-muted-foreground/40";
+    status === "ok"
+      ? "bg-success"
+      : status === "degraded"
+        ? "bg-warning"
+        : status === "down" || status === "error"
+          ? "bg-destructive"
+          : "bg-muted-foreground/40";
   const label =
-    status === "ok" ? "Healthy" :
-    status === "degraded" ? "Degraded" :
-    status === "down" ? "Down" :
-    status === "error" ? "Error" :
-    status || "Unknown";
+    status === "ok"
+      ? "Healthy"
+      : status === "degraded"
+        ? "Degraded"
+        : status === "down"
+          ? "Down"
+          : status === "error"
+            ? "Error"
+            : status || "Unknown";
   return (
     <Badge variant="outline" className="gap-1.5 text-[10px] uppercase tracking-wider">
       <span className={cn("w-1.5 h-1.5 rounded-full", tone)} />
@@ -404,12 +563,23 @@ function StatusDot({ status }: { status: string }) {
   );
 }
 
-function SyncRow({ label, value, tone }: { label: string; value: number; tone: "success" | "error" | "info" | "muted" }) {
+function SyncRow({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "success" | "error" | "info" | "muted";
+}) {
   const dot =
-    tone === "success" ? "bg-success" :
-    tone === "error"   ? "bg-destructive" :
-    tone === "info"    ? "bg-info" :
-    "bg-muted-foreground/40";
+    tone === "success"
+      ? "bg-success"
+      : tone === "error"
+        ? "bg-destructive"
+        : tone === "info"
+          ? "bg-info"
+          : "bg-muted-foreground/40";
   return (
     <div className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2">
       <div className="flex items-center gap-2 text-sm">
@@ -436,7 +606,11 @@ function QuickAction({ to, label, icon: Icon }: { to: string; label: string; ico
 function formatBytes(b: number) {
   if (!b) return "0 B";
   const u = ["B", "KB", "MB", "GB", "TB"];
-  let i = 0; let n = b;
-  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  let i = 0;
+  let n = b;
+  while (n >= 1024 && i < u.length - 1) {
+    n /= 1024;
+    i++;
+  }
   return `${n.toFixed(n >= 100 || i === 0 ? 0 : 1)} ${u[i]}`;
 }

@@ -14,7 +14,11 @@ export const auth0Configuration = {
 
 export async function checkAuth0Reachability() {
   if (!auth0Configuration.configured) {
-    return { configured: false, reachable: false, message: "Auth0 environment variables are not configured" };
+    return {
+      configured: false,
+      reachable: false,
+      message: "Auth0 environment variables are not configured",
+    };
   }
   const domain = auth0Configuration.domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
   try {
@@ -25,7 +29,9 @@ export async function checkAuth0Reachability() {
     return {
       configured: true,
       reachable: response.ok,
-      message: response.ok ? "Auth0 discovery is available" : `Auth0 returned HTTP ${response.status}`,
+      message: response.ok
+        ? "Auth0 discovery is available"
+        : `Auth0 returned HTTP ${response.status}`,
     };
   } catch (error) {
     return {

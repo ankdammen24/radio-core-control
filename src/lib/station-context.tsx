@@ -26,9 +26,7 @@ export type StationBrand = {
 };
 
 export type StationScope =
-  | { kind: "station"; station: StationBrand }
-  | { kind: "all" }
-  | { kind: "none" };
+  { kind: "station"; station: StationBrand } | { kind: "all" } | { kind: "none" };
 
 type Ctx = {
   scope: StationScope;
@@ -54,21 +52,21 @@ export function StationProvider({ children }: { children: ReactNode }) {
       return {
         source: result.source,
         stations: result.data.map((s): StationBrand => ({
-        id: s.id,
-        name: s.name,
-        slug: s.slug,
-        description: s.description,
-        isActive: s.is_active,
-        logoUrl: s.logo_url,
-        accentColor: s.accent_color,
-        slogan: s.slogan,
-        publicUrl: s.public_url,
-      })),
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          description: s.description,
+          isActive: s.is_active,
+          logoUrl: s.logo_url,
+          accentColor: s.accent_color,
+          slogan: s.slogan,
+          publicUrl: s.public_url,
+        })),
       };
     },
   });
 
-  const stations = data?.stations ?? [];
+  const stations = useMemo(() => data?.stations ?? [], [data?.stations]);
 
   // Default to first active station once loaded, if none selected.
   useEffect(() => {
@@ -91,7 +89,13 @@ export function StationProvider({ children }: { children: ReactNode }) {
 
   return (
     <StationCtx.Provider
-      value={{ scope, stations, dataSource: data?.source ?? null, loading: isLoading, setActiveStationId }}
+      value={{
+        scope,
+        stations,
+        dataSource: data?.source ?? null,
+        loading: isLoading,
+        setActiveStationId,
+      }}
     >
       {children}
     </StationCtx.Provider>

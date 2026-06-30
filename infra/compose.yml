@@ -11,7 +11,6 @@
 name: radio-core
 
 services:
-
   # ─── Reverse Proxy ────────────────────────────────────────────────────────────
   nginx-proxy:
     image: nginx:stable-alpine
@@ -57,6 +56,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+      mongodb-init:
+        condition: service_completed_successfully
     networks:
       - radio-core
     healthcheck:
@@ -173,11 +174,54 @@ services:
     networks:
       - radio-core
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--username", "${MONGODB_ROOT_USER:-root}", "--password", "${MONGODB_ROOT_PASSWORD:-changeme}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "--username",
+          "${MONGODB_ROOT_USER:-root}",
+          "--password",
+          "${MONGODB_ROOT_PASSWORD:-changeme}",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+
+  # Ensures the least-privilege application user also exists on pre-existing
+  # MongoDB volumes, where docker-entrypoint-initdb.d is not run again.
+  mongodb-init:
+    image: mongo:7
+    restart: "no"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGODB_DB:-radiocore}
+      MONGODB_USER: ${MONGODB_USER:-radio}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-radio}
+    volumes:
+      - ./mongodb/init/01-create-app-user.js:/scripts/01-create-app-user.js:ro
+    command:
+      - mongosh
+      - --host
+      - mongodb
+      - --username
+      - ${MONGODB_ROOT_USER:-root}
+      - --password
+      - ${MONGODB_ROOT_PASSWORD:-changeme}
+      - --authenticationDatabase
+      - admin
+      - --quiet
+      - --file
+      - /scripts/01-create-app-user.js
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - radio-core
 
 # ─── Volymer ──────────────────────────────────────────────────────────────────
 volumes:

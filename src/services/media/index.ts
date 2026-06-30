@@ -17,7 +17,9 @@ interface ApiEnvelope<T> {
   source: "radio-core";
 }
 
-export async function getMediaStatus(stationId?: string | null): Promise<SourcedResult<MediaStatus>> {
+export async function getMediaStatus(
+  stationId?: string | null,
+): Promise<SourcedResult<MediaStatus>> {
   const query = stationId ? `?station_id=${encodeURIComponent(stationId)}` : "";
   const response = await apiClient.get<ApiEnvelope<MediaStatus>>(`/api/media/status${query}`, {
     cache: "no-store",
@@ -30,10 +32,30 @@ export async function getMediaStatus(stationId?: string | null): Promise<Sourced
     stationId ? builder.eq("station_id", stationId) : builder;
   const [total, ready, pending, processing, errors, missing] = await Promise.all([
     filter(database.from("media_files").select("*", { count: "exact", head: true })),
-    filter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "ready")),
-    filter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "imported")),
-    filter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "paused")),
-    filter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "error")),
+    filter(
+      database
+        .from("media_files")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "ready"),
+    ),
+    filter(
+      database
+        .from("media_files")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "imported"),
+    ),
+    filter(
+      database
+        .from("media_files")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "paused"),
+    ),
+    filter(
+      database
+        .from("media_files")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "error"),
+    ),
     filter(
       database
         .from("media_files")
@@ -41,7 +63,9 @@ export async function getMediaStatus(stationId?: string | null): Promise<Sourced
         .eq("status", "missing_metadata"),
     ),
   ]);
-  const firstError = [total, ready, pending, processing, errors, missing].find(({ error }) => error)?.error;
+  const firstError = [total, ready, pending, processing, errors, missing].find(
+    ({ error }) => error,
+  )?.error;
   if (firstError) throw firstError;
   const data: MediaStatus = {
     total: total.count ?? 0,

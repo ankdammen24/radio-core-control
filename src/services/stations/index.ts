@@ -25,7 +25,7 @@ function fromSupabase(row: {
   slug: string;
   description: string | null;
   is_active: boolean;
-}) : Station {
+}): Station {
   const optional = row as typeof row & {
     logo_url?: string | null;
     accent_color?: string | null;
@@ -64,7 +64,9 @@ export async function listStations(): Promise<SourcedResult<Station[]>> {
 }
 
 export async function getStation(id: string): Promise<SourcedResult<Station | null>> {
-  const response = await apiClient.get<ApiEnvelope<Station>>(`/api/stations/${encodeURIComponent(id)}`);
+  const response = await apiClient.get<ApiEnvelope<Station>>(
+    `/api/stations/${encodeURIComponent(id)}`,
+  );
   if (response.data?.data && !response.error) {
     return { data: response.data.data, source: "radio-core", fallback: false };
   }

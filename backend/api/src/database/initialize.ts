@@ -34,7 +34,15 @@ const validators: Array<{ name: string; validator: Document }> = [
     validator: {
       $jsonSchema: {
         bsonType: "object",
-        required: ["id", "station_id", "file_name", "asset_type", "status", "created_at", "updated_at"],
+        required: [
+          "id",
+          "station_id",
+          "file_name",
+          "asset_type",
+          "status",
+          "created_at",
+          "updated_at",
+        ],
       },
     },
   },
@@ -50,10 +58,11 @@ const validators: Array<{ name: string; validator: Document }> = [
 ];
 
 async function ensureCollections(db: Db) {
-  const existing = new Set((await db.listCollections({}, { nameOnly: true }).toArray()).map(({ name }) => name));
+  const existing = new Set(
+    (await db.listCollections({}, { nameOnly: true }).toArray()).map(({ name }) => name),
+  );
   for (const { name, validator } of validators) {
     if (!existing.has(name)) await db.createCollection(name, { validator });
-    else await db.command({ collMod: name, validator, validationLevel: "moderate" });
   }
 }
 

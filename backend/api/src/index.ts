@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const IS_PROD = process.env.NODE_ENV === "production";
 
 const STUDIO_DOMAIN = process.env.STUDIO_DOMAIN ?? "studio.radiouppsala.se";
-const API_DOMAIN    = process.env.API_DOMAIN    ?? "api.radiouppsala.se";
+const API_DOMAIN = process.env.API_DOMAIN ?? "api.radiouppsala.se";
 
 // ─── Trust proxy ──────────────────────────────────────────────────────────────
 // nginx körs på samma Docker-nätverk. req.ip / req.secure / req.protocol
@@ -62,13 +62,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Authorization",
-      "Content-Type",
-      "X-Stack-Token",
-      "X-Request-ID",
-      "X-Api-Key",
-    ],
+    allowedHeaders: ["Authorization", "Content-Type", "X-Stack-Token", "X-Request-ID", "X-Api-Key"],
     maxAge: 86400,
   }),
 );
@@ -146,13 +140,18 @@ async function start() {
     await initializeMongo();
     console.log("[radio-core-api] MongoDB collections and Radio Uppsala seed are ready");
   } catch (error) {
-    console.error("[radio-core-api] MongoDB initialization failed; API will retry on requests", error);
+    console.error(
+      "[radio-core-api] MongoDB initialization failed; API will retry on requests",
+      error,
+    );
   }
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`[radio-core-api] 0.0.0.0:${PORT} (${process.env.NODE_ENV ?? "development"})`);
     console.log(`[radio-core-api] CORS: ${ALLOWED_ORIGINS.join(", ")}`);
-    console.log(`[radio-core-api] Cookies: secure=${IS_PROD}, sameSite=${IS_PROD ? "none" : "lax"}`);
+    console.log(
+      `[radio-core-api] Cookies: secure=${IS_PROD}, sameSite=${IS_PROD ? "none" : "lax"}`,
+    );
   });
 }
 

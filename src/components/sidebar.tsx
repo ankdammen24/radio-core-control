@@ -12,12 +12,45 @@
 import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Radio, Music, ListMusic, Mic, Megaphone, MessageSquare,
-  Calendar, Repeat, ShieldAlert, CalendarClock, Activity, Headphones, Server,
-  Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
-  Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
-  ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
-  Cpu, Newspaper, Key, GitCompareArrows,
+  LayoutDashboard,
+  Radio,
+  Music,
+  ListMusic,
+  Mic,
+  Megaphone,
+  MessageSquare,
+  Calendar,
+  Repeat,
+  ShieldAlert,
+  CalendarClock,
+  Activity,
+  Headphones,
+  Server,
+  Plug,
+  RefreshCw,
+  Building2,
+  Users,
+  HardDrive,
+  FileCode2,
+  Archive,
+  ScrollText,
+  Settings,
+  ChevronDown,
+  Webhook,
+  Antenna,
+  Mic2,
+  Podcast,
+  Cloud,
+  ShieldCheck,
+  Sliders,
+  AudioLines,
+  MonitorSpeaker,
+  GalleryVerticalEnd,
+  X,
+  Cpu,
+  Newspaper,
+  Key,
+  GitCompareArrows,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
@@ -41,44 +74,44 @@ const GROUPS: Group[] = [
     label: "Operate",
     items: [
       { label: "Studio Cockpit", icon: GalleryVerticalEnd, to: "/cockpit" },
-      { label: "Now Playing",    icon: Activity,           to: "/now-playing" },
-      { label: "Live / Takeover", icon: Radio,             to: "/live" },
-      { label: "Listeners",      icon: Headphones,         to: "/listeners" },
-      { label: "Health",         icon: Server,             to: "/health" },
+      { label: "Now Playing", icon: Activity, to: "/now-playing" },
+      { label: "Live / Takeover", icon: Radio, to: "/live" },
+      { label: "Listeners", icon: Headphones, to: "/listeners" },
+      { label: "Health", icon: Server, to: "/health" },
     ],
   },
   {
     id: "content",
     label: "Content",
     items: [
-      { label: "Media",       icon: Music,         to: "/media" },
-      { label: "Playlists",   icon: ListMusic,     to: "/playlists" },
-      { label: "Voicetracks", icon: Mic,           to: "/voicetracks" },
-      { label: "Ads",         icon: Megaphone,     to: "/ads" },
-      { label: "Inbox",       icon: MessageSquare, to: "/inbox" },
-      { label: "News",        icon: Newspaper,     to: "/news" },
+      { label: "Media", icon: Music, to: "/media" },
+      { label: "Playlists", icon: ListMusic, to: "/playlists" },
+      { label: "Voicetracks", icon: Mic, to: "/voicetracks" },
+      { label: "Ads", icon: Megaphone, to: "/ads" },
+      { label: "Inbox", icon: MessageSquare, to: "/inbox" },
+      { label: "News", icon: Newspaper, to: "/news" },
     ],
   },
   {
     id: "schedule",
     label: "Schedule",
     items: [
-      { label: "Scheduling", icon: Calendar,      to: "/scheduler" },
-      { label: "Rotation",   icon: Repeat,        to: "/rotation" },
-      { label: "Fallback",   icon: ShieldAlert,   to: "/fallback" },
-      { label: "Shows",      icon: Mic2,          to: "/shows" },
-      { label: "Episodes",   icon: CalendarClock, to: "/episodes" },
+      { label: "Scheduling", icon: Calendar, to: "/scheduler" },
+      { label: "Rotation", icon: Repeat, to: "/rotation" },
+      { label: "Fallback", icon: ShieldAlert, to: "/fallback" },
+      { label: "Shows", icon: Mic2, to: "/shows" },
+      { label: "Episodes", icon: CalendarClock, to: "/episodes" },
     ],
   },
   {
     id: "streaming",
     label: "Streaming",
     items: [
-      { label: "Streaming Outputs", icon: AudioLines,      to: "/streaming-outputs" },
-      { label: "Mountpoints",       icon: MonitorSpeaker,  disabled: true },
-      { label: "Relays",            icon: Antenna,         disabled: true },
-      { label: "Live Inputs",       icon: Mic,             disabled: true },
-      { label: "Stream Config",     icon: FileCode2,       to: "/streaming" },
+      { label: "Streaming Outputs", icon: AudioLines, to: "/streaming-outputs" },
+      { label: "Mountpoints", icon: MonitorSpeaker, disabled: true },
+      { label: "Relays", icon: Antenna, disabled: true },
+      { label: "Live Inputs", icon: Mic, disabled: true },
+      { label: "Stream Config", icon: FileCode2, to: "/streaming" },
     ],
   },
   {
@@ -87,8 +120,8 @@ const GROUPS: Group[] = [
     items: [
       { label: "Runtime Targets", icon: Plug, to: "/runtime-targets" },
       // AzuraCast hidden — legacy integration, phasing out per radio-core-v2.md §3
-      { label: "Agents",    icon: Cpu,     to: "/agents" },
-      { label: "Webhooks",  icon: Webhook, disabled: true },
+      { label: "Agents", icon: Cpu, to: "/agents" },
+      { label: "Webhooks", icon: Webhook, disabled: true },
       { label: "Sync Jobs", icon: RefreshCw, to: "/sync-jobs" },
       { label: "Podcast Hub", icon: Podcast, to: "/podcast-hub" },
     ],
@@ -97,18 +130,18 @@ const GROUPS: Group[] = [
     id: "admin",
     label: "Admin",
     items: [
-      { label: "Stations",  icon: Radio,       to: "/stations" },
-      { label: "Accounts",  icon: Building2,   to: "/accounts" },
-      { label: "Users",     icon: Users,       to: "/users" },
-      { label: "Roles",     icon: ShieldCheck, disabled: true },
-      { label: "API Tokens", icon: Key,        to: "/tokens" },
-      { label: "Storage",   icon: HardDrive,   to: "/storage" },
-      { label: "R2 Files",  icon: HardDrive,   to: "/r2-storage" },
+      { label: "Stations", icon: Radio, to: "/stations" },
+      { label: "Accounts", icon: Building2, to: "/accounts" },
+      { label: "Users", icon: Users, to: "/users" },
+      { label: "Roles", icon: ShieldCheck, disabled: true },
+      { label: "API Tokens", icon: Key, to: "/tokens" },
+      { label: "Storage", icon: HardDrive, to: "/storage" },
+      { label: "R2 Files", icon: HardDrive, to: "/r2-storage" },
       { label: "Storage Targets", icon: Cloud, to: "/storage-targets" },
-      { label: "Config",    icon: Sliders,     to: "/configs" },
-      { label: "Backup",    icon: Archive,     to: "/backup" },
-      { label: "Audit",     icon: ScrollText,  to: "/audit" },
-      { label: "Settings",  icon: Settings,    to: "/settings" },
+      { label: "Config", icon: Sliders, to: "/configs" },
+      { label: "Backup", icon: Archive, to: "/backup" },
+      { label: "Audit", icon: ScrollText, to: "/audit" },
+      { label: "Settings", icon: Settings, to: "/settings" },
       { label: "Migration Status", icon: GitCompareArrows, to: "/migration-status" },
     ],
   },
@@ -116,16 +149,27 @@ const GROUPS: Group[] = [
 
 const LEGACY_DASHBOARD: Item = { label: "Dashboard", icon: LayoutDashboard, to: "/" };
 
-export function Sidebar({ onNavigate, showClose }: { onNavigate?: () => void; showClose?: boolean }) {
+export function Sidebar({
+  onNavigate,
+  showClose,
+}: {
+  onNavigate?: () => void;
+  showClose?: boolean;
+}) {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  const groupHasActive = (g: Group) => g.items.some((it) => it.to && (path === it.to || (it.to !== "/" && path.startsWith(it.to))));
+  const groupHasActive = (g: Group) =>
+    g.items.some((it) => it.to && (path === it.to || (it.to !== "/" && path.startsWith(it.to))));
   const [openOverrides, setOpenOverrides] = useState<Record<string, boolean | undefined>>({});
 
   return (
     <aside className="w-64 shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col h-full">
       <div className="px-4 py-4 border-b border-sidebar-border flex items-center justify-between">
-        <Link to={"/" as "/"} onClick={onNavigate} className="block text-sidebar-foreground hover:opacity-90 transition">
+        <Link
+          to={"/" as "/"}
+          onClick={onNavigate}
+          className="block text-sidebar-foreground hover:opacity-90 transition"
+        >
           <RadioCoreLogo size="md" tone="brand" />
         </Link>
         {showClose && (
@@ -171,8 +215,16 @@ export function Sidebar({ onNavigate, showClose }: { onNavigate?: () => void; sh
   );
 }
 
-function NavGroup({ label, open, onToggle, children }: {
-  label: string; open: boolean; onToggle: () => void; children: ReactNode;
+function NavGroup({
+  label,
+  open,
+  onToggle,
+  children,
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
 }) {
   return (
     <div>
@@ -182,14 +234,24 @@ function NavGroup({ label, open, onToggle, children }: {
         className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] uppercase tracking-widest text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
       >
         <span>{label}</span>
-        <ChevronDown className={cn("w-3 h-3 transition-transform", open ? "rotate-0" : "-rotate-90")} />
+        <ChevronDown
+          className={cn("w-3 h-3 transition-transform", open ? "rotate-0" : "-rotate-90")}
+        />
       </button>
       {open && <div className="space-y-0.5">{children}</div>}
     </div>
   );
 }
 
-function NavLink({ path, item, onNavigate }: { path: string; item: Item; onNavigate?: () => void }) {
+function NavLink({
+  path,
+  item,
+  onNavigate,
+}: {
+  path: string;
+  item: Item;
+  onNavigate?: () => void;
+}) {
   const Icon = item.icon;
   if (item.disabled || !item.to) {
     return (
@@ -199,7 +261,9 @@ function NavLink({ path, item, onNavigate }: { path: string; item: Item; onNavig
       >
         <Icon className="w-4 h-4 shrink-0" />
         <span className="truncate flex-1">{item.label}</span>
-        <span className="text-[9px] uppercase tracking-wider rounded bg-sidebar-accent/40 px-1.5 py-0.5">Soon</span>
+        <span className="text-[9px] uppercase tracking-wider rounded bg-sidebar-accent/40 px-1.5 py-0.5">
+          Soon
+        </span>
       </div>
     );
   }

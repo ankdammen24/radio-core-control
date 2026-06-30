@@ -16,17 +16,17 @@ through `src/services/database`; authentication goes through
 
 ### Phase 3 feature tracking
 
-| Feature | Current source | New source | Status | Fallback | Next step |
-| --- | --- | --- | --- | --- | --- |
-| System health | Radio Core API | `GET /api/health` | Migrated | None; UI reports unavailable | Add Redis/media/worker dependency checks |
-| Stations (global read context) | Radio Core API | MongoDB `stations` via `GET /api/stations` | API-first | Supabase `stations` | Add authenticated create/update/delete endpoints |
-| Station detail read | Radio Core API | MongoDB `stations` via `GET /api/stations/:id` | Service ready | Supabase `stations` | Adopt in detail/edit views after write parity |
-| Station administration writes | Supabase | Radio Core API | Not migrated | Existing Supabase behavior | Add authorization, audit and CRUD routes |
-| Media status aggregate | Radio Core API | MongoDB `media_assets` via `GET /api/media/status` | API-first | Supabase `media_files` aggregate | Populate Mongo from upload/processing pipeline |
-| Media library and metadata | Supabase | Radio Core API | Not migrated | Existing Supabase behavior | Add paginated media and metadata routes |
-| Public config (read-only) | Radio Core API | MongoDB `system_config` via `GET /api/config/public` | API-first | Supabase `system_settings.public` | Add schema versioning and cache invalidation |
-| Settings writes | Supabase | Radio Core API | Not migrated | Existing Supabase behavior | Add authenticated config write routes |
-| Authentication/login | Supabase Auth; Auth0 boundary retained | Radio Core/Auth0 | Not migrated | Existing login | Implement production Auth0 adapter and backend session validation |
+| Feature                        | Current source                         | New source                                           | Status        | Fallback                          | Next step                                                         |
+| ------------------------------ | -------------------------------------- | ---------------------------------------------------- | ------------- | --------------------------------- | ----------------------------------------------------------------- |
+| System health                  | Radio Core API                         | `GET /api/health`                                    | Migrated      | None; UI reports unavailable      | Add Redis/media/worker dependency checks                          |
+| Stations (global read context) | Radio Core API                         | MongoDB `stations` via `GET /api/stations`           | API-first     | Supabase `stations`               | Add authenticated create/update/delete endpoints                  |
+| Station detail read            | Radio Core API                         | MongoDB `stations` via `GET /api/stations/:id`       | Service ready | Supabase `stations`               | Adopt in detail/edit views after write parity                     |
+| Station administration writes  | Supabase                               | Radio Core API                                       | Not migrated  | Existing Supabase behavior        | Add authorization, audit and CRUD routes                          |
+| Media status aggregate         | Radio Core API                         | MongoDB `media_assets` via `GET /api/media/status`   | API-first     | Supabase `media_files` aggregate  | Populate Mongo from upload/processing pipeline                    |
+| Media library and metadata     | Supabase                               | Radio Core API                                       | Not migrated  | Existing Supabase behavior        | Add paginated media and metadata routes                           |
+| Public config (read-only)      | Radio Core API                         | MongoDB `system_config` via `GET /api/config/public` | API-first     | Supabase `system_settings.public` | Add schema versioning and cache invalidation                      |
+| Settings writes                | Supabase                               | Radio Core API                                       | Not migrated  | Existing Supabase behavior        | Add authenticated config write routes                             |
+| Authentication/login           | Supabase Auth; Auth0 boundary retained | Radio Core/Auth0                                     | Not migrated  | Existing login                    | Implement production Auth0 adapter and backend session validation |
 
 MongoDB initialization creates validated `stations`, `media_assets` and
 `system_config` collections, indexes them and upserts the Radio Uppsala seed.
@@ -41,7 +41,7 @@ use.
 | -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------ |
 | Authentication | Supabase Auth through `AuthService`; Auth0 configuration retained behind the auth boundary | `/auth/*` is development-only and returns 501 in production | Implement production sessions/Auth0 adapter before switching |
 | Users          | Supabase (`profiles`, `user_roles`, `accounts`)                                            | No production route                                         | Add `/api/users`, roles and account authorization            |
-| Radio Stations | Radio Core for global reads; Supabase for writes and remaining views                       | Read endpoints implemented                                  | Add authenticated station writes and station scoping        |
+| Radio Stations | Radio Core for global reads; Supabase for writes and remaining views                       | Read endpoints implemented                                  | Add authenticated station writes and station scoping         |
 | Playlists      | Supabase (`playlists`, `playlist_assignments`, `rotation_rules`)                           | No route                                                    | Add playlist and rotation routes                             |
 | Podcasts       | Supabase (`podcasts`, podcast sources/subscriptions)                                       | No route                                                    | Add podcast catalogue and sync routes                        |
 | Episodes       | Supabase (`episodes`, `podcast_episodes`, `shows`, `rundown_items`)                        | No route                                                    | Add episode/show/rundown routes                              |
