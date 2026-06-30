@@ -1,10 +1,11 @@
 # modules/
 
 All feature functionality lives here as a vertical slice:
-`modules/<name>/<name>.{types,repository,service,routes}.ts` plus an
-`index.ts` barrel. See `modules/stations` for the reference implementation —
-copy that structure when building the next module.
+`modules/<name>/<name>.{types,repository,service,routes,validation}.ts`
+plus an `index.ts` barrel. See `modules/stations` for the reference
+structure.
 
-Planned modules (not yet created — added when their functionality is built,
-not before): playlists, media, podcasts, news, live, users, auth, settings,
-automation.
+Implemented: stations, media, playlists, podcasts, settings.
+
+Not yet built (added when their functionality is actually migrated, not
+before): news, live, users, auth, automation.
