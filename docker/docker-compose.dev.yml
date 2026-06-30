@@ -1,3 +1,0 @@
-# DEPRECATED — Använd infra/compose.dev.yml istället.
-# Denna fil behålls enbart för referens och bör inte användas.
-# docker compose -f infra/compose.yml -f infra/compose.dev.yml up -d
