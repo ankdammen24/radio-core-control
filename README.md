@@ -84,6 +84,30 @@ Required runtime secrets (managed via Lovable Cloud → Secrets, never committed
 
 The web app never reads R2 credentials — they are resolved server-side inside `createServerFn` handlers.
 
+## Backend (Docker)
+
+The minimal production backend (`nginx-proxy`, `radio-core-api`, `mongodb`) can be
+started directly from the project root:
+
+```bash
+cp infra/.env.example infra/.env
+docker compose up -d --build
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+The root `docker-compose.yml` includes [`infra/compose.yml`](./infra/compose.yml)
+using `infra/.env` for variable interpolation, so paths and env vars resolve the
+same way regardless of which directory you run from.
+
+The underlying infra command remains available directly, e.g. for explicit
+overlay files (`infra/compose.dev.yml`, `infra/compose.production.yml`):
+
+```bash
+docker compose -f infra/compose.yml --env-file infra/.env up -d --build
+```
+
 ## Deployment
 
 - **Web app**: published from Lovable to `*.lovable.app` (and optional custom domain). Frontend changes require clicking *Update* in the publish dialog; backend changes deploy immediately.
