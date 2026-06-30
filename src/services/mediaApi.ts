@@ -15,6 +15,15 @@ export interface ApiMediaFile {
   status: string;
   storageLocationId: string | null;
   azuracastMediaId: string | null;
+  title: string | null;
+  artist: string | null;
+  album: string | null;
+  genre: string | null;
+  isrc: string | null;
+  artworkUrl: string | null;
+  sourceId: string | null;
+  externalId: string | null;
+  streamUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,6 +36,12 @@ export interface CreateMediaInput {
   mediaKind?: string;
   status?: string;
   durationSeconds?: number;
+  title?: string;
+  artist?: string;
+  album?: string;
+  genre?: string;
+  artworkUrl?: string;
+  streamUrl?: string;
 }
 
 export type UpdateMediaInput = Partial<Omit<CreateMediaInput, "fileName">> & { fileName?: string };

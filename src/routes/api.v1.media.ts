@@ -24,6 +24,12 @@ export const Route = createFileRoute("/api/v1/media")({
           mediaKind: typeof body.mediaKind === "string" ? body.mediaKind : undefined,
           status: typeof body.status === "string" ? body.status : undefined,
           durationSeconds: typeof body.durationSeconds === "number" ? body.durationSeconds : undefined,
+          title: typeof body.title === "string" ? body.title : undefined,
+          artist: typeof body.artist === "string" ? body.artist : undefined,
+          album: typeof body.album === "string" ? body.album : undefined,
+          genre: typeof body.genre === "string" ? body.genre : undefined,
+          artworkUrl: typeof body.artworkUrl === "string" ? body.artworkUrl : undefined,
+          streamUrl: typeof body.streamUrl === "string" ? body.streamUrl : undefined,
         });
         return jsonSuccess(media, 201);
       },
