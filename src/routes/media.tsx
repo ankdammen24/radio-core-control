@@ -22,6 +22,8 @@ import { useState, useMemo } from "react";
 
 export const Route = createFileRoute("/media")({ component: MediaPage });
 
+const STATUSES = ["imported", "missing_metadata", "ready", "synced", "error", "paused"];
+
 function MediaPage() {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -35,7 +37,7 @@ function MediaPage() {
     return (query.data ?? []).filter((m: ApiMediaFile) => {
       if (statusFilter !== "all" && m.status !== statusFilter) return false;
       if (q) {
-        const hay = [m.title, m.artist, m.album].filter(Boolean).join(" ").toLowerCase();
+        const hay = [m.fileName, m.originalFileName].filter(Boolean).join(" ").toLowerCase();
         if (!hay.includes(q.toLowerCase())) return false;
       }
       return true;
@@ -66,7 +68,7 @@ function MediaPage() {
       description="All audio files across stations."
       searchValue={q}
       onSearchChange={setQ}
-      searchPlaceholder="Search artist, title, album…"
+      searchPlaceholder="Search file name…"
       filters={
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="h-9 w-40">
@@ -74,8 +76,11 @@ function MediaPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="active">active</SelectItem>
-            <SelectItem value="archived">archived</SelectItem>
+            {STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       }
@@ -84,26 +89,28 @@ function MediaPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Artist</TableHead>
-            <TableHead>Album</TableHead>
+            <TableHead>File name</TableHead>
+            <TableHead>Kind</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>AzuraCast</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filtered.map((m) => (
-            <TableRow key={m._id}>
-              <TableCell className="font-medium">{m.title}</TableCell>
-              <TableCell>{m.artist ?? "—"}</TableCell>
-              <TableCell className="text-muted-foreground">{m.album ?? "—"}</TableCell>
-              <TableCell className="text-muted-foreground">{m.type}</TableCell>
+            <TableRow key={m.id}>
+              <TableCell className="font-medium">{m.fileName}</TableCell>
+              <TableCell className="text-muted-foreground">{m.mediaKind}</TableCell>
+              <TableCell className="text-muted-foreground">{m.fileType ?? "—"}</TableCell>
               <TableCell className="text-muted-foreground">
-                {m.duration ? `${Math.round(m.duration)}s` : "—"}
+                {m.durationSeconds ? `${Math.round(m.durationSeconds)}s` : "—"}
               </TableCell>
               <TableCell>
                 <StatusBadge status={m.status} />
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {m.azuracastMediaId ? "synced" : "—"}
               </TableCell>
             </TableRow>
           ))}

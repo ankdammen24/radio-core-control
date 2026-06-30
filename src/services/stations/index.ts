@@ -18,12 +18,12 @@ export interface Station {
 
 function fromApi(station: ApiStation): Station {
   return {
-    id: station._id,
+    id: station.id,
     name: station.name,
     slug: station.slug,
     description: station.description ?? null,
-    is_active: station.status === "active",
-    logo_url: station.logoUrl ?? null,
+    is_active: station.isActive,
+    logo_url: station.demoArtworkUrl ?? null,
     accent_color: null,
     slogan: null,
     public_url: null,

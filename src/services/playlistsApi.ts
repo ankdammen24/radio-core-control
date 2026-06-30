@@ -1,31 +1,37 @@
 import { apiClient } from "@/lib/api";
 
-export type PlaylistStatus = "active" | "inactive";
-
 export interface ApiPlaylistItem {
+  id: string;
+  playlistId: string;
   mediaId: string;
-  addedAt: string;
+  position: number;
+  createdAt: string;
 }
 
 export interface ApiPlaylist {
-  _id: string;
+  id: string;
   name: string;
-  description?: string;
-  stationId?: string;
-  items: ApiPlaylistItem[];
-  status: PlaylistStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string | null;
+  stationId: string | null;
+  playlistType: string;
+  priority: number;
+  azuracastPlaylistId: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  items?: ApiPlaylistItem[];
 }
 
 export interface CreatePlaylistInput {
   name: string;
   description?: string;
   stationId?: string;
-  status?: PlaylistStatus;
+  playlistType?: string;
+  priority?: number;
+  azuracastPlaylistId?: string;
 }
 
-export type UpdatePlaylistInput = Partial<CreatePlaylistInput>;
+export type UpdatePlaylistInput = Partial<CreatePlaylistInput> & { isActive?: boolean };
 
 interface SuccessEnvelope<T> {
   success: true;

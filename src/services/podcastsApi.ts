@@ -1,18 +1,15 @@
 import { apiClient } from "@/lib/api";
 
-export type PodcastStatus = "active" | "inactive";
-export type EpisodeStatus = "draft" | "published";
-
 export interface ApiPodcast {
-  _id: string;
+  id: string;
   title: string;
-  description?: string;
-  author?: string;
-  imageUrl?: string;
-  rssUrl?: string;
-  status: PodcastStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string | null;
+  author: string | null;
+  imageUrl: string | null;
+  rssUrl: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreatePodcastInput {
@@ -21,31 +18,31 @@ export interface CreatePodcastInput {
   author?: string;
   imageUrl?: string;
   rssUrl?: string;
-  status?: PodcastStatus;
+  status?: string;
 }
 
 export type UpdatePodcastInput = Partial<CreatePodcastInput>;
 
 export interface ApiEpisode {
-  _id: string;
+  id: string;
   podcastId: string;
   title: string;
-  description?: string;
-  audioUrl?: string;
-  duration?: number;
-  publishedAt?: string;
-  status: EpisodeStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string | null;
+  audioUrl: string | null;
+  durationSeconds: number | null;
+  publishedAt: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateEpisodeInput {
   title: string;
   description?: string;
   audioUrl?: string;
-  duration?: number;
+  durationSeconds?: number;
   publishedAt?: string;
-  status?: EpisodeStatus;
+  status?: string;
 }
 
 interface SuccessEnvelope<T> {

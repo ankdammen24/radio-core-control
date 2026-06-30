@@ -27,10 +27,10 @@ export const env: Readonly<ClientEnvironment> = Object.freeze({
 export const SUPABASE_ENABLED = Boolean(env.supabaseUrl && env.supabaseAnonKey);
 export const LOCAL_AUTH_ENABLED = env.enableLocalAuth;
 
-if (!env.apiUrl) {
-  throw new Error("VITE_API_URL is required. Set it to the Radio Core API gateway URL.");
-}
-
+// The Radio Core API now runs in-process (TanStack Start server routes under
+// /api/v1/*, same Vercel deployment). VITE_API_URL is only needed when
+// pointing at a separate, externally hosted API gateway — leave it unset to
+// use same-origin relative requests.
 if (import.meta.env.DEV) {
   if (Boolean(env.supabaseUrl) !== Boolean(env.supabaseAnonKey)) {
     console.warn(
