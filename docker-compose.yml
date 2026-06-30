@@ -1,3 +1,0 @@
-include:
-  - path: infra/compose.yml
-    env_file: infra/.env
