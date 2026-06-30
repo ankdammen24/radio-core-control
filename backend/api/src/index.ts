@@ -1,34 +1,38 @@
 import express from "express";
+import { apiConfig } from "./config/api.js";
+import { logger } from "./core/logger.js";
 import { closeMongo, pingMongo } from "./database/mongo.js";
+import { cors } from "./middleware/cors.middleware.js";
+import { errorHandler } from "./middleware/error-handler.middleware.js";
+import { notFound } from "./middleware/not-found.middleware.js";
+import { requestId } from "./middleware/request-id.middleware.js";
+import { requestLogger } from "./middleware/request-logger.middleware.js";
+import { rootRouter } from "./routes/index.js";
+import { startWorkers } from "./workers/index.js";
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
 
 app.disable("x-powered-by");
+app.use(requestId);
+app.use(cors);
+app.use(requestLogger);
+app.use(express.json());
 
-app.get("/health", (_request, response) => {
-  response.set("Cache-Control", "no-store");
-  response.status(200).json({ status: "ok", service: "radio-core-api" });
-});
+app.use(rootRouter);
 
-app.get("/api/health", async (_request, response) => {
-  const database = await pingMongo()
-    .then(() => "connected" as const)
-    .catch(() => "not_connected" as const);
+app.use(notFound);
+app.use(errorHandler);
 
-  response.set("Cache-Control", "no-store");
-  response.status(200).json({ status: "ok", service: "radio-core-api", database });
-});
-
-app.use((_request, response) => {
-  response.status(404).json({ error: "Not found" });
-});
-
-const server = app.listen(port, "0.0.0.0", () => {
-  console.log(`[radio-core-api] listening on 0.0.0.0:${port}`);
+const server = app.listen(apiConfig.port, "0.0.0.0", () => {
+  logger.info(`radio-core-api listening on 0.0.0.0:${apiConfig.port}`);
   void pingMongo()
-    .then(() => console.log("[radio-core-api] MongoDB connected"))
-    .catch((error) => console.warn(`[radio-core-api] MongoDB unavailable: ${error.message}`));
+    .then(() => logger.info("MongoDB connected"))
+    .catch((error: unknown) =>
+      logger.warn("MongoDB unavailable", {
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  void startWorkers();
 });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {

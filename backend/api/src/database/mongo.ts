@@ -1,6 +1,7 @@
 import { MongoClient, type Db } from "mongodb";
+import { mongodbConfig } from "../config/mongodb.js";
 
-const mongoUri = process.env.MONGODB_URI ?? "mongodb://mongodb:27017/radio-core";
+const mongoUri = mongodbConfig.uri;
 
 let client: MongoClient | undefined;
 let connection: Promise<MongoClient> | undefined;
