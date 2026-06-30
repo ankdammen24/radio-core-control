@@ -26,7 +26,7 @@ through `src/services/database`; authentication goes through
 | Media library and metadata     | Supabase                               | Radio Core API                                       | Not migrated  | Existing Supabase behavior        | Add paginated media and metadata routes                           |
 | Public config (read-only)      | Radio Core API                         | MongoDB `system_config` via `GET /api/config/public` | API-first     | Supabase `system_settings.public` | Add schema versioning and cache invalidation                      |
 | Settings writes                | Supabase                               | Radio Core API                                       | Not migrated  | Existing Supabase behavior        | Add authenticated config write routes                             |
-| Authentication/login           | Supabase Auth; Auth0 boundary retained | Radio Core/Auth0                                     | Not migrated  | Existing login                    | Implement production Auth0 adapter and backend session validation |
+| Authentication/login           | Supabase Auth                          | Radio Core                                           | Not migrated  | Existing login                    | Implement production backend session validation                  |
 
 MongoDB initialization creates validated `stations`, `media_assets` and
 `system_config` collections, indexes them and upserts the Radio Uppsala seed.
@@ -39,7 +39,7 @@ use.
 
 | Category       | Current provider                                                                           | Radio Core support                                          | Next migration step                                          |
 | -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------ |
-| Authentication | Supabase Auth through `AuthService`; Auth0 configuration retained behind the auth boundary | `/auth/*` is development-only and returns 501 in production | Implement production sessions/Auth0 adapter before switching |
+| Authentication | Supabase Auth through `AuthService` | `/auth/*` is development-only and returns 501 in production | Implement production session validation before switching |
 | Users          | Supabase (`profiles`, `user_roles`, `accounts`)                                            | No production route                                         | Add `/api/users`, roles and account authorization            |
 | Radio Stations | Radio Core for global reads; Supabase for writes and remaining views                       | Read endpoints implemented                                  | Add authenticated station writes and station scoping         |
 | Playlists      | Supabase (`playlists`, `playlist_assignments`, `rotation_rules`)                           | No route                                                    | Add playlist and rotation routes                             |
@@ -76,14 +76,6 @@ Supabase is a real provider, not a stub. Browser credentials use
   gateway, `https://api.radiouppsala.se`.
 - Cross-domain cookies are enabled by the API client with
   `credentials: "include"` for future staged route migrations.
-
-## Auth0 status
-
-No direct Auth0 SDK usage existed in the repository when this phase started.
-The required Auth0 environment configuration is now isolated in
-`src/services/auth/auth0.ts`. Supabase remains the active `AuthService` adapter
-until the existing Vercel Auth0 bootstrap can be connected to the same contract.
-Components do not call Auth0 or Supabase Auth directly.
 
 ## Route migration checklist
 

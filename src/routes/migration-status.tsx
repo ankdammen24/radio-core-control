@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, Database, KeyRound, Radio, Music, Settings2 } from "lucide-react";
+import { Activity, Database, Radio, Music, Settings2 } from "lucide-react";
 import { AppLayout } from "@/components/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { checkBackendHealth } from "@/services/health";
 import { checkDatabaseHealth } from "@/services/database";
-import { checkAuth0Reachability } from "@/services/auth";
 import { listStations } from "@/services/stations";
 import { getMediaStatus } from "@/services/media";
 import { getPublicConfig } from "@/services/config";
@@ -18,12 +17,11 @@ function MigrationStatusPage() {
   const connectivity = useQuery({
     queryKey: ["provider-connectivity"],
     queryFn: async () => {
-      const [api, supabase, auth0] = await Promise.all([
+      const [api, supabase] = await Promise.all([
         checkBackendHealth(),
         checkDatabaseHealth(),
-        checkAuth0Reachability(),
       ]);
-      return { api, supabase, auth0 };
+      return { api, supabase };
     },
     refetchInterval: 30_000,
   });
@@ -62,13 +60,6 @@ function MigrationStatusPage() {
           icon={Database}
           reachable={connectivity.data?.supabase.reachable}
           detail={connectivity.data?.supabase.message}
-        />
-        <ProviderCard
-          label="Auth0"
-          icon={KeyRound}
-          reachable={connectivity.data?.auth0.reachable}
-          configured={connectivity.data?.auth0.configured}
-          detail={connectivity.data?.auth0.message}
         />
       </div>
 

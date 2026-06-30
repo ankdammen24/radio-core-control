@@ -1,7 +1,7 @@
 # Vercel
 
-Radio Core Frontend is backend-first. Supabase and Auth0 are optional legacy
-integrations and are not required for build, startup, or read-only guest mode.
+Radio Core Frontend is backend-first. Supabase is an optional legacy
+integration and is not required for build, startup, or read-only guest mode.
 
 ## Minimal production configuration
 
@@ -34,19 +34,6 @@ VITE_SUPABASE_ANON_KEY=
 Supabase is enabled only when both values exist. The Vercel Supabase integration
 names with the `NEXT_PUBLIC_RC_SUPABASE_` prefix are also detected. Server-only
 service-role credentials must never have a `VITE_` or `NEXT_PUBLIC_` prefix.
-
-## Optional Auth0 legacy integration
-
-```env
-VITE_AUTH0_DOMAIN=
-VITE_AUTH0_CLIENT_ID=
-VITE_AUTH0_AUDIENCE=
-VITE_AUTH0_CALLBACK_URL=
-VITE_AUTH0_LOGOUT_URL=
-```
-
-Auth0 discovery is enabled only when domain and client ID exist. Missing Auth0
-configuration does not initialize an SDK or block the application.
 
 ## Deployment behavior
 
