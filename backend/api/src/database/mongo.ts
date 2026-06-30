@@ -1,17 +1,15 @@
 import { MongoClient, type Db } from "mongodb";
 
-const mongoUrl = process.env.MONGODB_URL;
-const databaseName = process.env.MONGODB_DB ?? "radiocore";
+const mongoUri = process.env.MONGODB_URI ?? "mongodb://mongodb:27017/radio-core";
 
 let client: MongoClient | undefined;
 let connection: Promise<MongoClient> | undefined;
 
 export function getMongoClient() {
-  if (!mongoUrl) throw new Error("MONGODB_URL is not configured");
-  client ??= new MongoClient(mongoUrl, {
+  client ??= new MongoClient(mongoUri, {
     maxPoolSize: 10,
     minPoolSize: 0,
-    serverSelectionTimeoutMS: 3_000,
+    serverSelectionTimeoutMS: 1_500,
   });
   connection ??= client.connect().catch((error) => {
     connection = undefined;
@@ -21,7 +19,7 @@ export function getMongoClient() {
 }
 
 export async function getMongoDatabase(): Promise<Db> {
-  return (await getMongoClient()).db(databaseName);
+  return (await getMongoClient()).db();
 }
 
 export async function pingMongo() {

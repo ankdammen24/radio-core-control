@@ -1,38 +1,17 @@
-# Radio Core — Docker Compose (bas)
-#
-# Minimal API stack. Media, workers and scheduling are added later.
-#
-# Starta:     docker compose -f infra/compose.yml up -d
-# Stoppa:     docker compose -f infra/compose.yml down
-# Loggar:     docker compose -f infra/compose.yml logs -f
-# Status:     docker compose -f infra/compose.yml ps
-
 name: radio-core
 
 services:
-  # ─── Reverse Proxy ────────────────────────────────────────────────────────────
   nginx-proxy:
     image: nginx:stable-alpine
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - nginx_logs:/var/log/nginx
     depends_on:
       radio-core-api:
         condition: service_healthy
-    networks:
-      - radio-core
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # ─── API Server ───────────────────────────────────────────────────────────────
   radio-core-api:
     build:
       context: ../backend/api
@@ -42,96 +21,33 @@ services:
       - "3000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3000
-      REDIS_URL: redis://redis:6379
-      MONGODB_URL: mongodb://${MONGODB_ROOT_USER:-root}:${MONGODB_ROOT_PASSWORD:-changeme}@mongodb:27017/${MONGODB_DB:-radiocore}?authSource=admin
-      MONGODB_DB: ${MONGODB_DB:-radiocore}
+      PORT: ${PORT:-3000}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/radio-core}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-https://api.radiouppsala.se}
     depends_on:
-      redis:
-        condition: service_healthy
       mongodb:
         condition: service_healthy
-    networks:
-      - radio-core
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ─── Redis ────────────────────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: >
-      redis-server
-      --appendonly yes
-      --maxmemory ${REDIS_MAX_MEMORY:-256mb}
-      --maxmemory-policy allkeys-lru
-    expose:
-      - "6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - radio-core
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 5s
 
-  # ─── MongoDB ──────────────────────────────────────────────────────────────────
   mongodb:
     image: mongo:7
     restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-changeme}
-      MONGO_INITDB_DATABASE: ${MONGODB_DB:-radiocore}
     expose:
       - "27017"
     volumes:
       - mongodb_data:/data/db
-    networks:
-      - radio-core
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mongosh",
-          "--quiet",
-          "--username",
-          "${MONGODB_ROOT_USER:-root}",
-          "--password",
-          "${MONGODB_ROOT_PASSWORD:-changeme}",
-          "--authenticationDatabase",
-          "admin",
-          "--eval",
-          "db.adminCommand('ping')",
-        ]
-      interval: 10s
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 10s
 
-# ─── Volymer ──────────────────────────────────────────────────────────────────
 volumes:
-  redis_data:
-    name: radio_core_redis
   mongodb_data:
     name: radio_core_mongodb
-  nginx_logs:
-    name: radio_core_nginx_logs
-
-# ─── Nätverk ──────────────────────────────────────────────────────────────────
-networks:
-  radio-core:
-    name: radio_core_network
-    driver: bridge

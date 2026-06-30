@@ -4,16 +4,14 @@ on:
   pull_request:
     paths:
       - "backend/api/**"
-      - "infra/compose.yml"
-      - "infra/nginx/**"
+      - "infra/**"
       - ".github/workflows/api-docker.yml"
   push:
     branches:
       - main
     paths:
       - "backend/api/**"
-      - "infra/compose.yml"
-      - "infra/nginx/**"
+      - "infra/**"
       - ".github/workflows/api-docker.yml"
 
 permissions:
@@ -48,30 +46,33 @@ jobs:
       - name: Verify minimal Compose services
         run: |
           services="$(docker compose -f infra/compose.yml config --services | sort | tr '\n' ' ')"
-          test "$services" = "mongodb nginx-proxy radio-core-api redis "
+          test "$services" = "mongodb nginx-proxy radio-core-api "
 
-      - name: Build API image
-        run: docker build --tag radio-core-api:test backend/api
-
-      - name: Start API image
-        run: docker run --detach --name radio-core-api-test --publish 3100:3000 radio-core-api:test
-
-      - name: Verify health endpoints
+      - name: Start minimal production stack
         run: |
-          for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:3100/health >/tmp/health.json \
-              && curl --fail --silent http://127.0.0.1:3100/api/health >/tmp/api-health.json; then
+          cp infra/.env.example infra/.env
+          docker compose -f infra/compose.yml --env-file infra/.env up -d --build
+
+      - name: Show Compose status
+        run: docker compose -f infra/compose.yml ps
+
+      - name: Verify proxied health endpoints
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost/health >/tmp/health.json \
+              && curl --fail --silent http://localhost/api/health >/tmp/api-health.json; then
               break
             fi
-            sleep 1
+            sleep 2
           done
           jq -e '.ok == true and .service == "radio-core-api"' /tmp/health.json
           jq -e '.ok == true and .service == "radio-core-api"' /tmp/api-health.json
+          jq -e '.dependencies.mongodb.ok == true' /tmp/api-health.json
 
-      - name: Show container logs
+      - name: Show Compose logs
         if: always()
-        run: docker logs radio-core-api-test || true
+        run: docker compose -f infra/compose.yml logs
 
-      - name: Remove test container
+      - name: Stop minimal production stack
         if: always()
-        run: docker rm --force radio-core-api-test || true
+        run: docker compose -f infra/compose.yml down --volumes
