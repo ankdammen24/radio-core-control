@@ -9,7 +9,8 @@
  */
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { database } from "@/services/database";
+import { listStations } from "@/services/stations";
+import type { DataSource } from "@/services/data-source";
 
 export type StationBrand = {
   id: string;
@@ -32,6 +33,7 @@ export type StationScope =
 type Ctx = {
   scope: StationScope;
   stations: StationBrand[];
+  dataSource: DataSource | null;
   loading: boolean;
   setActiveStationId: (id: string | "all") => void;
 };
@@ -48,22 +50,25 @@ export function StationProvider({ children }: { children: ReactNode }) {
   const { data, isLoading } = useQuery({
     queryKey: ["station-context"],
     queryFn: async () => {
-      const { data } = await database
-        .from("stations")
-        .select("id,name,slug,description,is_active, accounts(name)")
-        .order("name");
-      return (data ?? []).map((s): StationBrand => ({
+      const result = await listStations();
+      return {
+        source: result.source,
+        stations: result.data.map((s): StationBrand => ({
         id: s.id,
         name: s.name,
         slug: s.slug,
         description: s.description,
         isActive: s.is_active,
-        accountName: (s as { accounts?: { name?: string } | null }).accounts?.name ?? null,
-      }));
+        logoUrl: s.logo_url,
+        accentColor: s.accent_color,
+        slogan: s.slogan,
+        publicUrl: s.public_url,
+      })),
+      };
     },
   });
 
-  const stations = data ?? [];
+  const stations = data?.stations ?? [];
 
   // Default to first active station once loaded, if none selected.
   useEffect(() => {
@@ -85,7 +90,9 @@ export function StationProvider({ children }: { children: ReactNode }) {
   }, [activeId, stations]);
 
   return (
-    <StationCtx.Provider value={{ scope, stations, loading: isLoading, setActiveStationId }}>
+    <StationCtx.Provider
+      value={{ scope, stations, dataSource: data?.source ?? null, loading: isLoading, setActiveStationId }}
+    >
       {children}
     </StationCtx.Provider>
   );

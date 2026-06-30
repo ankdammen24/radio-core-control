@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SignalBars, RuntimeBadge, toRuntimeState } from "@/components/runtime-indicators";
+import { listStations } from "@/services/stations";
+import { getMediaStatus } from "@/services/media";
 
 export const Route = createFileRoute("/admin/")({ component: Dashboard });
 
@@ -35,13 +37,12 @@ function Dashboard() {
         stationId ? q.eq("station_id", stationId) : q;
 
       const [
-        stations, media, missing, playlists, voicetracks, ads,
+        stationResult, mediaStatusResult, playlists, voicetracks, ads,
         runtimeTargets, syncFailed, syncSucceeded, syncQueued,
         storage, audit, agents, events,
       ] = await Promise.all([
-        database.from("stations").select("*", { count: "exact", head: true }).eq("is_active", true),
-        sFilter(database.from("media_files").select("*", { count: "exact", head: true })),
-        sFilter(database.from("media_files").select("*", { count: "exact", head: true }).eq("status", "missing_metadata")),
+        listStations(),
+        getMediaStatus(stationId),
         sFilter(database.from("playlists").select("*", { count: "exact", head: true }).eq("is_active", true)),
         sFilter(database.from("voicetracks").select("*", { count: "exact", head: true })),
         sFilter(database.from("ad_spots").select("*", { count: "exact", head: true })),
@@ -69,9 +70,11 @@ function Dashboard() {
       const agentStat = (s: string) => agentRows.filter((a) => a.status === s).length;
 
       return {
-        stations: stations.count ?? 0,
-        media: media.count ?? 0,
-        missing: missing.count ?? 0,
+        stations: stationResult.data.filter((station) => station.is_active).length,
+        media: mediaStatusResult.data.total,
+        missing: mediaStatusResult.data.missing_metadata,
+        stationSource: stationResult.source,
+        mediaSource: mediaStatusResult.source,
         playlists: playlists.count ?? 0,
         voicetracks: voicetracks.count ?? 0,
         ads: ads.count ?? 0,

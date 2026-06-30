@@ -48,6 +48,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://redis:6379
       MONGODB_URL: mongodb://${MONGODB_USER:-radio}:${MONGODB_PASSWORD:-radio}@mongodb:27017/${MONGODB_DB:-radiocore}
+      MONGODB_DB: ${MONGODB_DB:-radiocore}
+      RADIO_UPPSALA_STATION_ID: ${RADIO_UPPSALA_STATION_ID:-7b5fd114-b188-4d8d-9210-3e924c68efc7}
       JWT_SECRET: ${JWT_SECRET}
       AUTH_SECRET: ${AUTH_SECRET}
     depends_on:
@@ -161,6 +163,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-changeme}
       MONGO_INITDB_DATABASE: ${MONGODB_DB:-radiocore}
+      MONGODB_USER: ${MONGODB_USER:-radio}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-radio}
     expose:
       - "27017"
     volumes:
@@ -169,7 +173,7 @@ services:
     networks:
       - radio-core
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--quiet", "--username", "${MONGODB_ROOT_USER:-root}", "--password", "${MONGODB_ROOT_PASSWORD:-changeme}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 10

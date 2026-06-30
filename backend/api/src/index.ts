@@ -19,6 +19,12 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import { closeMongo, pingMongo } from "./database/mongo.js";
+import { initializeMongo } from "./database/initialize.js";
+import authRouter from "./routes/auth.js";
+import stationsRouter from "./routes/stations.js";
+import mediaRouter from "./routes/media.js";
+import configRouter from "./routes/config.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -89,11 +95,17 @@ export const COOKIE_DEFAULTS = {
 
 app.get("/health", (_req, res) => {
   res.set("Cache-Control", "no-store");
-  res.send("OK");
+  res.json({ ok: true, service: "radio-core-api" });
 });
 
-app.get("/api/health", (_req, res) => {
+app.get("/api/health", async (_req, res) => {
   res.set("Cache-Control", "no-store");
+  let mongodb: { ok: boolean; latency_ms?: number; error?: string };
+  try {
+    mongodb = await pingMongo();
+  } catch (error) {
+    mongodb = { ok: false, error: error instanceof Error ? error.message : "MongoDB unavailable" };
+  }
   res.json({
     ok: true,
     service: "radio-core-api",
@@ -101,17 +113,15 @@ app.get("/api/health", (_req, res) => {
     env: process.env.NODE_ENV ?? "unknown",
     ts: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),
+    dependencies: { mongodb },
   });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-// Auth importeras dynamiskt för att undvika ESM-cirkelberoenden under init
-import authRouter from "./routes/auth.js";
 app.use("/auth", authRouter);
-
-// Placeholder — ersätts med faktiska routers:
-//   import stationsRouter from "./routes/stations.js";
-//   app.use("/api/stations", stationsRouter);
+app.use("/api/stations", stationsRouter);
+app.use("/api/media", mediaRouter);
+app.use("/api/config", configRouter);
 
 app.all("/api/*", (_req, res) => {
   res.status(501).json({
@@ -131,8 +141,23 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`[radio-core-api] 0.0.0.0:${PORT} (${process.env.NODE_ENV ?? "development"})`);
-  console.log(`[radio-core-api] CORS: ${ALLOWED_ORIGINS.join(", ")}`);
-  console.log(`[radio-core-api] Cookies: secure=${IS_PROD}, sameSite=${IS_PROD ? "none" : "lax"}`);
-});
+async function start() {
+  try {
+    await initializeMongo();
+    console.log("[radio-core-api] MongoDB collections and Radio Uppsala seed are ready");
+  } catch (error) {
+    console.error("[radio-core-api] MongoDB initialization failed; API will retry on requests", error);
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`[radio-core-api] 0.0.0.0:${PORT} (${process.env.NODE_ENV ?? "development"})`);
+    console.log(`[radio-core-api] CORS: ${ALLOWED_ORIGINS.join(", ")}`);
+    console.log(`[radio-core-api] Cookies: secure=${IS_PROD}, sameSite=${IS_PROD ? "none" : "lax"}`);
+  });
+}
+
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => void closeMongo().finally(() => process.exit(0)));
+}
+
+void start();

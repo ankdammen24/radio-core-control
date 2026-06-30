@@ -11,3 +11,27 @@ export const auth0Configuration = {
     return Boolean(this.domain && this.clientId && this.audience);
   },
 };
+
+export async function checkAuth0Reachability() {
+  if (!auth0Configuration.configured) {
+    return { configured: false, reachable: false, message: "Auth0 environment variables are not configured" };
+  }
+  const domain = auth0Configuration.domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  try {
+    const response = await fetch(`https://${domain}/.well-known/openid-configuration`, {
+      method: "GET",
+      cache: "no-store",
+    });
+    return {
+      configured: true,
+      reachable: response.ok,
+      message: response.ok ? "Auth0 discovery is available" : `Auth0 returned HTTP ${response.status}`,
+    };
+  } catch (error) {
+    return {
+      configured: true,
+      reachable: false,
+      message: error instanceof Error ? error.message : "Auth0 is unavailable",
+    };
+  }
+}

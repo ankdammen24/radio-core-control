@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { database } from "@/services/database";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Plug, Zap, Shield, User as UserIcon, Building2, Wrench, ArrowRight } from "lucide-react";
+import { getPublicConfig } from "@/services/config";
 
 export const Route = createFileRoute("/settings")({ component: SettingsPage });
 
@@ -235,6 +237,10 @@ function ProfileTab() {
 
 function BrandTab({ isAdmin }: { isAdmin: boolean }) {
   const qc = useQueryClient();
+  const publicConfig = useQuery({
+    queryKey: ["public-config"],
+    queryFn: getPublicConfig,
+  });
   const { data: stations } = useQuery({
     queryKey: ["stations-brand"],
     queryFn: async () => (await database.from("stations").select("*").order("name")).data ?? [],
@@ -259,6 +265,26 @@ function BrandTab({ isAdmin }: { isAdmin: boolean }) {
 
   return (
     <div className="space-y-4">
+      <Card className="p-6">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-semibold">Publik konfiguration</h3>
+            <p className="text-xs text-muted-foreground">Read-only från den aktiva datakällan.</p>
+          </div>
+          <Badge variant="outline">
+            {publicConfig.data?.source ?? (publicConfig.isLoading ? "loading" : "unavailable")}
+          </Badge>
+        </div>
+        {publicConfig.error ? (
+          <p className="text-sm text-destructive">{publicConfig.error.message}</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
+            <ReadOnlyConfig label="Produkt" value={publicConfig.data?.data.product_name} />
+            <ReadOnlyConfig label="Standardstation" value={publicConfig.data?.data.default_station_slug} />
+            <ReadOnlyConfig label="Lyssnarlänk" value={publicConfig.data?.data.listen_url} />
+          </div>
+        )}
+      </Card>
       {stations.map((s: any) => (
         <Card key={s.id} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -268,6 +294,15 @@ function BrandTab({ isAdmin }: { isAdmin: boolean }) {
           </div>
         </Card>
       ))}
+    </div>
+  );
+}
+
+function ReadOnlyConfig({ label, value }: { label: string; value: unknown }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 truncate font-mono text-xs">{typeof value === "string" ? value : "—"}</div>
     </div>
   );
 }

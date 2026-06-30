@@ -17,7 +17,7 @@ import {
   Plug, RefreshCw, Building2, Users, HardDrive, FileCode2, Archive, ScrollText,
   Settings, ChevronDown, Webhook, Antenna, Mic2, Podcast, Cloud,
   ShieldCheck, Sliders, AudioLines, MonitorSpeaker, GalleryVerticalEnd, X,
-  Cpu, Newspaper, Key,
+  Cpu, Newspaper, Key, GitCompareArrows,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioCoreLogo } from "@/components/radio-core-logo";
@@ -109,6 +109,7 @@ const GROUPS: Group[] = [
       { label: "Backup",    icon: Archive,     to: "/backup" },
       { label: "Audit",     icon: ScrollText,  to: "/audit" },
       { label: "Settings",  icon: Settings,    to: "/settings" },
+      { label: "Migration Status", icon: GitCompareArrows, to: "/migration-status" },
     ],
   },
 ];
