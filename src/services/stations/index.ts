@@ -1,5 +1,4 @@
-import { apiClient } from "@/lib/api";
-import { database, SUPABASE_ENABLED } from "@/services/database";
+import { listStations as listApiStations, getStation as getApiStation, type ApiStation } from "@/services/stationsApi";
 import type { SourcedResult } from "@/services/data-source";
 
 export interface Station {
@@ -9,88 +8,52 @@ export interface Station {
   description: string | null;
   is_active: boolean;
   logo_url: string | null;
+  /** Not modeled by the Radio Core API yet — always null until added to the backend. */
   accent_color: string | null;
+  /** Not modeled by the Radio Core API yet — always null until added to the backend. */
   slogan: string | null;
+  /** Not modeled by the Radio Core API yet — always null until added to the backend. */
   public_url: string | null;
 }
 
-interface ApiEnvelope<T> {
-  data: T;
-  source: "radio-core";
-}
-
-function fromSupabase(row: {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  is_active: boolean;
-}): Station {
-  const optional = row as typeof row & {
-    logo_url?: string | null;
-    accent_color?: string | null;
-    slogan?: string | null;
-    public_url?: string | null;
-  };
+function fromApi(station: ApiStation): Station {
   return {
-    ...row,
-    logo_url: optional.logo_url ?? null,
-    accent_color: optional.accent_color ?? null,
-    slogan: optional.slogan ?? null,
-    public_url: optional.public_url ?? null,
-  };
-}
-
-async function listFromSupabase(reason: string): Promise<SourcedResult<Station[]>> {
-  if (!SUPABASE_ENABLED) {
-    return { data: [], source: "none", fallback: false, fallbackReason: reason };
-  }
-  const { data, error } = await database
-    .from("stations")
-    .select("id,name,slug,description,is_active")
-    .order("name");
-  if (error) throw error;
-  return {
-    data: (data ?? []).map(fromSupabase),
-    source: "supabase",
-    fallback: true,
-    fallbackReason: reason,
+    id: station._id,
+    name: station.name,
+    slug: station.slug,
+    description: station.description ?? null,
+    is_active: station.status === "active",
+    logo_url: station.logoUrl ?? null,
+    accent_color: null,
+    slogan: null,
+    public_url: null,
   };
 }
 
 export async function listStations(): Promise<SourcedResult<Station[]>> {
-  const response = await apiClient.get<ApiEnvelope<Station[]>>("/api/stations");
-  if (Array.isArray(response.data?.data) && !response.error) {
-    return { data: response.data.data, source: "radio-core", fallback: false };
+  try {
+    const stations = await listApiStations();
+    return { data: stations.map(fromApi), source: "radio-core", fallback: false };
+  } catch (error) {
+    return {
+      data: [],
+      source: "none",
+      fallback: false,
+      fallbackReason: error instanceof Error ? error.message : "Radio Core Backend is unavailable",
+    };
   }
-  return listFromSupabase(response.error ?? `Radio Core returned HTTP ${response.status}`);
 }
 
 export async function getStation(id: string): Promise<SourcedResult<Station | null>> {
-  const response = await apiClient.get<ApiEnvelope<Station>>(
-    `/api/stations/${encodeURIComponent(id)}`,
-  );
-  if (response.data?.data && !response.error) {
-    return { data: response.data.data, source: "radio-core", fallback: false };
-  }
-  if (!SUPABASE_ENABLED) {
+  try {
+    const station = await getApiStation(id);
+    return { data: fromApi(station), source: "radio-core", fallback: false };
+  } catch (error) {
     return {
       data: null,
       source: "none",
       fallback: false,
-      fallbackReason: response.error ?? `Radio Core returned HTTP ${response.status}`,
+      fallbackReason: error instanceof Error ? error.message : "Radio Core Backend is unavailable",
     };
   }
-  const { data, error } = await database
-    .from("stations")
-    .select("id,name,slug,description,is_active")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw error;
-  return {
-    data: data ? fromSupabase(data) : null,
-    source: "supabase",
-    fallback: true,
-    fallbackReason: response.error ?? `Radio Core returned HTTP ${response.status}`,
-  };
 }
