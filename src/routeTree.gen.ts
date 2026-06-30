@@ -95,6 +95,10 @@ import { Route as ApiV1StationsStationIdFallbackTracksRouteImport } from './rout
 import { Route as ApiV1FallbackTracksIdRouteImport } from './routes/api.v1.fallback-tracks.$id'
 import { Route as ApiV1StationsStationIdStreamingOutputsRouteImport } from './routes/api.v1.stations.$stationId.streaming-outputs'
 import { Route as ApiV1StreamingOutputsIdRouteImport } from './routes/api.v1.streaming-outputs.$id'
+import { Route as ApiV1MediaSourcesRouteImport } from './routes/api.v1.media-sources'
+import { Route as ApiV1MediaSourcesIdRouteImport } from './routes/api.v1.media-sources.$id'
+import { Route as ApiV1MediaSourcesIdSyncRouteImport } from './routes/api.v1.media-sources.$id.sync'
+import { Route as ApiV1MediaSourcesIdSyncRunsRouteImport } from './routes/api.v1.media-sources.$id.sync-runs'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -539,6 +543,27 @@ const ApiV1StreamingOutputsIdRoute = ApiV1StreamingOutputsIdRouteImport.update({
   path: '/api/v1/streaming-outputs/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1MediaSourcesRoute = ApiV1MediaSourcesRouteImport.update({
+  id: '/api/v1/media-sources',
+  path: '/api/v1/media-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaSourcesIdRoute = ApiV1MediaSourcesIdRouteImport.update({
+  id: '/api/v1/media-sources/$id',
+  path: '/api/v1/media-sources/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaSourcesIdSyncRoute = ApiV1MediaSourcesIdSyncRouteImport.update({
+  id: '/api/v1/media-sources/$id/sync',
+  path: '/api/v1/media-sources/$id/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaSourcesIdSyncRunsRoute =
+  ApiV1MediaSourcesIdSyncRunsRouteImport.update({
+    id: '/api/v1/media-sources/$id/sync-runs',
+    path: '/api/v1/media-sources/$id/sync-runs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -627,6 +652,10 @@ export interface FileRoutesByFullPath {
   '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
   '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
   '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
+  '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
+  '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -715,6 +744,10 @@ export interface FileRoutesByTo {
   '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
   '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
   '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
+  '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
+  '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -804,6 +837,10 @@ export interface FileRoutesById {
   '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
   '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
   '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
+  '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
+  '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -894,6 +931,10 @@ export interface FileRouteTypes {
     | '/api/v1/fallback-tracks/$id'
     | '/api/v1/stations/$stationId/streaming-outputs'
     | '/api/v1/streaming-outputs/$id'
+    | '/api/v1/media-sources'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media-sources/$id/sync'
+    | '/api/v1/media-sources/$id/sync-runs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -982,6 +1023,10 @@ export interface FileRouteTypes {
     | '/api/v1/fallback-tracks/$id'
     | '/api/v1/stations/$stationId/streaming-outputs'
     | '/api/v1/streaming-outputs/$id'
+    | '/api/v1/media-sources'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media-sources/$id/sync'
+    | '/api/v1/media-sources/$id/sync-runs'
   id:
     | '__root__'
     | '/'
@@ -1070,6 +1115,10 @@ export interface FileRouteTypes {
     | '/api/v1/fallback-tracks/$id'
     | '/api/v1/stations/$stationId/streaming-outputs'
     | '/api/v1/streaming-outputs/$id'
+    | '/api/v1/media-sources'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media-sources/$id/sync'
+    | '/api/v1/media-sources/$id/sync-runs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1156,6 +1205,10 @@ export interface RootRouteChildren {
   ApiV1FallbackTracksIdRoute: typeof ApiV1FallbackTracksIdRoute
   ApiV1StationsStationIdStreamingOutputsRoute: typeof ApiV1StationsStationIdStreamingOutputsRoute
   ApiV1StreamingOutputsIdRoute: typeof ApiV1StreamingOutputsIdRoute
+  ApiV1MediaSourcesRoute: typeof ApiV1MediaSourcesRoute
+  ApiV1MediaSourcesIdRoute: typeof ApiV1MediaSourcesIdRoute
+  ApiV1MediaSourcesIdSyncRoute: typeof ApiV1MediaSourcesIdSyncRoute
+  ApiV1MediaSourcesIdSyncRunsRoute: typeof ApiV1MediaSourcesIdSyncRunsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1762,6 +1815,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1StreamingOutputsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/media-sources': {
+      id: '/api/v1/media-sources'
+      path: '/api/v1/media-sources'
+      fullPath: '/api/v1/media-sources'
+      preLoaderRoute: typeof ApiV1MediaSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media-sources/$id': {
+      id: '/api/v1/media-sources/$id'
+      path: '/api/v1/media-sources/$id'
+      fullPath: '/api/v1/media-sources/$id'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media-sources/$id/sync': {
+      id: '/api/v1/media-sources/$id/sync'
+      path: '/api/v1/media-sources/$id/sync'
+      fullPath: '/api/v1/media-sources/$id/sync'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media-sources/$id/sync-runs': {
+      id: '/api/v1/media-sources/$id/sync-runs'
+      path: '/api/v1/media-sources/$id/sync-runs'
+      fullPath: '/api/v1/media-sources/$id/sync-runs'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1888,6 +1969,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1FallbackTracksIdRoute: ApiV1FallbackTracksIdRoute,
   ApiV1StationsStationIdStreamingOutputsRoute: ApiV1StationsStationIdStreamingOutputsRoute,
   ApiV1StreamingOutputsIdRoute: ApiV1StreamingOutputsIdRoute,
+  ApiV1MediaSourcesRoute: ApiV1MediaSourcesRoute,
+  ApiV1MediaSourcesIdRoute: ApiV1MediaSourcesIdRoute,
+  ApiV1MediaSourcesIdSyncRoute: ApiV1MediaSourcesIdSyncRoute,
+  ApiV1MediaSourcesIdSyncRunsRoute: ApiV1MediaSourcesIdSyncRunsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

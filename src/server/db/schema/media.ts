@@ -15,6 +15,17 @@ export const mediaFiles = pgTable("media_files", {
   status:             text("status").notNull().default("ready"),
   storageLocationId:  uuid("storage_location_id"),
   azuracastMediaId:   text("azuracast_media_id"),
+  // Metadata (the old Supabase schema kept this in a separate track_metadata join table)
+  title:              text("title"),
+  artist:             text("artist"),
+  album:              text("album"),
+  genre:              text("genre"),
+  isrc:               text("isrc"),
+  artworkUrl:         text("artwork_url"),
+  // Remote-sourced tracks (e.g. Fablesh) — audio is streamed, not stored locally
+  sourceId:           uuid("source_id"),
+  externalId:         text("external_id"),
+  streamUrl:          text("stream_url"),
   createdAt:          timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt:          timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

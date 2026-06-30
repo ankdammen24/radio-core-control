@@ -19,6 +19,12 @@ export const Route = createFileRoute("/api/v1/media/$id")({
           ...(typeof body.mediaKind === "string" ? { mediaKind: body.mediaKind } : {}),
           ...(typeof body.status === "string" ? { status: body.status } : {}),
           ...(typeof body.durationSeconds === "number" ? { durationSeconds: body.durationSeconds } : {}),
+          ...(typeof body.title === "string" ? { title: body.title } : {}),
+          ...(typeof body.artist === "string" ? { artist: body.artist } : {}),
+          ...(typeof body.album === "string" ? { album: body.album } : {}),
+          ...(typeof body.genre === "string" ? { genre: body.genre } : {}),
+          ...(typeof body.artworkUrl === "string" ? { artworkUrl: body.artworkUrl } : {}),
+          ...(typeof body.streamUrl === "string" ? { streamUrl: body.streamUrl } : {}),
         });
         if (!media) return jsonError("Media not found", "MEDIA_NOT_FOUND", 404);
         return jsonSuccess(media);

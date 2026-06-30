@@ -8,6 +8,10 @@ export const podcasts = pgTable("podcasts", {
   imageUrl:     text("image_url"),
   rssUrl:       text("rss_url"),
   status:       text("status").notNull().default("active"),
+  /** Set when this podcast was synced from a media_sources row (e.g. Fablesh); null for manually-created podcasts. */
+  sourceId:     uuid("source_id"),
+  externalId:   text("external_id"),
+  checksum:     text("checksum"),
   createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt:    timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -24,6 +28,10 @@ export const podcastEpisodes = pgTable("podcast_episodes", {
   durationSeconds:  integer("duration_seconds"),
   publishedAt:      timestamp("published_at", { withTimezone: true }),
   status:           text("status").notNull().default("draft"),
+  /** Remote episode id from the source (e.g. Fablesh episode id), used to diff on sync. */
+  guid:             text("guid"),
+  checksum:         text("checksum"),
+  deletedAt:        timestamp("deleted_at", { withTimezone: true }),
   createdAt:        timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt:        timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
