@@ -8,30 +8,16 @@ app.disable("x-powered-by");
 
 app.get("/health", (_request, response) => {
   response.set("Cache-Control", "no-store");
-  response.status(200).json({ ok: true, service: "radio-core-api" });
+  response.status(200).json({ status: "ok", service: "radio-core-api" });
 });
 
 app.get("/api/health", async (_request, response) => {
-  let mongodb: { ok: boolean; latency_ms?: number; error?: string };
-  try {
-    mongodb = await pingMongo();
-  } catch (error) {
-    mongodb = {
-      ok: false,
-      error: error instanceof Error ? error.message : "MongoDB unavailable",
-    };
-  }
+  const database = await pingMongo()
+    .then(() => "connected" as const)
+    .catch(() => "not_connected" as const);
 
   response.set("Cache-Control", "no-store");
-  response.status(200).json({
-    ok: true,
-    service: "radio-core-api",
-    version: process.env.npm_package_version ?? "0.1.0",
-    environment: process.env.NODE_ENV ?? "development",
-    public_url: process.env.API_PUBLIC_URL ?? null,
-    timestamp: new Date().toISOString(),
-    dependencies: { mongodb },
-  });
+  response.status(200).json({ status: "ok", service: "radio-core-api", database });
 });
 
 app.use((_request, response) => {
