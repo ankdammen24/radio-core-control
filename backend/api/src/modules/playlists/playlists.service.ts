@@ -1,6 +1,6 @@
 import { AppError } from "../../core/app-error.js";
 import type { PlaylistRepository } from "./playlists.repository.js";
-import type { CreatePlaylistInput } from "./playlists.types.js";
+import type { CreatePlaylistInput, UpdatePlaylistInput } from "./playlists.types.js";
 
 export class PlaylistService {
   constructor(private readonly repository: PlaylistRepository) {}
@@ -26,6 +26,21 @@ export class PlaylistService {
       createdAt: now,
       updatedAt: now,
     });
+  }
+
+  async updatePlaylist(id: string, input: UpdatePlaylistInput) {
+    const updated = await this.repository.updateById(id, input);
+    if (!updated) {
+      throw AppError.notFound(`Playlist ${id} not found`, "PLAYLIST_NOT_FOUND");
+    }
+    return updated;
+  }
+
+  async deletePlaylist(id: string) {
+    const deleted = await this.repository.deleteById(id);
+    if (!deleted) {
+      throw AppError.notFound(`Playlist ${id} not found`, "PLAYLIST_NOT_FOUND");
+    }
   }
 
   async addMediaToPlaylist(playlistId: string, mediaId: string) {

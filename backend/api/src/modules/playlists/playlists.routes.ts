@@ -4,7 +4,11 @@ import { validateBody } from "../../middleware/validation.middleware.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { PlaylistRepository } from "./playlists.repository.js";
 import { PlaylistService } from "./playlists.service.js";
-import { validateAddPlaylistItem, validateCreatePlaylist } from "./playlists.validation.js";
+import {
+  validateAddPlaylistItem,
+  validateCreatePlaylist,
+  validateUpdatePlaylist,
+} from "./playlists.validation.js";
 
 const repository = new PlaylistRepository();
 const service = new PlaylistService(repository);
@@ -33,6 +37,23 @@ playlistsRouter.post(
   asyncHandler(async (req, res) => {
     const playlist = await service.createPlaylist(req.body);
     sendSuccess(res, playlist, undefined, 201);
+  }),
+);
+
+playlistsRouter.patch(
+  "/:id",
+  validateBody(validateUpdatePlaylist),
+  asyncHandler(async (req, res) => {
+    const playlist = await service.updatePlaylist(req.params.id, req.body);
+    sendSuccess(res, playlist);
+  }),
+);
+
+playlistsRouter.delete(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    await service.deletePlaylist(req.params.id);
+    res.status(204).end();
   }),
 );
 

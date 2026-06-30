@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { database } from "@/services/database";
+import {
+  listStations,
+  createStation,
+  updateStation,
+  deleteStation,
+  type ApiStation,
+} from "@/services/stationsApi";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import {
@@ -24,114 +30,82 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { StatusBadge } from "@/components/status-badge";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState, ErrorState, LoadingRows } from "@/components/data-states";
-import { Plus, Trash2, Radio, Key, Copy } from "lucide-react";
+import { Plus, Trash2, Radio } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { stationSchema, formatZodError } from "@/lib/validation";
-import { useServerFn } from "@tanstack/react-start";
-import { generateStationApiKey } from "@/lib/news.functions";
 
 export const Route = createFileRoute("/stations")({ component: StationsPage });
+
+const EMPTY_FORM = {
+  name: "",
+  slug: "",
+  description: "",
+  logoUrl: "",
+  streamUrl: "",
+  timezone: "",
+};
 
 function StationsPage() {
   const qc = useQueryClient();
   const { isEditor, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [errs, setErrs] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    slug: "",
-    description: "",
-    account_id: "",
-    azuracast_station_id: "",
-    is_active: true,
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
 
-  const { data: accounts } = useQuery({
-    queryKey: ["accounts-list"],
-    queryFn: async () =>
-      (await database.from("accounts").select("id,name").order("name")).data ?? [],
-  });
   const stations = useQuery({
     queryKey: ["stations"],
-    queryFn: async () => {
-      const { data, error } = await database
-        .from("stations")
-        .select("*, accounts(name)")
-        .order("name");
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: listStations,
   });
 
   const create = useMutation({
     mutationFn: async () => {
-      const parsed = stationSchema.safeParse(form);
-      if (!parsed.success) {
-        const m = formatZodError(parsed.error);
+      if (!form.name.trim() || !form.slug.trim()) {
+        const m = "Name and slug are required";
         setErrs(m);
         throw new Error(m);
       }
       setErrs(null);
-      const payload = {
-        ...parsed.data,
-        is_active: true,
-        account_id: form.account_id || null,
-        azuracast_station_id: form.azuracast_station_id || null,
-      };
-      const { error } = await database.from("stations").insert(payload as any);
-      if (error) throw error;
+      await createStation({
+        name: form.name.trim(),
+        slug: form.slug.trim(),
+        description: form.description || undefined,
+        logoUrl: form.logoUrl || undefined,
+        streamUrl: form.streamUrl || undefined,
+        timezone: form.timezone || undefined,
+      });
     },
     onSuccess: () => {
       toast.success("Station created");
       setOpen(false);
-      setForm({
-        name: "",
-        slug: "",
-        description: "",
-        account_id: "",
-        azuracast_station_id: "",
-        is_active: true,
-      });
+      setForm(EMPTY_FORM);
       qc.invalidateQueries({ queryKey: ["stations"] });
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
+
   const toggle = useMutation({
-    mutationFn: async ({ id, val }: { id: string; val: boolean }) => {
-      const { error } = await database.from("stations").update({ is_active: val }).eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+      updateStation(id, { status: active ? "active" : "inactive" }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["stations"] }),
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
+
   const del = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await database.from("stations").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => deleteStation(id),
     onSuccess: () => {
       toast.success("Deleted");
       qc.invalidateQueries({ queryKey: ["stations"] });
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
     <AppLayout
       title="Stations"
-      description="Broadcast stations linked to AzuraCast."
+      description="Radio stations served by Radio Core."
       actions={
         isEditor && (
           <Dialog open={open} onOpenChange={setOpen}>
@@ -163,28 +137,25 @@ function StationsPage() {
                   />
                 </div>
                 <div>
-                  <Label>Account</Label>
-                  <Select
-                    value={form.account_id}
-                    onValueChange={(v) => setForm({ ...form, account_id: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {accounts?.map((a) => (
-                        <SelectItem key={a.id} value={a.id}>
-                          {a.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Stream URL</Label>
+                  <Input
+                    value={form.streamUrl}
+                    onChange={(e) => setForm({ ...form, streamUrl: e.target.value })}
+                  />
                 </div>
                 <div>
-                  <Label>AzuraCast Station ID</Label>
+                  <Label>Logo URL</Label>
                   <Input
-                    value={form.azuracast_station_id}
-                    onChange={(e) => setForm({ ...form, azuracast_station_id: e.target.value })}
+                    value={form.logoUrl}
+                    onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Timezone</Label>
+                  <Input
+                    placeholder="Europe/Stockholm"
+                    value={form.timezone}
+                    onChange={(e) => setForm({ ...form, timezone: e.target.value })}
                   />
                 </div>
                 <div>
@@ -210,61 +181,43 @@ function StationsPage() {
       {!stations.error && (
         <Card className="overflow-hidden">
           {stations.isLoading ? (
-            <LoadingRows cols={7} />
+            <LoadingRows cols={5} />
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Slug</TableHead>
-                  <TableHead>Account</TableHead>
-                  <TableHead>AzuraCast ID</TableHead>
-                  <TableHead>API Key</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Stream URL</TableHead>
                   <TableHead>Active</TableHead>
                   <TableHead className="w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {stations.data?.map((s: any) => (
-                  <TableRow key={s.id}>
+                {stations.data?.map((s: ApiStation) => (
+                  <TableRow key={s._id}>
                     <TableCell className="font-medium">{s.name}</TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">
                       {s.slug}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {s.accounts?.name ?? "—"}
-                    </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">
-                      {s.azuracast_station_id ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      {isAdmin ? (
-                        <StationApiKeyButton stationId={s.id} hasKey={!!s.api_key_hash} />
-                      ) : s.api_key_hash ? (
-                        <span className="text-xs text-emerald-400">set</span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">none</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={s.azuracast_station_id ? "ok" : "untested"} />
+                      {s.streamUrl ?? "—"}
                     </TableCell>
                     <TableCell>
                       <Switch
-                        checked={s.is_active}
+                        checked={s.status === "active"}
                         disabled={!isEditor}
-                        onCheckedChange={(v) => toggle.mutate({ id: s.id, val: v })}
+                        onCheckedChange={(v) => toggle.mutate({ id: s._id, active: v })}
                       />
                     </TableCell>
                     <TableCell>
                       {isAdmin && (
                         <ConfirmDialog
                           title={`Delete station "${s.name}"?`}
-                          description="This removes the station from Radio Core. AzuraCast data is not deleted."
+                          description="This removes the station from Radio Core."
                           confirmText="Delete"
                           destructive
-                          onConfirm={() => del.mutateAsync(s.id)}
+                          onConfirm={() => del.mutateAsync(s._id)}
                           trigger={
                             <Button variant="ghost" size="icon">
                               <Trash2 className="w-4 h-4" />
@@ -283,68 +236,12 @@ function StationsPage() {
               <EmptyState
                 icon={Radio}
                 title="Inga stationer ännu"
-                description="Kör den frivilliga bootstrapen eller skapa en station när en skrivbar backend är ansluten."
+                description="Skapa en station för att komma igång."
               />
             </div>
           )}
         </Card>
       )}
     </AppLayout>
-  );
-}
-
-function StationApiKeyButton({ stationId, hasKey }: { stationId: string; hasKey: boolean }) {
-  const gen = useServerFn(generateStationApiKey);
-  const [issued, setIssued] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  async function generate() {
-    setBusy(true);
-    try {
-      const r = await gen({ data: { stationId } });
-      setIssued(r.plaintext);
-      setOpen(true);
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <>
-      <Button size="sm" variant={hasKey ? "ghost" : "outline"} onClick={generate} disabled={busy}>
-        <Key className="w-3.5 h-3.5 mr-1" />
-        {hasKey ? "Rotate" : "Generate"}
-      </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>API key issued</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Copy this key now — it will not be shown again. Use it as{" "}
-            <code className="font-mono">Authorization: Bearer &lt;key&gt;</code> when calling{" "}
-            <code className="font-mono">/api/public/radio/news</code>.
-          </p>
-          <div className="flex gap-2 items-center bg-muted/40 p-2 rounded font-mono text-xs break-all">
-            <span className="flex-1">{issued}</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                if (issued) {
-                  navigator.clipboard.writeText(issued);
-                  toast.success("Copied");
-                }
-              }}
-            >
-              <Copy className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
   );
 }
