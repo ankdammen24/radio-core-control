@@ -1,31 +1,38 @@
 import { apiClient } from "@/lib/api";
 
-export type StationStatus = "active" | "inactive";
-
 export interface ApiStation {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
-  description?: string;
-  logoUrl?: string;
-  streamUrl?: string;
-  timezone?: string;
-  status: StationStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string | null;
+  accountId: string | null;
+  isActive: boolean;
+  demoMode: boolean;
+  demoStreamUrl: string | null;
+  demoArtworkUrl: string | null;
+  azuracastStationId: string | null;
+  apiKeyHash: string | null;
+  apiKeyPrefix: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateStationInput {
   name: string;
   slug: string;
   description?: string;
-  logoUrl?: string;
-  streamUrl?: string;
-  timezone?: string;
-  status?: StationStatus;
+  accountId?: string;
+  azuracastStationId?: string;
 }
 
-export type UpdateStationInput = Partial<CreateStationInput>;
+export interface UpdateStationInput {
+  name?: string;
+  slug?: string;
+  description?: string;
+  accountId?: string;
+  azuracastStationId?: string;
+  isActive?: boolean;
+}
 
 interface SuccessEnvelope<T> {
   success: true;

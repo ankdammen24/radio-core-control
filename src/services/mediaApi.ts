@@ -1,33 +1,35 @@
 import { apiClient } from "@/lib/api";
 
-export type MediaStatus = "active" | "archived";
-
 export interface ApiMediaFile {
-  _id: string;
-  title: string;
-  artist?: string;
-  album?: string;
-  duration?: number;
-  fileUrl: string;
-  storageKey: string;
-  type: string;
-  status: MediaStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  id: string;
+  stationId: string | null;
+  fileName: string;
+  filePath: string | null;
+  originalFileName: string | null;
+  fileType: string | null;
+  mimeType: string | null;
+  fileSize: number | null;
+  durationSeconds: number | null;
+  checksum: string | null;
+  mediaKind: string;
+  status: string;
+  storageLocationId: string | null;
+  azuracastMediaId: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateMediaInput {
-  title: string;
-  artist?: string;
-  album?: string;
-  duration?: number;
-  fileUrl: string;
-  storageKey: string;
-  type: string;
-  status?: MediaStatus;
+  fileName: string;
+  stationId?: string;
+  filePath?: string;
+  fileType?: string;
+  mediaKind?: string;
+  status?: string;
+  durationSeconds?: number;
 }
 
-export type UpdateMediaInput = Partial<CreateMediaInput>;
+export type UpdateMediaInput = Partial<Omit<CreateMediaInput, "fileName">> & { fileName?: string };
 
 interface SuccessEnvelope<T> {
   success: true;

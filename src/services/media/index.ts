@@ -22,26 +22,26 @@ const EMPTY_MEDIA_STATUS: MediaStatus = {
 };
 
 /**
- * The Radio Core API models media lifecycle as active/archived only — the
- * richer ingestion-pipeline states (imported/missing_metadata/processing/etc.)
- * from the old Supabase schema aren't modeled yet. `ready` reflects active
- * media; pending/processing/error/missing_metadata are always 0 until a
- * processing pipeline exists.
- *
- * `stationId` is accepted for call-site compatibility but not yet applied —
- * the Media module has no stationId field in the backend yet.
+ * `stationId` is accepted for call-site compatibility; once set it filters
+ * client-side since the API does not yet expose a station-scoped query param.
  */
-export async function getMediaStatus(_stationId?: string | null): Promise<SourcedResult<MediaStatus>> {
+export async function getMediaStatus(stationId?: string | null): Promise<SourcedResult<MediaStatus>> {
   try {
-    const media = await listMedia();
-    const active = media.filter((m) => m.status === "active").length;
-    const archived = media.filter((m) => m.status === "archived").length;
+    const all = await listMedia();
+    const media = stationId ? all.filter((m) => m.stationId === stationId) : all;
+    const byStatus: Record<string, number> = {};
+    for (const m of media) {
+      byStatus[m.status] = (byStatus[m.status] ?? 0) + 1;
+    }
     return {
       data: {
-        ...EMPTY_MEDIA_STATUS,
         total: media.length,
-        ready: active,
-        by_status: { active, archived },
+        ready: byStatus.ready ?? 0,
+        pending: byStatus.imported ?? 0,
+        processing: byStatus.paused ?? 0,
+        error: byStatus.error ?? 0,
+        missing_metadata: byStatus.missing_metadata ?? 0,
+        by_status: byStatus,
       },
       source: "radio-core",
       fallback: false,

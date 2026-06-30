@@ -39,14 +39,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/stations")({ component: StationsPage });
 
-const EMPTY_FORM = {
-  name: "",
-  slug: "",
-  description: "",
-  logoUrl: "",
-  streamUrl: "",
-  timezone: "",
-};
+const EMPTY_FORM = { name: "", slug: "", description: "", azuracastStationId: "" };
 
 function StationsPage() {
   const qc = useQueryClient();
@@ -72,9 +65,7 @@ function StationsPage() {
         name: form.name.trim(),
         slug: form.slug.trim(),
         description: form.description || undefined,
-        logoUrl: form.logoUrl || undefined,
-        streamUrl: form.streamUrl || undefined,
-        timezone: form.timezone || undefined,
+        azuracastStationId: form.azuracastStationId || undefined,
       });
     },
     onSuccess: () => {
@@ -88,7 +79,7 @@ function StationsPage() {
 
   const toggle = useMutation({
     mutationFn: ({ id, active }: { id: string; active: boolean }) =>
-      updateStation(id, { status: active ? "active" : "inactive" }),
+      updateStation(id, { isActive: active }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["stations"] }),
     onError: (e: Error) => toast.error(e.message),
   });
@@ -137,25 +128,10 @@ function StationsPage() {
                   />
                 </div>
                 <div>
-                  <Label>Stream URL</Label>
+                  <Label>AzuraCast Station ID</Label>
                   <Input
-                    value={form.streamUrl}
-                    onChange={(e) => setForm({ ...form, streamUrl: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Logo URL</Label>
-                  <Input
-                    value={form.logoUrl}
-                    onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Timezone</Label>
-                  <Input
-                    placeholder="Europe/Stockholm"
-                    value={form.timezone}
-                    onChange={(e) => setForm({ ...form, timezone: e.target.value })}
+                    value={form.azuracastStationId}
+                    onChange={(e) => setForm({ ...form, azuracastStationId: e.target.value })}
                   />
                 </div>
                 <div>
@@ -188,26 +164,26 @@ function StationsPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Slug</TableHead>
-                  <TableHead>Stream URL</TableHead>
+                  <TableHead>AzuraCast ID</TableHead>
                   <TableHead>Active</TableHead>
                   <TableHead className="w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stations.data?.map((s: ApiStation) => (
-                  <TableRow key={s._id}>
+                  <TableRow key={s.id}>
                     <TableCell className="font-medium">{s.name}</TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">
                       {s.slug}
                     </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">
-                      {s.streamUrl ?? "—"}
+                      {s.azuracastStationId ?? "—"}
                     </TableCell>
                     <TableCell>
                       <Switch
-                        checked={s.status === "active"}
+                        checked={s.isActive}
                         disabled={!isEditor}
-                        onCheckedChange={(v) => toggle.mutate({ id: s._id, active: v })}
+                        onCheckedChange={(v) => toggle.mutate({ id: s.id, active: v })}
                       />
                     </TableCell>
                     <TableCell>
@@ -217,7 +193,7 @@ function StationsPage() {
                           description="This removes the station from Radio Core."
                           confirmText="Delete"
                           destructive
-                          onConfirm={() => del.mutateAsync(s._id)}
+                          onConfirm={() => del.mutateAsync(s.id)}
                           trigger={
                             <Button variant="ghost" size="icon">
                               <Trash2 className="w-4 h-4" />
