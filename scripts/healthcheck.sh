@@ -27,7 +27,6 @@ echo ""
 
 check "/health"            "nginx proxy"
 check "/api/health"        "radio-core-api"
-check "/media-api/health"  "radio-core-media"
 
 echo ""
 if [[ $FAIL -eq 0 ]]; then

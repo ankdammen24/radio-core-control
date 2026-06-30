@@ -1,7 +1,6 @@
 # Radio Core — Docker Compose (bas)
 #
-# Definierar alla tjänster och det interna nätverket.
-# Används som grund för dev- och produktionsmiljöer.
+# Minimal API stack. Media, workers and scheduling are added later.
 #
 # Starta:     docker compose -f infra/compose.yml up -d
 # Stoppa:     docker compose -f infra/compose.yml down
@@ -44,20 +43,14 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
-      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://redis:6379
-      MONGODB_URL: mongodb://${MONGODB_USER:-radio}:${MONGODB_PASSWORD:-radio}@mongodb:27017/${MONGODB_DB:-radiocore}
+      MONGODB_URL: mongodb://${MONGODB_ROOT_USER:-root}:${MONGODB_ROOT_PASSWORD:-changeme}@mongodb:27017/${MONGODB_DB:-radiocore}?authSource=admin
       MONGODB_DB: ${MONGODB_DB:-radiocore}
-      RADIO_UPPSALA_STATION_ID: ${RADIO_UPPSALA_STATION_ID:-7b5fd114-b188-4d8d-9210-3e924c68efc7}
-      JWT_SECRET: ${JWT_SECRET}
-      AUTH_SECRET: ${AUTH_SECRET}
     depends_on:
       redis:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-      mongodb-init:
-        condition: service_completed_successfully
     networks:
       - radio-core
     healthcheck:
@@ -72,67 +65,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # ─── Media Server ─────────────────────────────────────────────────────────────
-  radio-core-media:
-    build:
-      context: ../backend/media
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    expose:
-      - "3001"
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3001
-      REDIS_URL: redis://redis:6379
-      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
-      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
-      R2_SECRET_KEY: ${R2_SECRET_KEY}
-      R2_BUCKET: ${R2_BUCKET}
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - radio-core
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-
-  # ─── Worker ───────────────────────────────────────────────────────────────────
-  radio-core-worker:
-    build:
-      context: ../backend/workers
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: redis://redis:6379
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - radio-core
-
-  # ─── Scheduler ────────────────────────────────────────────────────────────────
-  scheduler:
-    build:
-      context: ../backend/scheduler
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: redis://redis:6379
-      CRON_SECRET: ${CRON_SECRET}
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - radio-core
-
   # ─── Redis ────────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
@@ -142,7 +74,6 @@ services:
       --appendonly yes
       --maxmemory ${REDIS_MAX_MEMORY:-256mb}
       --maxmemory-policy allkeys-lru
-      --requirepass ${REDIS_PASSWORD:-}
     expose:
       - "6379"
     volumes:
@@ -164,13 +95,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-changeme}
       MONGO_INITDB_DATABASE: ${MONGODB_DB:-radiocore}
-      MONGODB_USER: ${MONGODB_USER:-radio}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-radio}
     expose:
       - "27017"
     volumes:
       - mongodb_data:/data/db
-      - ./mongodb/init:/docker-entrypoint-initdb.d:ro
     networks:
       - radio-core
     healthcheck:
@@ -192,36 +120,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 20s
-
-  # Ensures the least-privilege application user also exists on pre-existing
-  # MongoDB volumes, where docker-entrypoint-initdb.d is not run again.
-  mongodb-init:
-    image: mongo:7
-    restart: "no"
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGODB_DB:-radiocore}
-      MONGODB_USER: ${MONGODB_USER:-radio}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-radio}
-    volumes:
-      - ./mongodb/init/01-create-app-user.js:/scripts/01-create-app-user.js:ro
-    command:
-      - mongosh
-      - --host
-      - mongodb
-      - --username
-      - ${MONGODB_ROOT_USER:-root}
-      - --password
-      - ${MONGODB_ROOT_PASSWORD:-changeme}
-      - --authenticationDatabase
-      - admin
-      - --quiet
-      - --file
-      - /scripts/01-create-app-user.js
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - radio-core
 
 # ─── Volymer ──────────────────────────────────────────────────────────────────
 volumes:

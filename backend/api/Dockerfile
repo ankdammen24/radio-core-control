@@ -7,14 +7,14 @@ COPY package*.json ./
 
 # ─── Development ──────────────────────────────────────────────────────────────
 FROM base AS development
-RUN npm install
+RUN npm ci --no-audit --no-fund
 COPY . .
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # ─── Build ────────────────────────────────────────────────────────────────────
 FROM base AS builder
-RUN npm install --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
@@ -24,7 +24,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
+RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
 

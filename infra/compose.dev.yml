@@ -1,16 +1,11 @@
-# Radio Core — Docker Compose (dev-override)
+# Radio Core — minimal development override
 #
-# Utökar compose.yml med lokala verktyg och öppna portar för debugging.
-# PostgreSQL (för Drizzle ORM), pgAdmin, Mailpit tillkommer.
-#
-# Starta:  docker compose -f infra/compose.yml -f infra/compose.dev.yml up -d
-# Snabbval via npm: npm run docker:up (konfigureras i package.json)
+# Start:
+#   docker compose -f infra/compose.yml -f infra/compose.dev.yml up -d --build
 
 name: radio-core
 
 services:
-
-  # ─── API: source-mount + dev-mode ─────────────────────────────────────────
   radio-core-api:
     build:
       context: ../backend/api
@@ -21,79 +16,11 @@ services:
       - ../backend/api:/app
       - /app/node_modules
 
-  # ─── Media: source-mount + dev-mode ───────────────────────────────────────
-  radio-core-media:
-    build:
-      context: ../backend/media
-      target: development
-    environment:
-      NODE_ENV: development
-    volumes:
-      - ../backend/media:/app
-      - /app/node_modules
-
-  # ─── Redis: öppna port för debugging ──────────────────────────────────────
   redis:
     ports:
       - "6379:6379"
 
-  # ─── MongoDB: öppna port för debugging ────────────────────────────────────
   mongodb:
     ports:
       - "27017:27017"
 
-  # ─── PostgreSQL (Drizzle ORM — primär appDB) ──────────────────────────────
-  postgres:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-radiocore}
-      POSTGRES_USER: ${POSTGRES_USER:-radiocore}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-radiocore}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - radio-core
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-radiocore}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
-  # ─── pgAdmin ──────────────────────────────────────────────────────────────
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@radio-core.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-localdev}
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-    ports:
-      - "5050:80"
-    networks:
-      - radio-core
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # ─── Mailpit (lokal SMTP) ─────────────────────────────────────────────────
-  mailpit:
-    image: axllent/mailpit:latest
-    restart: unless-stopped
-    environment:
-      MP_MAX_MESSAGES: 500
-      MP_SMTP_AUTH_ACCEPT_ANY: "true"
-      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
-    ports:
-      - "8025:8025"   # Web UI
-      - "1025:1025"   # SMTP
-    networks:
-      - radio-core
-
-volumes:
-  postgres_data:
-    name: radio_core_postgres

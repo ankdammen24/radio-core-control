@@ -37,34 +37,6 @@ services:
         max-size: "50m"
         max-file: "5"
 
-  radio-core-media:
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "5"
-
-  radio-core-worker:
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-
-  scheduler:
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-
   redis:
     restart: always
     deploy:
