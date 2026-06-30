@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/v1/playlists/$id")({
         const playlist = await updatePlaylist(params.id, {
           ...(typeof body.name === "string" ? { name: body.name } : {}),
           ...(typeof body.description === "string" ? { description: body.description } : {}),
-          ...(typeof body.stationId === "string" ? { stationId: body.stationId || null } : {}),
+          ...(typeof body.stationId === "string" && body.stationId ? { stationId: body.stationId } : {}),
           ...(typeof body.playlistType === "string" ? { playlistType: body.playlistType } : {}),
           ...(typeof body.priority === "number" ? { priority: body.priority } : {}),
           ...(typeof body.azuracastPlaylistId === "string"

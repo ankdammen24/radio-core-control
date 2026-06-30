@@ -72,6 +72,19 @@ import { Route as ApiPublicRadioNewsIdRouteImport } from './routes/api.public.ra
 import { Route as ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport } from './routes/api.public.stations.$stationId.episodes.$episodeId'
 import { Route as ApiPublicRadioNewsIdBroadcastedRouteImport } from './routes/api.public.radio.news.$id.broadcasted'
 import { Route as ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport } from './routes/api.public.stations.$stationId.podcasts.$podcastId.episodes'
+import { Route as ApiV1StationsRouteImport } from './routes/api.v1.stations'
+import { Route as ApiV1StationsIdRouteImport } from './routes/api.v1.stations.$id'
+import { Route as ApiV1MediaRouteImport } from './routes/api.v1.media'
+import { Route as ApiV1MediaIdRouteImport } from './routes/api.v1.media.$id'
+import { Route as ApiV1PlaylistsRouteImport } from './routes/api.v1.playlists'
+import { Route as ApiV1PlaylistsIdRouteImport } from './routes/api.v1.playlists.$id'
+import { Route as ApiV1PlaylistsIdItemsRouteImport } from './routes/api.v1.playlists.$id.items'
+import { Route as ApiV1PlaylistsIdItemsMediaIdRouteImport } from './routes/api.v1.playlists.$id.items.$mediaId'
+import { Route as ApiV1PodcastsRouteImport } from './routes/api.v1.podcasts'
+import { Route as ApiV1PodcastsIdRouteImport } from './routes/api.v1.podcasts.$id'
+import { Route as ApiV1PodcastsIdEpisodesRouteImport } from './routes/api.v1.podcasts.$id.episodes'
+import { Route as ApiV1SettingsGlobalRouteImport } from './routes/api.v1.settings.global'
+import { Route as ApiV1SettingsStationsStationIdRouteImport } from './routes/api.v1.settings.stations.$stationId'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -393,6 +406,73 @@ const ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute =
     path: '/$podcastId/episodes',
     getParentRoute: () => ApiPublicStationsStationIdPodcastsRoute,
   } as any)
+const ApiV1StationsRoute = ApiV1StationsRouteImport.update({
+  id: '/api/v1/stations',
+  path: '/api/v1/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StationsIdRoute = ApiV1StationsIdRouteImport.update({
+  id: '/api/v1/stations/$id',
+  path: '/api/v1/stations/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaRoute = ApiV1MediaRouteImport.update({
+  id: '/api/v1/media',
+  path: '/api/v1/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaIdRoute = ApiV1MediaIdRouteImport.update({
+  id: '/api/v1/media/$id',
+  path: '/api/v1/media/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlaylistsRoute = ApiV1PlaylistsRouteImport.update({
+  id: '/api/v1/playlists',
+  path: '/api/v1/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlaylistsIdRoute = ApiV1PlaylistsIdRouteImport.update({
+  id: '/api/v1/playlists/$id',
+  path: '/api/v1/playlists/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlaylistsIdItemsRoute = ApiV1PlaylistsIdItemsRouteImport.update({
+  id: '/api/v1/playlists/$id/items',
+  path: '/api/v1/playlists/$id/items',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlaylistsIdItemsMediaIdRoute =
+  ApiV1PlaylistsIdItemsMediaIdRouteImport.update({
+    id: '/api/v1/playlists/$id/items/$mediaId',
+    path: '/api/v1/playlists/$id/items/$mediaId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1PodcastsRoute = ApiV1PodcastsRouteImport.update({
+  id: '/api/v1/podcasts',
+  path: '/api/v1/podcasts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PodcastsIdRoute = ApiV1PodcastsIdRouteImport.update({
+  id: '/api/v1/podcasts/$id',
+  path: '/api/v1/podcasts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PodcastsIdEpisodesRoute = ApiV1PodcastsIdEpisodesRouteImport.update({
+  id: '/api/v1/podcasts/$id/episodes',
+  path: '/api/v1/podcasts/$id/episodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SettingsGlobalRoute = ApiV1SettingsGlobalRouteImport.update({
+  id: '/api/v1/settings/global',
+  path: '/api/v1/settings/global',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SettingsStationsStationIdRoute =
+  ApiV1SettingsStationsStationIdRouteImport.update({
+    id: '/api/v1/settings/stations/$stationId',
+    path: '/api/v1/settings/stations/$stationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -458,6 +538,19 @@ export interface FileRoutesByFullPath {
   '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
+  '/api/v1/stations': typeof ApiV1StationsRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/media': typeof ApiV1MediaRoute
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -523,6 +616,19 @@ export interface FileRoutesByTo {
   '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
+  '/api/v1/stations': typeof ApiV1StationsRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/media': typeof ApiV1MediaRoute
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -589,6 +695,19 @@ export interface FileRoutesById {
   '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
   '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
   '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
+  '/api/v1/stations': typeof ApiV1StationsRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/media': typeof ApiV1MediaRoute
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -656,6 +775,19 @@ export interface FileRouteTypes {
     | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
+    | '/api/v1/stations'
+    | '/api/v1/stations/$id'
+    | '/api/v1/media'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/v1/podcasts'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/global'
+    | '/api/v1/settings/stations/$stationId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -721,6 +853,19 @@ export interface FileRouteTypes {
     | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
+    | '/api/v1/stations'
+    | '/api/v1/stations/$id'
+    | '/api/v1/media'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/v1/podcasts'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/global'
+    | '/api/v1/settings/stations/$stationId'
   id:
     | '__root__'
     | '/'
@@ -786,6 +931,19 @@ export interface FileRouteTypes {
     | '/api/public/radio/news/$id/broadcasted'
     | '/api/public/stations/$stationId/episodes/$episodeId'
     | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
+    | '/api/v1/stations'
+    | '/api/v1/stations/$id'
+    | '/api/v1/media'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/v1/podcasts'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/global'
+    | '/api/v1/settings/stations/$stationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -849,6 +1007,19 @@ export interface RootRouteChildren {
   ApiPublicRadioNewsRoute: typeof ApiPublicRadioNewsRouteWithChildren
   ApiPublicStationsStationIdPodcastsRoute: typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
   ApiPublicStationsStationIdEpisodesEpisodeIdRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  ApiV1StationsRoute: typeof ApiV1StationsRoute
+  ApiV1StationsIdRoute: typeof ApiV1StationsIdRoute
+  ApiV1MediaRoute: typeof ApiV1MediaRoute
+  ApiV1MediaIdRoute: typeof ApiV1MediaIdRoute
+  ApiV1PlaylistsRoute: typeof ApiV1PlaylistsRoute
+  ApiV1PlaylistsIdRoute: typeof ApiV1PlaylistsIdRoute
+  ApiV1PlaylistsIdItemsRoute: typeof ApiV1PlaylistsIdItemsRoute
+  ApiV1PlaylistsIdItemsMediaIdRoute: typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  ApiV1PodcastsRoute: typeof ApiV1PodcastsRoute
+  ApiV1PodcastsIdRoute: typeof ApiV1PodcastsIdRoute
+  ApiV1PodcastsIdEpisodesRoute: typeof ApiV1PodcastsIdEpisodesRoute
+  ApiV1SettingsGlobalRoute: typeof ApiV1SettingsGlobalRoute
+  ApiV1SettingsStationsStationIdRoute: typeof ApiV1SettingsStationsStationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1294,6 +1465,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport
       parentRoute: typeof ApiPublicStationsStationIdPodcastsRoute
     }
+    '/api/v1/stations': {
+      id: '/api/v1/stations'
+      path: '/api/v1/stations'
+      fullPath: '/api/v1/stations'
+      preLoaderRoute: typeof ApiV1StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$id': {
+      id: '/api/v1/stations/$id'
+      path: '/api/v1/stations/$id'
+      fullPath: '/api/v1/stations/$id'
+      preLoaderRoute: typeof ApiV1StationsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media': {
+      id: '/api/v1/media'
+      path: '/api/v1/media'
+      fullPath: '/api/v1/media'
+      preLoaderRoute: typeof ApiV1MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media/$id': {
+      id: '/api/v1/media/$id'
+      path: '/api/v1/media/$id'
+      fullPath: '/api/v1/media/$id'
+      preLoaderRoute: typeof ApiV1MediaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/playlists': {
+      id: '/api/v1/playlists'
+      path: '/api/v1/playlists'
+      fullPath: '/api/v1/playlists'
+      preLoaderRoute: typeof ApiV1PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/playlists/$id': {
+      id: '/api/v1/playlists/$id'
+      path: '/api/v1/playlists/$id'
+      fullPath: '/api/v1/playlists/$id'
+      preLoaderRoute: typeof ApiV1PlaylistsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/playlists/$id/items': {
+      id: '/api/v1/playlists/$id/items'
+      path: '/api/v1/playlists/$id/items'
+      fullPath: '/api/v1/playlists/$id/items'
+      preLoaderRoute: typeof ApiV1PlaylistsIdItemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/playlists/$id/items/$mediaId': {
+      id: '/api/v1/playlists/$id/items/$mediaId'
+      path: '/api/v1/playlists/$id/items/$mediaId'
+      fullPath: '/api/v1/playlists/$id/items/$mediaId'
+      preLoaderRoute: typeof ApiV1PlaylistsIdItemsMediaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts': {
+      id: '/api/v1/podcasts'
+      path: '/api/v1/podcasts'
+      fullPath: '/api/v1/podcasts'
+      preLoaderRoute: typeof ApiV1PodcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts/$id': {
+      id: '/api/v1/podcasts/$id'
+      path: '/api/v1/podcasts/$id'
+      fullPath: '/api/v1/podcasts/$id'
+      preLoaderRoute: typeof ApiV1PodcastsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts/$id/episodes': {
+      id: '/api/v1/podcasts/$id/episodes'
+      path: '/api/v1/podcasts/$id/episodes'
+      fullPath: '/api/v1/podcasts/$id/episodes'
+      preLoaderRoute: typeof ApiV1PodcastsIdEpisodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/settings/global': {
+      id: '/api/v1/settings/global'
+      path: '/api/v1/settings/global'
+      fullPath: '/api/v1/settings/global'
+      preLoaderRoute: typeof ApiV1SettingsGlobalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/settings/stations/$stationId': {
+      id: '/api/v1/settings/stations/$stationId'
+      path: '/api/v1/settings/stations/$stationId'
+      fullPath: '/api/v1/settings/stations/$stationId'
+      preLoaderRoute: typeof ApiV1SettingsStationsStationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1397,6 +1659,19 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicStationsStationIdPodcastsRouteWithChildren,
   ApiPublicStationsStationIdEpisodesEpisodeIdRoute:
     ApiPublicStationsStationIdEpisodesEpisodeIdRoute,
+  ApiV1StationsRoute: ApiV1StationsRoute,
+  ApiV1StationsIdRoute: ApiV1StationsIdRoute,
+  ApiV1MediaRoute: ApiV1MediaRoute,
+  ApiV1MediaIdRoute: ApiV1MediaIdRoute,
+  ApiV1PlaylistsRoute: ApiV1PlaylistsRoute,
+  ApiV1PlaylistsIdRoute: ApiV1PlaylistsIdRoute,
+  ApiV1PlaylistsIdItemsRoute: ApiV1PlaylistsIdItemsRoute,
+  ApiV1PlaylistsIdItemsMediaIdRoute: ApiV1PlaylistsIdItemsMediaIdRoute,
+  ApiV1PodcastsRoute: ApiV1PodcastsRoute,
+  ApiV1PodcastsIdRoute: ApiV1PodcastsIdRoute,
+  ApiV1PodcastsIdEpisodesRoute: ApiV1PodcastsIdEpisodesRoute,
+  ApiV1SettingsGlobalRoute: ApiV1SettingsGlobalRoute,
+  ApiV1SettingsStationsStationIdRoute: ApiV1SettingsStationsStationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

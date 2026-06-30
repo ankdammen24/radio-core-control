@@ -81,16 +81,16 @@ function PlaylistsPage() {
 
   const create = useMutation({
     mutationFn: async () => {
-      if (!form.name.trim()) {
-        const m = "Name is required";
+      if (!form.name.trim() || !form.stationId) {
+        const m = "Name and station are required";
         setErrs(m);
         throw new Error(m);
       }
       setErrs(null);
       await createPlaylist({
         name: form.name.trim(),
+        stationId: form.stationId,
         description: form.description || undefined,
-        stationId: form.stationId || undefined,
         playlistType: form.playlistType,
         priority: form.priority,
         azuracastPlaylistId: form.azuracastPlaylistId || undefined,
@@ -155,13 +155,13 @@ function PlaylistsPage() {
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div>
-            <Label>Station</Label>
+            <Label>Station *</Label>
             <Select
               value={form.stationId}
               onValueChange={(v) => setForm({ ...form, stationId: v })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select station (optional)" />
+                <SelectValue placeholder="Select station" />
               </SelectTrigger>
               <SelectContent>
                 {stations?.map((s) => (
