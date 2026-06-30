@@ -1,7 +1,7 @@
 /**
  * Playlists repository — Drizzle ORM
  */
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { playlists, playlistAssignments } from "@/server/db/schema";
 
@@ -46,26 +46,29 @@ export async function listPlaylistItems(playlistId: string): Promise<PlaylistAss
     .select()
     .from(playlistAssignments)
     .where(eq(playlistAssignments.playlistId, playlistId))
-    .orderBy(asc(playlistAssignments.position));
+    .orderBy(desc(playlistAssignments.weight));
 }
 
 export async function addPlaylistItem(
   playlistId: string,
-  mediaId: string,
+  mediaFileId: string,
 ): Promise<PlaylistAssignmentRow> {
-  const existing = await listPlaylistItems(playlistId);
-  const position = existing.length;
   const rows = await db
     .insert(playlistAssignments)
-    .values({ playlistId, mediaId, position })
+    .values({ playlistId, mediaFileId })
     .returning();
   return rows[0];
 }
 
-export async function removePlaylistItem(playlistId: string, mediaId: string): Promise<boolean> {
+export async function removePlaylistItem(playlistId: string, mediaFileId: string): Promise<boolean> {
   const rows = await db
     .delete(playlistAssignments)
-    .where(and(eq(playlistAssignments.playlistId, playlistId), eq(playlistAssignments.mediaId, mediaId)))
+    .where(
+      and(
+        eq(playlistAssignments.playlistId, playlistId),
+        eq(playlistAssignments.mediaFileId, mediaFileId),
+      ),
+    )
     .returning({ id: playlistAssignments.id });
   return rows.length > 0;
 }

@@ -12,6 +12,5 @@ export * from "./streaming";
 export * from "./media";
 export * from "./users";
 export * from "./runtime";
-export * from "./playlists";
 export * from "./podcasts";
 export * from "./settings";

@@ -3,8 +3,9 @@ import { apiClient } from "@/lib/api";
 export interface ApiPlaylistItem {
   id: string;
   playlistId: string;
-  mediaId: string;
-  position: number;
+  mediaFileId: string;
+  weight: number;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -12,7 +13,7 @@ export interface ApiPlaylist {
   id: string;
   name: string;
   description: string | null;
-  stationId: string | null;
+  stationId: string;
   playlistType: string;
   priority: number;
   azuracastPlaylistId: string | null;
@@ -24,8 +25,8 @@ export interface ApiPlaylist {
 
 export interface CreatePlaylistInput {
   name: string;
+  stationId: string;
   description?: string;
-  stationId?: string;
   playlistType?: string;
   priority?: number;
   azuracastPlaylistId?: string;
