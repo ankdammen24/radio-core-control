@@ -45,7 +45,5 @@ runs.
 - No provider: read-only guest mode.
 - `VITE_ENABLE_LOCAL_AUTH=true`: explicit local administrator bootstrap.
 - Supabase values present: legacy Supabase login.
-- Auth0 values present: optional Auth0 configuration and reachability; login
-  SDK activation remains isolated behind the auth service boundary.
 
 Disable local auth after a durable production login provider has been enabled.

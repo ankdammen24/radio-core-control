@@ -18,7 +18,6 @@ export const authService =
 
 export const LOGIN_CONFIGURED = AUTH_MODE === "supabase";
 
-export { auth0Configuration, checkAuth0Reachability } from "./auth0";
 export type {
   AppRole,
   AuthMode,
