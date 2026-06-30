@@ -10,6 +10,7 @@ import { db } from "@/server/db/client";
 import {
   icecastConfigs, liquidsoapConfigs, streamMounts,
   playlists, playlistAssignments, liveInputs, fallbackTracks, mediaFiles,
+  streamingOutputs,
 } from "@/server/db/schema";
 
 export type IcecastConfigRow = typeof icecastConfigs.$inferSelect;
@@ -17,6 +18,8 @@ export type LiquidsoapConfigRow = typeof liquidsoapConfigs.$inferSelect;
 export type StreamMountRow = typeof streamMounts.$inferSelect;
 export type PlaylistRow = typeof playlists.$inferSelect;
 export type LiveInputRow = typeof liveInputs.$inferSelect;
+export type FallbackTrackRow = typeof fallbackTracks.$inferSelect;
+export type StreamingOutputRow = typeof streamingOutputs.$inferSelect;
 
 export async function getIcecastConfig(stationId: string): Promise<IcecastConfigRow | null> {
   const rows = await db
@@ -130,4 +133,164 @@ export async function getLiveInput(stationId: string): Promise<LiveInputRow | nu
     .where(eq(liveInputs.stationId, stationId))
     .limit(1);
   return rows[0] ?? null;
+}
+
+// ─── Admin CRUD (dashboard) ─────────────────────────────────────────────────
+// The functions above are the read path consumed by api.public.station-config
+// (pulled by the broadcast agent). Everything below is for the admin
+// dashboard that manages this configuration.
+
+export async function upsertIcecastConfig(
+  stationId: string,
+  data: Partial<typeof icecastConfigs.$inferInsert>,
+): Promise<IcecastConfigRow> {
+  const existing = await getIcecastConfig(stationId);
+  if (existing) {
+    const rows = await db
+      .update(icecastConfigs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(icecastConfigs.id, existing.id))
+      .returning();
+    return rows[0];
+  }
+  const rows = await db.insert(icecastConfigs).values({ ...data, stationId }).returning();
+  return rows[0];
+}
+
+export async function upsertLiquidsoapConfig(
+  stationId: string,
+  data: Partial<typeof liquidsoapConfigs.$inferInsert>,
+): Promise<LiquidsoapConfigRow> {
+  const existing = await getLiquidsoapConfig(stationId);
+  if (existing) {
+    const rows = await db
+      .update(liquidsoapConfigs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(liquidsoapConfigs.id, existing.id))
+      .returning();
+    return rows[0];
+  }
+  const rows = await db.insert(liquidsoapConfigs).values({ ...data, stationId }).returning();
+  return rows[0];
+}
+
+export async function listStreamMounts(stationId: string): Promise<StreamMountRow[]> {
+  return db.select().from(streamMounts).where(eq(streamMounts.stationId, stationId));
+}
+
+export async function createStreamMount(
+  data: typeof streamMounts.$inferInsert,
+): Promise<StreamMountRow> {
+  const rows = await db.insert(streamMounts).values(data).returning();
+  return rows[0];
+}
+
+export async function updateStreamMount(
+  id: string,
+  data: Partial<typeof streamMounts.$inferInsert>,
+): Promise<StreamMountRow | null> {
+  const rows = await db
+    .update(streamMounts)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(streamMounts.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteStreamMount(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(streamMounts)
+    .where(eq(streamMounts.id, id))
+    .returning({ id: streamMounts.id });
+  return rows.length > 0;
+}
+
+export async function listLiveInputs(stationId: string): Promise<LiveInputRow[]> {
+  return db.select().from(liveInputs).where(eq(liveInputs.stationId, stationId));
+}
+
+export async function createLiveInput(
+  data: typeof liveInputs.$inferInsert,
+): Promise<LiveInputRow> {
+  const rows = await db.insert(liveInputs).values(data).returning();
+  return rows[0];
+}
+
+export async function updateLiveInput(
+  id: string,
+  data: Partial<typeof liveInputs.$inferInsert>,
+): Promise<LiveInputRow | null> {
+  const rows = await db
+    .update(liveInputs)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(liveInputs.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteLiveInput(id: string): Promise<boolean> {
+  const rows = await db.delete(liveInputs).where(eq(liveInputs.id, id)).returning({ id: liveInputs.id });
+  return rows.length > 0;
+}
+
+export async function listFallbackTracks(stationId: string): Promise<FallbackTrackRow[]> {
+  return db.select().from(fallbackTracks).where(eq(fallbackTracks.stationId, stationId));
+}
+
+export async function createFallbackTrack(
+  data: typeof fallbackTracks.$inferInsert,
+): Promise<FallbackTrackRow> {
+  const rows = await db.insert(fallbackTracks).values(data).returning();
+  return rows[0];
+}
+
+export async function updateFallbackTrack(
+  id: string,
+  data: Partial<typeof fallbackTracks.$inferInsert>,
+): Promise<FallbackTrackRow | null> {
+  const rows = await db
+    .update(fallbackTracks)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(fallbackTracks.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteFallbackTrack(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(fallbackTracks)
+    .where(eq(fallbackTracks.id, id))
+    .returning({ id: fallbackTracks.id });
+  return rows.length > 0;
+}
+
+export async function listStreamingOutputs(stationId: string): Promise<StreamingOutputRow[]> {
+  return db.select().from(streamingOutputs).where(eq(streamingOutputs.stationId, stationId));
+}
+
+export async function createStreamingOutput(
+  data: typeof streamingOutputs.$inferInsert,
+): Promise<StreamingOutputRow> {
+  const rows = await db.insert(streamingOutputs).values(data).returning();
+  return rows[0];
+}
+
+export async function updateStreamingOutput(
+  id: string,
+  data: Partial<typeof streamingOutputs.$inferInsert>,
+): Promise<StreamingOutputRow | null> {
+  const rows = await db
+    .update(streamingOutputs)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(streamingOutputs.id, id))
+    .returning();
+  return rows[0] ?? null;
+}
+
+export async function deleteStreamingOutput(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(streamingOutputs)
+    .where(eq(streamingOutputs.id, id))
+    .returning({ id: streamingOutputs.id });
+  return rows.length > 0;
 }

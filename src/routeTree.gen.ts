@@ -85,6 +85,16 @@ import { Route as ApiV1PodcastsIdRouteImport } from './routes/api.v1.podcasts.$i
 import { Route as ApiV1PodcastsIdEpisodesRouteImport } from './routes/api.v1.podcasts.$id.episodes'
 import { Route as ApiV1SettingsGlobalRouteImport } from './routes/api.v1.settings.global'
 import { Route as ApiV1SettingsStationsStationIdRouteImport } from './routes/api.v1.settings.stations.$stationId'
+import { Route as ApiV1StationsStationIdIcecastConfigRouteImport } from './routes/api.v1.stations.$stationId.icecast-config'
+import { Route as ApiV1StationsStationIdLiquidsoapConfigRouteImport } from './routes/api.v1.stations.$stationId.liquidsoap-config'
+import { Route as ApiV1StationsStationIdStreamMountsRouteImport } from './routes/api.v1.stations.$stationId.stream-mounts'
+import { Route as ApiV1StreamMountsIdRouteImport } from './routes/api.v1.stream-mounts.$id'
+import { Route as ApiV1StationsStationIdLiveInputsRouteImport } from './routes/api.v1.stations.$stationId.live-inputs'
+import { Route as ApiV1LiveInputsIdRouteImport } from './routes/api.v1.live-inputs.$id'
+import { Route as ApiV1StationsStationIdFallbackTracksRouteImport } from './routes/api.v1.stations.$stationId.fallback-tracks'
+import { Route as ApiV1FallbackTracksIdRouteImport } from './routes/api.v1.fallback-tracks.$id'
+import { Route as ApiV1StationsStationIdStreamingOutputsRouteImport } from './routes/api.v1.stations.$stationId.streaming-outputs'
+import { Route as ApiV1StreamingOutputsIdRouteImport } from './routes/api.v1.streaming-outputs.$id'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -473,6 +483,62 @@ const ApiV1SettingsStationsStationIdRoute =
     path: '/api/v1/settings/stations/$stationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1StationsStationIdIcecastConfigRoute =
+  ApiV1StationsStationIdIcecastConfigRouteImport.update({
+    id: '/api/v1/stations/$stationId/icecast-config',
+    path: '/api/v1/stations/$stationId/icecast-config',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1StationsStationIdLiquidsoapConfigRoute =
+  ApiV1StationsStationIdLiquidsoapConfigRouteImport.update({
+    id: '/api/v1/stations/$stationId/liquidsoap-config',
+    path: '/api/v1/stations/$stationId/liquidsoap-config',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1StationsStationIdStreamMountsRoute =
+  ApiV1StationsStationIdStreamMountsRouteImport.update({
+    id: '/api/v1/stations/$stationId/stream-mounts',
+    path: '/api/v1/stations/$stationId/stream-mounts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1StreamMountsIdRoute = ApiV1StreamMountsIdRouteImport.update({
+  id: '/api/v1/stream-mounts/$id',
+  path: '/api/v1/stream-mounts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StationsStationIdLiveInputsRoute =
+  ApiV1StationsStationIdLiveInputsRouteImport.update({
+    id: '/api/v1/stations/$stationId/live-inputs',
+    path: '/api/v1/stations/$stationId/live-inputs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1LiveInputsIdRoute = ApiV1LiveInputsIdRouteImport.update({
+  id: '/api/v1/live-inputs/$id',
+  path: '/api/v1/live-inputs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StationsStationIdFallbackTracksRoute =
+  ApiV1StationsStationIdFallbackTracksRouteImport.update({
+    id: '/api/v1/stations/$stationId/fallback-tracks',
+    path: '/api/v1/stations/$stationId/fallback-tracks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1FallbackTracksIdRoute = ApiV1FallbackTracksIdRouteImport.update({
+  id: '/api/v1/fallback-tracks/$id',
+  path: '/api/v1/fallback-tracks/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StationsStationIdStreamingOutputsRoute =
+  ApiV1StationsStationIdStreamingOutputsRouteImport.update({
+    id: '/api/v1/stations/$stationId/streaming-outputs',
+    path: '/api/v1/stations/$stationId/streaming-outputs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1StreamingOutputsIdRoute = ApiV1StreamingOutputsIdRouteImport.update({
+  id: '/api/v1/streaming-outputs/$id',
+  path: '/api/v1/streaming-outputs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -551,6 +617,16 @@ export interface FileRoutesByFullPath {
   '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
   '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
   '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -629,6 +705,16 @@ export interface FileRoutesByTo {
   '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
   '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
   '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -708,6 +794,16 @@ export interface FileRoutesById {
   '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
   '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
   '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -788,6 +884,16 @@ export interface FileRouteTypes {
     | '/api/v1/podcasts/$id/episodes'
     | '/api/v1/settings/global'
     | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/v1/streaming-outputs/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -866,6 +972,16 @@ export interface FileRouteTypes {
     | '/api/v1/podcasts/$id/episodes'
     | '/api/v1/settings/global'
     | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/v1/streaming-outputs/$id'
   id:
     | '__root__'
     | '/'
@@ -944,6 +1060,16 @@ export interface FileRouteTypes {
     | '/api/v1/podcasts/$id/episodes'
     | '/api/v1/settings/global'
     | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/v1/streaming-outputs/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1020,6 +1146,16 @@ export interface RootRouteChildren {
   ApiV1PodcastsIdEpisodesRoute: typeof ApiV1PodcastsIdEpisodesRoute
   ApiV1SettingsGlobalRoute: typeof ApiV1SettingsGlobalRoute
   ApiV1SettingsStationsStationIdRoute: typeof ApiV1SettingsStationsStationIdRoute
+  ApiV1StationsStationIdIcecastConfigRoute: typeof ApiV1StationsStationIdIcecastConfigRoute
+  ApiV1StationsStationIdLiquidsoapConfigRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  ApiV1StationsStationIdStreamMountsRoute: typeof ApiV1StationsStationIdStreamMountsRoute
+  ApiV1StreamMountsIdRoute: typeof ApiV1StreamMountsIdRoute
+  ApiV1StationsStationIdLiveInputsRoute: typeof ApiV1StationsStationIdLiveInputsRoute
+  ApiV1LiveInputsIdRoute: typeof ApiV1LiveInputsIdRoute
+  ApiV1StationsStationIdFallbackTracksRoute: typeof ApiV1StationsStationIdFallbackTracksRoute
+  ApiV1FallbackTracksIdRoute: typeof ApiV1FallbackTracksIdRoute
+  ApiV1StationsStationIdStreamingOutputsRoute: typeof ApiV1StationsStationIdStreamingOutputsRoute
+  ApiV1StreamingOutputsIdRoute: typeof ApiV1StreamingOutputsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1556,6 +1692,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SettingsStationsStationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/stations/$stationId/icecast-config': {
+      id: '/api/v1/stations/$stationId/icecast-config'
+      path: '/api/v1/stations/$stationId/icecast-config'
+      fullPath: '/api/v1/stations/$stationId/icecast-config'
+      preLoaderRoute: typeof ApiV1StationsStationIdIcecastConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$stationId/liquidsoap-config': {
+      id: '/api/v1/stations/$stationId/liquidsoap-config'
+      path: '/api/v1/stations/$stationId/liquidsoap-config'
+      fullPath: '/api/v1/stations/$stationId/liquidsoap-config'
+      preLoaderRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$stationId/stream-mounts': {
+      id: '/api/v1/stations/$stationId/stream-mounts'
+      path: '/api/v1/stations/$stationId/stream-mounts'
+      fullPath: '/api/v1/stations/$stationId/stream-mounts'
+      preLoaderRoute: typeof ApiV1StationsStationIdStreamMountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stream-mounts/$id': {
+      id: '/api/v1/stream-mounts/$id'
+      path: '/api/v1/stream-mounts/$id'
+      fullPath: '/api/v1/stream-mounts/$id'
+      preLoaderRoute: typeof ApiV1StreamMountsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$stationId/live-inputs': {
+      id: '/api/v1/stations/$stationId/live-inputs'
+      path: '/api/v1/stations/$stationId/live-inputs'
+      fullPath: '/api/v1/stations/$stationId/live-inputs'
+      preLoaderRoute: typeof ApiV1StationsStationIdLiveInputsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/live-inputs/$id': {
+      id: '/api/v1/live-inputs/$id'
+      path: '/api/v1/live-inputs/$id'
+      fullPath: '/api/v1/live-inputs/$id'
+      preLoaderRoute: typeof ApiV1LiveInputsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$stationId/fallback-tracks': {
+      id: '/api/v1/stations/$stationId/fallback-tracks'
+      path: '/api/v1/stations/$stationId/fallback-tracks'
+      fullPath: '/api/v1/stations/$stationId/fallback-tracks'
+      preLoaderRoute: typeof ApiV1StationsStationIdFallbackTracksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/fallback-tracks/$id': {
+      id: '/api/v1/fallback-tracks/$id'
+      path: '/api/v1/fallback-tracks/$id'
+      fullPath: '/api/v1/fallback-tracks/$id'
+      preLoaderRoute: typeof ApiV1FallbackTracksIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$stationId/streaming-outputs': {
+      id: '/api/v1/stations/$stationId/streaming-outputs'
+      path: '/api/v1/stations/$stationId/streaming-outputs'
+      fullPath: '/api/v1/stations/$stationId/streaming-outputs'
+      preLoaderRoute: typeof ApiV1StationsStationIdStreamingOutputsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/streaming-outputs/$id': {
+      id: '/api/v1/streaming-outputs/$id'
+      path: '/api/v1/streaming-outputs/$id'
+      fullPath: '/api/v1/streaming-outputs/$id'
+      preLoaderRoute: typeof ApiV1StreamingOutputsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1672,6 +1878,16 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1PodcastsIdEpisodesRoute: ApiV1PodcastsIdEpisodesRoute,
   ApiV1SettingsGlobalRoute: ApiV1SettingsGlobalRoute,
   ApiV1SettingsStationsStationIdRoute: ApiV1SettingsStationsStationIdRoute,
+  ApiV1StationsStationIdIcecastConfigRoute: ApiV1StationsStationIdIcecastConfigRoute,
+  ApiV1StationsStationIdLiquidsoapConfigRoute: ApiV1StationsStationIdLiquidsoapConfigRoute,
+  ApiV1StationsStationIdStreamMountsRoute: ApiV1StationsStationIdStreamMountsRoute,
+  ApiV1StreamMountsIdRoute: ApiV1StreamMountsIdRoute,
+  ApiV1StationsStationIdLiveInputsRoute: ApiV1StationsStationIdLiveInputsRoute,
+  ApiV1LiveInputsIdRoute: ApiV1LiveInputsIdRoute,
+  ApiV1StationsStationIdFallbackTracksRoute: ApiV1StationsStationIdFallbackTracksRoute,
+  ApiV1FallbackTracksIdRoute: ApiV1FallbackTracksIdRoute,
+  ApiV1StationsStationIdStreamingOutputsRoute: ApiV1StationsStationIdStreamingOutputsRoute,
+  ApiV1StreamingOutputsIdRoute: ApiV1StreamingOutputsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
