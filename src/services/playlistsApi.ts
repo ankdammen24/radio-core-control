@@ -25,6 +25,8 @@ export interface CreatePlaylistInput {
   status?: PlaylistStatus;
 }
 
+export type UpdatePlaylistInput = Partial<CreatePlaylistInput>;
+
 interface SuccessEnvelope<T> {
   success: true;
   data: T;
@@ -63,6 +65,20 @@ export async function createPlaylist(input: CreatePlaylistInput): Promise<ApiPla
   );
   if (response.error) throw new Error(response.error);
   return unwrap(response.data, "Failed to create playlist");
+}
+
+export async function updatePlaylist(id: string, input: UpdatePlaylistInput): Promise<ApiPlaylist> {
+  const response = await apiClient.patch<SuccessEnvelope<ApiPlaylist> | ErrorEnvelope>(
+    `/api/v1/playlists/${encodeURIComponent(id)}`,
+    input,
+  );
+  if (response.error) throw new Error(response.error);
+  return unwrap(response.data, "Failed to update playlist");
+}
+
+export async function deletePlaylist(id: string): Promise<void> {
+  const response = await apiClient.delete<void>(`/api/v1/playlists/${encodeURIComponent(id)}`);
+  if (response.error) throw new Error(response.error);
 }
 
 export async function addMediaToPlaylist(playlistId: string, mediaId: string): Promise<ApiPlaylist> {

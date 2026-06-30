@@ -21,3 +21,10 @@ export interface CreatePlaylistInput {
   stationId?: string;
   status?: PlaylistStatus;
 }
+
+export interface UpdatePlaylistInput {
+  name?: string;
+  description?: string;
+  stationId?: string;
+  status?: PlaylistStatus;
+}
