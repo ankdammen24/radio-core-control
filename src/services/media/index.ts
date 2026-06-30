@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api";
-import { database } from "@/services/database";
+import { database, SUPABASE_ENABLED } from "@/services/database";
 import type { SourcedResult } from "@/services/data-source";
 
 export interface MediaStatus {
@@ -17,6 +17,16 @@ interface ApiEnvelope<T> {
   source: "radio-core";
 }
 
+const EMPTY_MEDIA_STATUS: MediaStatus = {
+  total: 0,
+  ready: 0,
+  pending: 0,
+  processing: 0,
+  error: 0,
+  missing_metadata: 0,
+  by_status: {},
+};
+
 export async function getMediaStatus(
   stationId?: string | null,
 ): Promise<SourcedResult<MediaStatus>> {
@@ -26,6 +36,15 @@ export async function getMediaStatus(
   });
   if (response.data?.data && !response.error) {
     return { data: response.data.data, source: "radio-core", fallback: false };
+  }
+
+  if (!SUPABASE_ENABLED) {
+    return {
+      data: EMPTY_MEDIA_STATUS,
+      source: "none",
+      fallback: false,
+      fallbackReason: response.error ?? `Radio Core returned HTTP ${response.status}`,
+    };
   }
 
   const filter = <T extends { eq: (column: string, value: string) => T }>(builder: T) =>

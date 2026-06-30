@@ -46,23 +46,20 @@ export type PublicScheduleBlock = {
 export const getPublicStation = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => slugSchema.parse(input ?? {}))
   .handler(async ({ data }): Promise<PublicStation | null> => {
-    const { adminDatabase } = await import("@/services/database/server");
-    const query = adminDatabase
-      .from("stations")
-      .select("id,name,slug,description,demo_artwork_url,demo_stream_url,demo_mode")
-      .eq("is_active", true);
-    const { data: row } = data.slug
-      ? await query.eq("slug", data.slug).maybeSingle()
-      : await query.order("name").limit(1).maybeSingle();
+    const { listStations } = await import("@/services/stations");
+    const stations = await listStations();
+    const row = data.slug
+      ? stations.data.find((station) => station.slug === data.slug && station.is_active)
+      : stations.data.find((station) => station.is_active);
     if (!row) return null;
     return {
       id: row.id,
       name: row.name,
       slug: row.slug,
       description: row.description,
-      demo_artwork_url: row.demo_artwork_url,
-      demo_stream_url: row.demo_stream_url,
-      demo_mode: row.demo_mode,
+      demo_artwork_url: null,
+      demo_stream_url: null,
+      demo_mode: false,
     };
   });
 
@@ -92,22 +89,39 @@ export const getPublicStreams = createServerFn({ method: "GET" })
     // Demo mode: synthesize a single profile from demo_stream_url.
     if (station?.demo_mode && station.demo_stream_url) {
       const url = station.demo_stream_url;
-      const fmt: "hls" | "aac" | "mp3" =
-        url.includes(".m3u8") ? "hls" : url.includes(".aac") ? "aac" : "mp3";
-      return [{ id: "demo", label: fmt === "hls" ? "Auto (HLS)" : `Demo (${fmt.toUpperCase()})`, url, format: fmt, bitrate: null }];
+      const fmt: "hls" | "aac" | "mp3" = url.includes(".m3u8")
+        ? "hls"
+        : url.includes(".aac")
+          ? "aac"
+          : "mp3";
+      return [
+        {
+          id: "demo",
+          label: fmt === "hls" ? "Auto (HLS)" : `Demo (${fmt.toUpperCase()})`,
+          url,
+          format: fmt,
+          bitrate: null,
+        },
+      ];
     }
 
     if (!mounts?.length) return [];
-    const base = ic ? `https://${ic.hostname}${ic.port && ic.port !== 443 ? `:${ic.port}` : ""}` : "";
+    const base = ic
+      ? `https://${ic.hostname}${ic.port && ic.port !== 443 ? `:${ic.port}` : ""}`
+      : "";
     const profiles: PublicStreamProfile[] = mounts.map((m) => {
       const fmt = String(m.format ?? "mp3").toLowerCase();
-      const format: "hls" | "aac" | "mp3" =
-        fmt.includes("hls") ? "hls" : fmt.includes("aac") ? "aac" : "mp3";
+      const format: "hls" | "aac" | "mp3" = fmt.includes("hls")
+        ? "hls"
+        : fmt.includes("aac")
+          ? "aac"
+          : "mp3";
       const path = m.mount_path.startsWith("/") ? m.mount_path : `/${m.mount_path}`;
       const url = base ? `${base}${path}` : path;
-      const label = format === "hls"
-        ? "Auto (HLS)"
-        : `${format.toUpperCase()}${m.bitrate ? ` ${m.bitrate}k` : ""}`;
+      const label =
+        format === "hls"
+          ? "Auto (HLS)"
+          : `${format.toUpperCase()}${m.bitrate ? ` ${m.bitrate}k` : ""}`;
       return { id: m.id, label, url, format, bitrate: m.bitrate ?? null };
     });
     return profiles;

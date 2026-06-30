@@ -19,6 +19,8 @@ function AuthPage() {
     signUp: createAccount,
     signInWithOAuth,
     signInWithSSO: startSSO,
+    mode,
+    loginConfigured,
   } = useAuth();
   const nav = useNavigate();
   const [email, setEmail] = useState("");
@@ -28,8 +30,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) nav({ to: "/" });
-  }, [loading, session, nav]);
+    if (!loading && session && mode !== "guest") nav({ to: "/" });
+  }, [loading, session, mode, nav]);
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +95,24 @@ function AuthPage() {
       setBusy(false);
     }
   };
+
+  if (!loginConfigured && mode === "guest") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <Card className="w-full max-w-md p-8 text-center">
+          <RadioCoreLogo size="lg" tone="brand" />
+          <h1 className="mt-6 text-xl font-semibold">Login not configured</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Radio Core is running in read-only guest mode. Configure an optional login provider or
+            explicitly enable local auth for bootstrap administration.
+          </p>
+          <Button className="mt-6" onClick={() => nav({ to: "/" })}>
+            Continue as guest
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">

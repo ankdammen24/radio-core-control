@@ -1,4 +1,4 @@
-export type DataSource = "radio-core" | "supabase";
+export type DataSource = "radio-core" | "supabase" | "none";
 
 export interface SourcedResult<T> {
   data: T;

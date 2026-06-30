@@ -1,9 +1,18 @@
-import type { Session, User } from "@supabase/supabase-js";
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  user_metadata?: Record<string, unknown>;
+}
 
-export type AuthSession = Session;
-export type AuthUser = User;
+export interface AuthSession {
+  access_token: string;
+  user: AuthUser;
+  expires_at?: number;
+}
+
 export type AppRole = "admin" | "editor" | "viewer";
 export type SocialProvider = "google" | "apple";
+export type AuthMode = "supabase" | "local" | "guest";
 
 export interface AuthService {
   getSession(): Promise<AuthSession | null>;

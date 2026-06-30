@@ -85,21 +85,21 @@ function MigrationStatusPage() {
             icon={Radio}
             feature="Stations (read)"
             source={features.data?.stations.source}
-            fallback="Supabase stations"
+            fallback="Supabase stations (when enabled)"
             reason={features.data?.stations.fallbackReason}
           />
           <FeatureRow
             icon={Music}
             feature="Media status"
             source={features.data?.media.source}
-            fallback="Supabase media_files aggregate"
+            fallback="Supabase media_files aggregate (when enabled)"
             reason={features.data?.media.fallbackReason}
           />
           <FeatureRow
             icon={Settings2}
             feature="Public config"
             source={features.data?.config.source}
-            fallback="Supabase system_settings"
+            fallback="Supabase system_settings (when enabled)"
             reason={features.data?.config.fallbackReason}
           />
         </div>

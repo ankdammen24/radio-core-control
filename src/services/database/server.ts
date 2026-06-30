@@ -1,25 +1,19 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { createDisabledSupabaseClient } from "@/lib/supabase/disabled-client";
 
-function createAdminDatabase() {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_URL;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.RC_SUPABASE_SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error("Supabase server access requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
-  }
-  return createClient<Database>(url, serviceRoleKey, {
-    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-  });
-}
+const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_URL;
+const serviceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.RC_SUPABASE_SUPABASE_SERVICE_ROLE_KEY;
 
-let instance: ReturnType<typeof createAdminDatabase> | undefined;
+export const serverSupabaseEnabled = Boolean(url && serviceRoleKey);
 
-/** Server-only provider. Never import this module into browser components. */
-export const adminDatabase = new Proxy({} as ReturnType<typeof createAdminDatabase>, {
-  get(_target, property) {
-    instance ??= createAdminDatabase();
-    const value = Reflect.get(instance, property, instance);
-    return typeof value === "function" ? value.bind(instance) : value;
-  },
-});
+export const adminDatabaseClient: SupabaseClient<Database> | null =
+  url && serviceRoleKey
+    ? createClient<Database>(url, serviceRoleKey, {
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      })
+    : null;
+
+/** Null-safe server compatibility surface for legacy routes. */
+export const adminDatabase = adminDatabaseClient ?? createDisabledSupabaseClient();

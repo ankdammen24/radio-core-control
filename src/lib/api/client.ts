@@ -1,6 +1,6 @@
-const configuredBaseUrl = import.meta.env.VITE_API_URL?.trim() ?? "";
+import { env } from "@/config/env";
 
-export const API_BASE_URL = configuredBaseUrl.replace(/\/$/, "");
+export const API_BASE_URL = env.apiUrl;
 
 export interface ApiResponse<T> {
   data: T | null;
@@ -36,13 +36,24 @@ function resolveUrl(path: string) {
 
 async function parseResponse(response: Response): Promise<unknown> {
   if (response.status === 204) return null;
+  const text = await response.text();
+  if (!text.trim()) return null;
   const contentType = response.headers.get("content-type") ?? "";
-  return contentType.includes("application/json") ? response.json() : response.text();
+  if (!contentType.includes("application/json")) return text;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new ApiError("Backend returned invalid JSON", response.status, text);
+  }
 }
 
 function errorMessage(payload: unknown, fallback: string) {
   if (payload && typeof payload === "object" && "error" in payload) {
     const value = (payload as { error?: unknown }).error;
+    if (typeof value === "string") return value;
+  }
+  if (payload && typeof payload === "object" && "message" in payload) {
+    const value = (payload as { message?: unknown }).message;
     if (typeof value === "string") return value;
   }
   return typeof payload === "string" && payload.trim() ? payload : fallback;
@@ -78,9 +89,12 @@ async function request<T>(
     }
     return { data: payload as T, error: null, status: response.status };
   } catch (error) {
+    if (error instanceof ApiError) {
+      return { data: null, error: error.message, status: error.status };
+    }
     return {
       data: null,
-      error: error instanceof Error ? error.message : "Backend request failed",
+      error: error instanceof Error ? error.message : "Radio Core Backend is unavailable",
       status: 0,
     };
   }

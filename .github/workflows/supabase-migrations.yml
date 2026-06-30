@@ -34,13 +34,20 @@ jobs:
         with:
           version: latest
 
+      - name: Supabase not configured
+        if: env.SUPABASE_DB_URL == ''
+        run: echo "Supabase is optional; skipping legacy migrations."
+
       - name: Verify configuration
+        if: env.SUPABASE_DB_URL != ''
         shell: bash
         run: |
           test -n "$SUPABASE_DB_URL" || { echo "Missing SUPABASE_DB_URL"; exit 1; }
 
       - name: Preview migrations
+        if: env.SUPABASE_DB_URL != ''
         run: supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
 
       - name: Apply migrations
+        if: env.SUPABASE_DB_URL != ''
         run: supabase db push --db-url "$SUPABASE_DB_URL"

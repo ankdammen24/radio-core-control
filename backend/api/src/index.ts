@@ -138,7 +138,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 async function start() {
   try {
     await initializeMongo();
-    console.log("[radio-core-api] MongoDB collections and Radio Uppsala seed are ready");
+    console.log("[radio-core-api] MongoDB collections are ready (empty database is valid)");
   } catch (error) {
     console.error(
       "[radio-core-api] MongoDB initialization failed; API will retry on requests",

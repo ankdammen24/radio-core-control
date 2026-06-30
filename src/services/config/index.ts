@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api";
-import { database } from "@/services/database";
+import { database, SUPABASE_ENABLED } from "@/services/database";
 import type { SourcedResult } from "@/services/data-source";
 
 export interface PublicConfig {
@@ -21,6 +21,15 @@ export async function getPublicConfig(): Promise<SourcedResult<PublicConfig>> {
   const response = await apiClient.get<ApiEnvelope<PublicConfig>>("/api/config/public");
   if (response.data?.data && !response.error) {
     return { data: response.data.data, source: "radio-core", fallback: false };
+  }
+
+  if (!SUPABASE_ENABLED) {
+    return {
+      data: {},
+      source: "none",
+      fallback: false,
+      fallbackReason: response.error ?? `Radio Core returned HTTP ${response.status}`,
+    };
   }
 
   const { data, error } = await database

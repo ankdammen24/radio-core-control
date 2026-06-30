@@ -2,8 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { database } from "@/services/database";
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StatusBadge } from "@/components/status-badge";
 import { SyncStatusBadge, type SyncStatus } from "@/components/sync-status-badge";
 import { useState, useMemo } from "react";
@@ -11,7 +24,10 @@ import { useStationScope } from "@/lib/station-context";
 
 export const Route = createFileRoute("/media")({ component: MediaPage });
 
-function deriveSyncStatus(m: { status?: string | null; azuracast_media_id?: string | null }): SyncStatus | null {
+function deriveSyncStatus(m: {
+  status?: string | null;
+  azuracast_media_id?: string | null;
+}): SyncStatus | null {
   if (!("azuracast_media_id" in m)) return null;
   if (m.status === "synced") return "synced";
   if (m.status === "error") return "failed";
@@ -45,18 +61,35 @@ function MediaPage() {
       if (scope.kind === "station" && m.station_id !== scope.station.id) return false;
       if (rightsFilter !== "all" && md?.rights_status !== rightsFilter) return false;
       if (q) {
-        const hay = [m.file_name, md?.artist, md?.title, md?.genre].filter(Boolean).join(" ").toLowerCase();
+        const hay = [m.file_name, md?.artist, md?.title, md?.genre]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         if (!hay.includes(q.toLowerCase())) return false;
       }
       return true;
     });
   }, [query.data, q, statusFilter, rightsFilter, scope]);
 
-  const state =
-    query.isLoading ? { kind: "loading" as const } :
-    query.error ? { kind: "error" as const, message: (query.error as Error).message, retry: () => query.refetch() } :
-    filtered.length === 0 ? { kind: "empty" as const, title: "No media files match", hint: "Adjust filters or import media via your runtime." } :
-    { kind: "ready" as const };
+  const state = query.isLoading
+    ? { kind: "loading" as const }
+    : query.error
+      ? {
+          kind: "error" as const,
+          message: (query.error as Error).message,
+          retry: () => query.refetch(),
+        }
+      : filtered.length === 0
+        ? {
+            kind: "empty" as const,
+            title: query.data?.length
+              ? "Ingen media matchar filtret"
+              : "Ingen media uppladdad ännu",
+            hint: query.data?.length
+              ? "Justera filtren och försök igen."
+              : "Media visas här när Radio Core Backend har fått sitt första objekt.",
+          }
+        : { kind: "ready" as const };
 
   return (
     <ResourcePageShell
@@ -68,17 +101,37 @@ function MediaPage() {
       filters={
         <>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="h-9 w-40">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All statuses</SelectItem>
-              {["imported","missing_metadata","ready","synced","error","paused"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {["imported", "missing_metadata", "ready", "synced", "error", "paused"].map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={rightsFilter} onValueChange={setRightsFilter}>
-            <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Rights" /></SelectTrigger>
+            <SelectTrigger className="h-9 w-40">
+              <SelectValue placeholder="Rights" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All rights</SelectItem>
-              {["unknown","cleared","ai_generated","local_permission","creative_commons","needs_review","blocked"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {[
+                "unknown",
+                "cleared",
+                "ai_generated",
+                "local_permission",
+                "creative_commons",
+                "needs_review",
+                "blocked",
+              ].map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </>
@@ -105,16 +158,23 @@ function MediaPage() {
             return (
               <TableRow key={m.id}>
                 <TableCell className="font-medium">
-                  <Link to="/metadata/$id" params={{ id: m.id }} className="hover:underline">{md?.title ?? m.file_name}</Link>
+                  <Link to="/metadata/$id" params={{ id: m.id }} className="hover:underline">
+                    {md?.title ?? m.file_name}
+                  </Link>
                 </TableCell>
                 <TableCell>{md?.artist ?? "—"}</TableCell>
                 <TableCell className="text-muted-foreground">{md?.genre ?? "—"}</TableCell>
                 <TableCell className="text-muted-foreground">{m.stations?.name ?? "—"}</TableCell>
-                <TableCell><StatusBadge status={m.status} /></TableCell>
+                <TableCell>
+                  <StatusBadge status={m.status} />
+                </TableCell>
                 <TableCell>{sync && <SyncStatusBadge status={sync} compact />}</TableCell>
-                <TableCell>{md?.rights_status && <StatusBadge status={md.rights_status} />}</TableCell>
+                <TableCell>
+                  {md?.rights_status && <StatusBadge status={md.rights_status} />}
+                </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
-                  {md?.is_local_music && "Local "}{md?.is_ai_generated && "AI"}
+                  {md?.is_local_music && "Local "}
+                  {md?.is_ai_generated && "AI"}
                 </TableCell>
               </TableRow>
             );

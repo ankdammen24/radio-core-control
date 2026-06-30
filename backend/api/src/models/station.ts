@@ -10,6 +10,9 @@ export interface StationDocument {
   accent_color: string | null;
   slogan: string | null;
   public_url: string | null;
+  domain?: string;
+  apiDomain?: string;
+  status?: "active" | "inactive";
   created_at: Date;
   updated_at: Date;
 }

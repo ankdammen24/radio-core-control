@@ -29,9 +29,9 @@ function PodcastsPage() {
       </div>
       <Card className="p-8 border-dashed text-center">
         <Headphones className="w-8 h-8 mx-auto text-muted-foreground mb-3" />
-        <h2 className="text-sm font-semibold">Podcast feed coming soon</h2>
+        <h2 className="text-sm font-semibold">Inga poddar ännu</h2>
         <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-          Episodes and podcast metadata will appear here once the podcast module is enabled.
+          Poddar och avsnitt visas här när katalogen innehåller data.
         </p>
       </Card>
     </PublicLayout>

@@ -39,6 +39,8 @@ variable.
 
 `.github/workflows/supabase-migrations.yml` applies migrations when migration
 files are pushed to `main`. It can also be started manually from GitHub Actions.
+When the integration secret is absent, the workflow exits successfully without
+touching a database.
 Configure these GitHub Actions secrets in the repository (preferably in the
 `production` environment):
 

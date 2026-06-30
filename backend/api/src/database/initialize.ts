@@ -9,10 +9,6 @@ import {
   systemConfigCollection,
 } from "../models/index.js";
 
-const RADIO_UPPSALA_ID =
-  process.env.RADIO_UPPSALA_STATION_ID ?? "7b5fd114-b188-4d8d-9210-3e924c68efc7";
-const SEED_MEDIA_ID = "ef279c25-bb3d-46a8-9c34-a83ce4c444b4";
-
 const validators: Array<{ name: string; validator: Document }> = [
   {
     name: STATIONS_COLLECTION,
@@ -80,63 +76,4 @@ export async function initializeMongo() {
     mediaAssets.createIndex({ station_id: 1, status: 1 }),
     systemConfig.createIndex({ key: 1 }, { unique: true }),
   ]);
-
-  const now = new Date();
-  await stations.updateOne(
-    { id: RADIO_UPPSALA_ID },
-    {
-      $setOnInsert: {
-        id: RADIO_UPPSALA_ID,
-        name: "Radio Uppsala",
-        slug: "radio-uppsala",
-        description: "Lokal radio från Uppsala.",
-        is_active: true,
-        logo_url: null,
-        accent_color: "#dc2626",
-        slogan: "Uppsala i etern",
-        public_url: "https://radiouppsala.se",
-        created_at: now,
-      },
-      $set: { updated_at: now },
-    },
-    { upsert: true },
-  );
-
-  await mediaAssets.updateOne(
-    { id: SEED_MEDIA_ID },
-    {
-      $setOnInsert: {
-        id: SEED_MEDIA_ID,
-        station_id: RADIO_UPPSALA_ID,
-        file_name: "radio-uppsala-station-ident.mp3",
-        asset_type: "jingle",
-        status: "pending",
-        playback_url: null,
-        duration_seconds: null,
-        created_at: now,
-      },
-      $set: { updated_at: now },
-    },
-    { upsert: true },
-  );
-
-  await systemConfig.updateOne(
-    { key: "public" },
-    {
-      $setOnInsert: { key: "public", created_at: now },
-      $set: {
-        is_public: true,
-        updated_at: now,
-        value: {
-          product_name: "Radio Core",
-          default_station_slug: "radio-uppsala",
-          public_site_url: "https://radiouppsala.se",
-          listen_url: "https://listen.radiouppsala.se",
-          support_email: "info@radiouppsala.se",
-          features: { podcasts: true, requests: true, public_player: true },
-        },
-      },
-    },
-    { upsert: true },
-  );
 }

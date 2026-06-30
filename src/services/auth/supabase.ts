@@ -1,5 +1,10 @@
-import { database } from "@/services/database";
+import { supabaseClient } from "@/services/database";
 import type { AuthService } from "./types";
+
+function client() {
+  if (!supabaseClient) throw new Error("Supabase login is not configured");
+  return supabaseClient;
+}
 
 function throwIfError(error: { message: string } | null) {
   if (error) throw new Error(error.message);
@@ -7,20 +12,20 @@ function throwIfError(error: { message: string } | null) {
 
 export const supabaseAuthService: AuthService = {
   async getSession() {
-    const { data, error } = await database.auth.getSession();
+    const { data, error } = await client().auth.getSession();
     throwIfError(error);
     return data.session;
   },
   onSessionChanged(callback) {
-    const { data } = database.auth.onAuthStateChange((_event, session) => callback(session));
+    const { data } = client().auth.onAuthStateChange((_event, session) => callback(session));
     return () => data.subscription.unsubscribe();
   },
   async signInWithPassword(email, password) {
-    const { error } = await database.auth.signInWithPassword({ email, password });
+    const { error } = await client().auth.signInWithPassword({ email, password });
     throwIfError(error);
   },
   async signUp(email, password, displayName) {
-    const { error } = await database.auth.signUp({
+    const { error } = await client().auth.signUp({
       email,
       password,
       options: {
@@ -31,14 +36,14 @@ export const supabaseAuthService: AuthService = {
     throwIfError(error);
   },
   async signInWithOAuth(provider) {
-    const { error } = await database.auth.signInWithOAuth({
+    const { error } = await client().auth.signInWithOAuth({
       provider,
       options: { redirectTo: window.location.origin },
     });
     throwIfError(error);
   },
   async signInWithSSO(domain) {
-    const { data, error } = await database.auth.signInWithSSO({
+    const { data, error } = await client().auth.signInWithSSO({
       domain,
       options: { redirectTo: window.location.origin },
     });
@@ -46,7 +51,7 @@ export const supabaseAuthService: AuthService = {
     return data?.url ?? null;
   },
   async signOut() {
-    const { error } = await database.auth.signOut();
+    const { error } = await client().auth.signOut();
     throwIfError(error);
   },
 };

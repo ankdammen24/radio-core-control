@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   authService,
+  AUTH_MODE,
+  LOGIN_CONFIGURED,
   type AppRole,
   type AuthSession,
   type AuthUser,
   type SocialProvider,
+  type AuthMode,
 } from "@/services/auth";
-import { database } from "@/services/database";
+import { database, SUPABASE_ENABLED } from "@/services/database";
 
 interface AuthState {
   session: AuthSession | null;
@@ -20,6 +23,8 @@ interface AuthState {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isEditor: boolean;
+  mode: AuthMode;
+  loginConfigured: boolean;
 }
 
 const AuthCtx = createContext<AuthState | null>(null);
@@ -42,7 +47,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       setSession(nextSession);
       try {
-        setRoles(nextSession?.user ? await loadRoles(nextSession.user.id) : []);
+        setRoles(
+          AUTH_MODE === "local"
+            ? ["admin"]
+            : SUPABASE_ENABLED && nextSession?.user
+              ? await loadRoles(nextSession.user.id)
+              : [],
+        );
       } finally {
         if (active) setLoading(false);
       }
@@ -74,6 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut: authService.signOut,
       isAdmin: roles.includes("admin"),
       isEditor: roles.includes("admin") || roles.includes("editor"),
+      mode: AUTH_MODE,
+      loginConfigured: LOGIN_CONFIGURED,
     }),
     [loading, roles, session],
   );
