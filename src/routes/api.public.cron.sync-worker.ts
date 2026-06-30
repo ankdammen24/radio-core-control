@@ -5,7 +5,10 @@ import { runSyncWorker } from "@/server/sync-worker.server";
 import { readEnv } from "@/server/env.server";
 
 function authorize(request: Request): boolean {
-  const expected = readEnv("CRON_SECRET") ?? readEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const expected =
+    readEnv("CRON_SECRET") ??
+    readEnv("SUPABASE_SERVICE_ROLE_KEY") ??
+    readEnv("RC_SUPABASE_SUPABASE_SERVICE_ROLE_KEY");
   if (!expected) return false;
   const header = request.headers.get("authorization") ?? "";
   const token = header.replace(/^Bearer\s+/i, "").trim();

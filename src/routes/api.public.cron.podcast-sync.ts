@@ -13,7 +13,12 @@ export const Route = createFileRoute("/api/public/cron/podcast-sync")({
         // Match the pattern used by other /api/public/cron/* routes:
         // require the Supabase anon key in the `apikey` header.
         const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY ?? "";
+        const expected =
+          process.env.SUPABASE_ANON_KEY ??
+          process.env.SUPABASE_PUBLISHABLE_KEY ??
+          process.env.RC_SUPABASE_SUPABASE_ANON_KEY ??
+          process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_PUBLISHABLE_KEY ??
+          "";
         if (!expected || apikey !== expected) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
@@ -39,10 +44,10 @@ export const Route = createFileRoute("/api/public/cron/podcast-sync")({
           );
         } catch (e) {
           console.error("[podcast-sync cron] failed", e);
-          return new Response(
-            JSON.stringify({ ok: false, error: (e as Error).message }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: (e as Error).message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
       },
     },

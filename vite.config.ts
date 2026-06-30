@@ -16,6 +16,9 @@ import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  // Vercel's Supabase integration uses NEXT_PUBLIC_RC_SUPABASE_* for the
+  // browser-safe URL/publishable key. Never expose the unprefixed RC secrets.
+  envPrefix: ["VITE_", "NEXT_PUBLIC_RC_SUPABASE_"],
   plugins: [tsConfigPaths(), tailwindcss(), tanstackStart(), react()],
   server: {
     port: 3000,

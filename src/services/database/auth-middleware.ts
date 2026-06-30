@@ -5,8 +5,12 @@ import type { Database } from "@/integrations/supabase/types";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const url = process.env.SUPABASE_URL;
-    const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY;
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_URL;
+    const anonKey =
+      process.env.SUPABASE_ANON_KEY ??
+      process.env.SUPABASE_PUBLISHABLE_KEY ??
+      process.env.RC_SUPABASE_SUPABASE_ANON_KEY ??
+      process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_PUBLISHABLE_KEY;
     if (!url || !anonKey) {
       throw new Response("Supabase server authentication is not configured", { status: 500 });
     }

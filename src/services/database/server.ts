@@ -2,8 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 function createAdminDatabase() {
-  const url = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_RC_SUPABASE_SUPABASE_URL;
+  const serviceRoleKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.RC_SUPABASE_SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceRoleKey) {
     throw new Error("Supabase server access requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
   }
