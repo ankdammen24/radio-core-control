@@ -99,6 +99,9 @@ import { Route as ApiV1MediaSourcesRouteImport } from './routes/api.v1.media-sou
 import { Route as ApiV1MediaSourcesIdRouteImport } from './routes/api.v1.media-sources.$id'
 import { Route as ApiV1MediaSourcesIdSyncRouteImport } from './routes/api.v1.media-sources.$id.sync'
 import { Route as ApiV1MediaSourcesIdSyncRunsRouteImport } from './routes/api.v1.media-sources.$id.sync-runs'
+import { Route as ApiV1SchedulerNextRouteImport } from './routes/api.v1.scheduler.next'
+import { Route as ApiV1SchedulerClockRouteImport } from './routes/api.v1.scheduler.clock'
+import { Route as ApiV1SchedulerTestRouteImport } from './routes/api.v1.scheduler.test'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -564,6 +567,21 @@ const ApiV1MediaSourcesIdSyncRunsRoute =
     path: '/api/v1/media-sources/$id/sync-runs',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1SchedulerNextRoute = ApiV1SchedulerNextRouteImport.update({
+  id: '/api/v1/scheduler/next',
+  path: '/api/v1/scheduler/next',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SchedulerClockRoute = ApiV1SchedulerClockRouteImport.update({
+  id: '/api/v1/scheduler/clock',
+  path: '/api/v1/scheduler/clock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SchedulerTestRoute = ApiV1SchedulerTestRouteImport.update({
+  id: '/api/v1/scheduler/test',
+  path: '/api/v1/scheduler/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -656,6 +674,9 @@ export interface FileRoutesByFullPath {
   '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -748,6 +769,9 @@ export interface FileRoutesByTo {
   '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -841,6 +865,9 @@ export interface FileRoutesById {
   '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -935,6 +962,9 @@ export interface FileRouteTypes {
     | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/test'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1027,6 +1057,9 @@ export interface FileRouteTypes {
     | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/test'
   id:
     | '__root__'
     | '/'
@@ -1119,6 +1152,9 @@ export interface FileRouteTypes {
     | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1209,6 +1245,9 @@ export interface RootRouteChildren {
   ApiV1MediaSourcesIdRoute: typeof ApiV1MediaSourcesIdRoute
   ApiV1MediaSourcesIdSyncRoute: typeof ApiV1MediaSourcesIdSyncRoute
   ApiV1MediaSourcesIdSyncRunsRoute: typeof ApiV1MediaSourcesIdSyncRunsRoute
+  ApiV1SchedulerNextRoute: typeof ApiV1SchedulerNextRoute
+  ApiV1SchedulerClockRoute: typeof ApiV1SchedulerClockRoute
+  ApiV1SchedulerTestRoute: typeof ApiV1SchedulerTestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1843,6 +1882,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRunsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/scheduler/next': {
+      id: '/api/v1/scheduler/next'
+      path: '/api/v1/scheduler/next'
+      fullPath: '/api/v1/scheduler/next'
+      preLoaderRoute: typeof ApiV1SchedulerNextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/scheduler/clock': {
+      id: '/api/v1/scheduler/clock'
+      path: '/api/v1/scheduler/clock'
+      fullPath: '/api/v1/scheduler/clock'
+      preLoaderRoute: typeof ApiV1SchedulerClockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/scheduler/test': {
+      id: '/api/v1/scheduler/test'
+      path: '/api/v1/scheduler/test'
+      fullPath: '/api/v1/scheduler/test'
+      preLoaderRoute: typeof ApiV1SchedulerTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1973,6 +2033,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1MediaSourcesIdRoute: ApiV1MediaSourcesIdRoute,
   ApiV1MediaSourcesIdSyncRoute: ApiV1MediaSourcesIdSyncRoute,
   ApiV1MediaSourcesIdSyncRunsRoute: ApiV1MediaSourcesIdSyncRunsRoute,
+  ApiV1SchedulerNextRoute: ApiV1SchedulerNextRoute,
+  ApiV1SchedulerClockRoute: ApiV1SchedulerClockRoute,
+  ApiV1SchedulerTestRoute: ApiV1SchedulerTestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
