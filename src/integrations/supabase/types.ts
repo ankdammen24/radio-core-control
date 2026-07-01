@@ -120,6 +120,7 @@ export type Database = {
           last_seen_at: string | null
           metadata: Json
           name: string
+          reload_requested_at: string | null
           stack_token_id: string | null
           station_id: string | null
           status: Database["public"]["Enums"]["agent_status"]
@@ -135,6 +136,7 @@ export type Database = {
           last_seen_at?: string | null
           metadata?: Json
           name: string
+          reload_requested_at?: string | null
           stack_token_id?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
@@ -150,6 +152,7 @@ export type Database = {
           last_seen_at?: string | null
           metadata?: Json
           name?: string
+          reload_requested_at?: string | null
           stack_token_id?: string | null
           station_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
@@ -1661,6 +1664,7 @@ export type Database = {
           last_used_at: string | null
           name: string
           purpose: string
+          revoked_at: string | null
           station_id: string | null
           token_hash: string
         }
@@ -1671,6 +1675,7 @@ export type Database = {
           last_used_at?: string | null
           name: string
           purpose?: string
+          revoked_at?: string | null
           station_id?: string | null
           token_hash: string
         }
@@ -1681,6 +1686,7 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           purpose?: string
+          revoked_at?: string | null
           station_id?: string | null
           token_hash?: string
         }
