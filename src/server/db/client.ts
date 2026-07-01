@@ -18,14 +18,26 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema/index";
 
 function createDb() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL is not set");
+  // Prefer the explicit DATABASE_URL when set (e.g. Neon / self-hosted).
+  // Fall back to Lovable Cloud's managed Supabase pooler connection string
+  // (`SUPABASE_DB_URL`), which is injected server-side and points at the
+  // pgbouncer pool — the correct endpoint for serverless workers.
+  const url = process.env.DATABASE_URL ?? process.env.SUPABASE_DB_URL;
+  if (!url) {
+    throw new Error(
+      "No database connection string found: set DATABASE_URL or ensure SUPABASE_DB_URL is available",
+    );
+  }
+
+  // Detect the Supabase transaction pooler (port 6543) — it does not support
+  // prepared statements, which the `postgres` driver enables by default.
+  const isPooler = /:6543\//.test(url) || /pgbouncer=true/i.test(url);
 
   const client = postgres(url, {
-    // Vercel serverless: disable idle connection timeout, limit pool size
     max: 5,
     idle_timeout: 20,
     connect_timeout: 10,
+    prepare: !isPooler,
   });
 
   return drizzle(client, { schema });
