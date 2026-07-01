@@ -63,128 +63,48 @@ export const getPublicStation = createServerFn({ method: "GET" })
     };
   });
 
-/** Get public stream URLs for a station. Builds full URLs from icecast config. */
+/** Get public stream URLs for a station. Builds full URLs from Drizzle (Postgres). */
 export const getPublicStreams = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<PublicStreamProfile[]> => {
-    const { adminDatabase } = await import("@/services/database/server");
-    const [{ data: mounts }, { data: ic }, { data: station }] = await Promise.all([
-      adminDatabase
-        .from("stream_mounts")
-        .select("id,mount_path,format,bitrate,is_default,is_active")
-        .eq("station_id", data.stationId)
-        .eq("is_active", true),
-      adminDatabase
-        .from("icecast_configs")
-        .select("hostname,port")
-        .eq("station_id", data.stationId)
-        .maybeSingle(),
-      adminDatabase
-        .from("stations")
-        .select("demo_stream_url,demo_mode")
-        .eq("id", data.stationId)
-        .maybeSingle(),
+    const { listStreamMounts, getIcecastConfig } = await import("@/server/repositories/streaming.repository");
+    const [mounts, ic] = await Promise.all([
+      listStreamMounts(data.stationId),
+      getIcecastConfig(data.stationId),
     ]);
-
-    // Demo mode: synthesize a single profile from demo_stream_url.
-    if (station?.demo_mode && station.demo_stream_url) {
-      const url = station.demo_stream_url;
-      const fmt: "hls" | "aac" | "mp3" = url.includes(".m3u8")
-        ? "hls"
-        : url.includes(".aac")
-          ? "aac"
-          : "mp3";
-      return [
-        {
-          id: "demo",
-          label: fmt === "hls" ? "Auto (HLS)" : `Demo (${fmt.toUpperCase()})`,
-          url,
-          format: fmt,
-          bitrate: null,
-        },
-      ];
-    }
-
-    if (!mounts?.length) return [];
+    if (!mounts.length) return [];
     const base = ic
       ? `https://${ic.hostname}${ic.port && ic.port !== 443 ? `:${ic.port}` : ""}`
       : "";
-    const profiles: PublicStreamProfile[] = mounts.map((m) => {
-      const fmt = String(m.format ?? "mp3").toLowerCase();
-      const format: "hls" | "aac" | "mp3" = fmt.includes("hls")
-        ? "hls"
-        : fmt.includes("aac")
-          ? "aac"
-          : "mp3";
-      const path = m.mount_path.startsWith("/") ? m.mount_path : `/${m.mount_path}`;
-      const url = base ? `${base}${path}` : path;
-      const label =
-        format === "hls"
-          ? "Auto (HLS)"
-          : `${format.toUpperCase()}${m.bitrate ? ` ${m.bitrate}k` : ""}`;
-      return { id: m.id, label, url, format, bitrate: m.bitrate ?? null };
-    });
-    return profiles;
+    return mounts
+      .filter((m) => m.isActive)
+      .map((m) => {
+        const fmt = String(m.format ?? "mp3").toLowerCase();
+        const format: "hls" | "aac" | "mp3" = fmt.includes("hls") ? "hls" : fmt.includes("aac") ? "aac" : "mp3";
+        const path = m.mountPath.startsWith("/") ? m.mountPath : `/${m.mountPath}`;
+        const url = base ? `${base}${path}` : path;
+        const label = format === "hls" ? "Auto (HLS)" : `${format.toUpperCase()}${m.bitrate ? ` ${m.bitrate}k` : ""}`;
+        return { id: m.id, label, url, format, bitrate: m.bitrate ?? null };
+      });
   });
 
-/** Now playing for a station (no auth — public read). */
+/** Now playing for a station — placeholder until runtime table exists. */
 export const getPublicNowPlaying = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }): Promise<PublicNowPlaying | null> => {
-    const { adminDatabase } = await import("@/services/database/server");
-    const { data: np } = await adminDatabase
-      .from("now_playing")
-      .select("title,artist,album,listeners,started_at")
-      .eq("station_id", data.stationId)
-      .maybeSingle();
-    if (!np) return null;
-    return {
-      title: np.title,
-      artist: np.artist,
-      album: np.album,
-      started_at: np.started_at,
-      listeners: np.listeners,
-    };
+  .handler(async (_): Promise<PublicNowPlaying | null> => {
+    return null;
   });
 
-/** Recently played (last 12 tracks) for a station. */
+/** Recently played — placeholder until play_history table exists. */
 export const getPublicRecentlyPlayed = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
-    const { adminDatabase } = await import("@/services/database/server");
-    const { data: rows } = await adminDatabase
-      .from("play_history")
-      .select("id,title,artist,album,played_at")
-      .eq("station_id", data.stationId)
-      .order("played_at", { ascending: false })
-      .limit(12);
-    return (rows ?? []).map((r) => ({
-      id: r.id,
-      title: r.title,
-      artist: r.artist,
-      album: r.album,
-      played_at: r.played_at,
-    }));
+  .handler(async (_) => {
+    return [] as { id: string; title: string | null; artist: string | null; album: string | null; played_at: string | null }[];
   });
 
-/** Upcoming schedule blocks for a station (next 7 by start time). */
+/** Upcoming schedule blocks — placeholder until schedule_blocks table exists. */
 export const getPublicSchedule = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ stationId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }): Promise<PublicScheduleBlock[]> => {
-    const { adminDatabase } = await import("@/services/database/server");
-    const { data: rows } = await adminDatabase
-      .from("schedule_blocks")
-      .select("id,name,day_of_week,start_time,end_time,is_active")
-      .eq("station_id", data.stationId)
-      .eq("is_active", true)
-      .order("day_of_week")
-      .order("start_time")
-      .limit(60);
-    return (rows ?? []).map((r) => ({
-      id: r.id,
-      name: r.name,
-      day_of_week: String(r.day_of_week),
-      start_time: String(r.start_time),
-      end_time: String(r.end_time),
-    }));
+  .handler(async (_): Promise<PublicScheduleBlock[]> => {
+    return [];
   });
