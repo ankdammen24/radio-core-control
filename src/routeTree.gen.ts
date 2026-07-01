@@ -102,6 +102,7 @@ import { Route as ApiV1MediaSourcesIdSyncRunsRouteImport } from './routes/api.v1
 import { Route as ApiV1SchedulerNextRouteImport } from './routes/api.v1.scheduler.next'
 import { Route as ApiV1SchedulerClockRouteImport } from './routes/api.v1.scheduler.clock'
 import { Route as ApiV1SchedulerTestRouteImport } from './routes/api.v1.scheduler.test'
+import { Route as ApiV1HealthRouteImport } from './routes/api.v1.health'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -582,6 +583,11 @@ const ApiV1SchedulerTestRoute = ApiV1SchedulerTestRouteImport.update({
   path: '/api/v1/scheduler/test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1HealthRoute = ApiV1HealthRouteImport.update({
+  id: '/api/v1/health',
+  path: '/api/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -677,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
   '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
   '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -772,6 +779,7 @@ export interface FileRoutesByTo {
   '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
   '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
   '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -868,6 +876,7 @@ export interface FileRoutesById {
   '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
   '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
   '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -965,6 +974,7 @@ export interface FileRouteTypes {
     | '/api/v1/scheduler/next'
     | '/api/v1/scheduler/clock'
     | '/api/v1/scheduler/test'
+    | '/api/v1/health'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1060,6 +1070,7 @@ export interface FileRouteTypes {
     | '/api/v1/scheduler/next'
     | '/api/v1/scheduler/clock'
     | '/api/v1/scheduler/test'
+    | '/api/v1/health'
   id:
     | '__root__'
     | '/'
@@ -1155,6 +1166,7 @@ export interface FileRouteTypes {
     | '/api/v1/scheduler/next'
     | '/api/v1/scheduler/clock'
     | '/api/v1/scheduler/test'
+    | '/api/v1/health'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1248,6 +1260,7 @@ export interface RootRouteChildren {
   ApiV1SchedulerNextRoute: typeof ApiV1SchedulerNextRoute
   ApiV1SchedulerClockRoute: typeof ApiV1SchedulerClockRoute
   ApiV1SchedulerTestRoute: typeof ApiV1SchedulerTestRoute
+  ApiV1HealthRoute: typeof ApiV1HealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1903,6 +1916,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SchedulerTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/health': {
+      id: '/api/v1/health'
+      path: '/api/v1/health'
+      fullPath: '/api/v1/health'
+      preLoaderRoute: typeof ApiV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2036,6 +2056,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1SchedulerNextRoute: ApiV1SchedulerNextRoute,
   ApiV1SchedulerClockRoute: ApiV1SchedulerClockRoute,
   ApiV1SchedulerTestRoute: ApiV1SchedulerTestRoute,
+  ApiV1HealthRoute: ApiV1HealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
