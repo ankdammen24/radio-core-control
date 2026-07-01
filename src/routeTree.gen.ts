@@ -59,50 +59,50 @@ import { Route as MetadataIndexRouteImport } from './routes/metadata.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as MetadataIdRouteImport } from './routes/metadata.$id'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as ApiV1StationsRouteImport } from './routes/api.v1.stations'
+import { Route as ApiV1PodcastsRouteImport } from './routes/api.v1.podcasts'
+import { Route as ApiV1PlaylistsRouteImport } from './routes/api.v1.playlists'
+import { Route as ApiV1MediaSourcesRouteImport } from './routes/api.v1.media-sources'
+import { Route as ApiV1MediaRouteImport } from './routes/api.v1.media'
+import { Route as ApiV1HealthRouteImport } from './routes/api.v1.health'
 import { Route as ApiPublicStationConfigRouteImport } from './routes/api.public.station-config'
 import { Route as ApiPublicNowPlayingRouteImport } from './routes/api.public.now-playing'
 import { Route as ApiPublicListenerStatsRouteImport } from './routes/api.public.listener-stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api.public.health'
+import { Route as ApiV1StreamingOutputsIdRouteImport } from './routes/api.v1.streaming-outputs.$id'
+import { Route as ApiV1StreamMountsIdRouteImport } from './routes/api.v1.stream-mounts.$id'
+import { Route as ApiV1StationsIdRouteImport } from './routes/api.v1.stations.$id'
+import { Route as ApiV1SettingsGlobalRouteImport } from './routes/api.v1.settings.global'
+import { Route as ApiV1SchedulerTestRouteImport } from './routes/api.v1.scheduler.test'
+import { Route as ApiV1SchedulerNextRouteImport } from './routes/api.v1.scheduler.next'
+import { Route as ApiV1SchedulerClockRouteImport } from './routes/api.v1.scheduler.clock'
+import { Route as ApiV1PodcastsIdRouteImport } from './routes/api.v1.podcasts.$id'
+import { Route as ApiV1PlaylistsIdRouteImport } from './routes/api.v1.playlists.$id'
+import { Route as ApiV1MediaIdRouteImport } from './routes/api.v1.media.$id'
+import { Route as ApiV1MediaSourcesIdRouteImport } from './routes/api.v1.media-sources.$id'
+import { Route as ApiV1LiveInputsIdRouteImport } from './routes/api.v1.live-inputs.$id'
+import { Route as ApiV1FallbackTracksIdRouteImport } from './routes/api.v1.fallback-tracks.$id'
 import { Route as ApiPublicRadioNewsRouteImport } from './routes/api.public.radio.news'
 import { Route as ApiPublicCronSyncWorkerRouteImport } from './routes/api.public.cron.sync-worker'
 import { Route as ApiPublicCronPodcastSyncRouteImport } from './routes/api.public.cron.podcast-sync'
 import { Route as ApiPublicAgentHeartbeatRouteImport } from './routes/api.public.agent.heartbeat'
+import { Route as ApiV1StationsStationIdStreamingOutputsRouteImport } from './routes/api.v1.stations.$stationId.streaming-outputs'
+import { Route as ApiV1StationsStationIdStreamMountsRouteImport } from './routes/api.v1.stations.$stationId.stream-mounts'
+import { Route as ApiV1StationsStationIdLiveInputsRouteImport } from './routes/api.v1.stations.$stationId.live-inputs'
+import { Route as ApiV1StationsStationIdLiquidsoapConfigRouteImport } from './routes/api.v1.stations.$stationId.liquidsoap-config'
+import { Route as ApiV1StationsStationIdIcecastConfigRouteImport } from './routes/api.v1.stations.$stationId.icecast-config'
+import { Route as ApiV1StationsStationIdFallbackTracksRouteImport } from './routes/api.v1.stations.$stationId.fallback-tracks'
+import { Route as ApiV1SettingsStationsStationIdRouteImport } from './routes/api.v1.settings.stations.$stationId'
+import { Route as ApiV1PodcastsIdEpisodesRouteImport } from './routes/api.v1.podcasts.$id.episodes'
+import { Route as ApiV1PlaylistsIdItemsRouteImport } from './routes/api.v1.playlists.$id.items'
+import { Route as ApiV1MediaSourcesIdSyncRunsRouteImport } from './routes/api.v1.media-sources.$id.sync-runs'
+import { Route as ApiV1MediaSourcesIdSyncRouteImport } from './routes/api.v1.media-sources.$id.sync'
 import { Route as ApiPublicStationsStationIdPodcastsRouteImport } from './routes/api.public.stations.$stationId.podcasts'
 import { Route as ApiPublicRadioNewsIdRouteImport } from './routes/api.public.radio.news.$id'
+import { Route as ApiV1PlaylistsIdItemsMediaIdRouteImport } from './routes/api.v1.playlists.$id.items.$mediaId'
 import { Route as ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport } from './routes/api.public.stations.$stationId.episodes.$episodeId'
 import { Route as ApiPublicRadioNewsIdBroadcastedRouteImport } from './routes/api.public.radio.news.$id.broadcasted'
 import { Route as ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport } from './routes/api.public.stations.$stationId.podcasts.$podcastId.episodes'
-import { Route as ApiV1StationsRouteImport } from './routes/api.v1.stations'
-import { Route as ApiV1StationsIdRouteImport } from './routes/api.v1.stations.$id'
-import { Route as ApiV1MediaRouteImport } from './routes/api.v1.media'
-import { Route as ApiV1MediaIdRouteImport } from './routes/api.v1.media.$id'
-import { Route as ApiV1PlaylistsRouteImport } from './routes/api.v1.playlists'
-import { Route as ApiV1PlaylistsIdRouteImport } from './routes/api.v1.playlists.$id'
-import { Route as ApiV1PlaylistsIdItemsRouteImport } from './routes/api.v1.playlists.$id.items'
-import { Route as ApiV1PlaylistsIdItemsMediaIdRouteImport } from './routes/api.v1.playlists.$id.items.$mediaId'
-import { Route as ApiV1PodcastsRouteImport } from './routes/api.v1.podcasts'
-import { Route as ApiV1PodcastsIdRouteImport } from './routes/api.v1.podcasts.$id'
-import { Route as ApiV1PodcastsIdEpisodesRouteImport } from './routes/api.v1.podcasts.$id.episodes'
-import { Route as ApiV1SettingsGlobalRouteImport } from './routes/api.v1.settings.global'
-import { Route as ApiV1SettingsStationsStationIdRouteImport } from './routes/api.v1.settings.stations.$stationId'
-import { Route as ApiV1StationsStationIdIcecastConfigRouteImport } from './routes/api.v1.stations.$stationId.icecast-config'
-import { Route as ApiV1StationsStationIdLiquidsoapConfigRouteImport } from './routes/api.v1.stations.$stationId.liquidsoap-config'
-import { Route as ApiV1StationsStationIdStreamMountsRouteImport } from './routes/api.v1.stations.$stationId.stream-mounts'
-import { Route as ApiV1StreamMountsIdRouteImport } from './routes/api.v1.stream-mounts.$id'
-import { Route as ApiV1StationsStationIdLiveInputsRouteImport } from './routes/api.v1.stations.$stationId.live-inputs'
-import { Route as ApiV1LiveInputsIdRouteImport } from './routes/api.v1.live-inputs.$id'
-import { Route as ApiV1StationsStationIdFallbackTracksRouteImport } from './routes/api.v1.stations.$stationId.fallback-tracks'
-import { Route as ApiV1FallbackTracksIdRouteImport } from './routes/api.v1.fallback-tracks.$id'
-import { Route as ApiV1StationsStationIdStreamingOutputsRouteImport } from './routes/api.v1.stations.$stationId.streaming-outputs'
-import { Route as ApiV1StreamingOutputsIdRouteImport } from './routes/api.v1.streaming-outputs.$id'
-import { Route as ApiV1MediaSourcesRouteImport } from './routes/api.v1.media-sources'
-import { Route as ApiV1MediaSourcesIdRouteImport } from './routes/api.v1.media-sources.$id'
-import { Route as ApiV1MediaSourcesIdSyncRouteImport } from './routes/api.v1.media-sources.$id.sync'
-import { Route as ApiV1MediaSourcesIdSyncRunsRouteImport } from './routes/api.v1.media-sources.$id.sync-runs'
-import { Route as ApiV1SchedulerNextRouteImport } from './routes/api.v1.scheduler.next'
-import { Route as ApiV1SchedulerClockRouteImport } from './routes/api.v1.scheduler.clock'
-import { Route as ApiV1SchedulerTestRouteImport } from './routes/api.v1.scheduler.test'
-import { Route as ApiV1HealthRouteImport } from './routes/api.v1.health'
 
 const VoicetracksRoute = VoicetracksRouteImport.update({
   id: '/voicetracks',
@@ -354,6 +354,36 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1StationsRoute = ApiV1StationsRouteImport.update({
+  id: '/api/v1/stations',
+  path: '/api/v1/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PodcastsRoute = ApiV1PodcastsRouteImport.update({
+  id: '/api/v1/podcasts',
+  path: '/api/v1/podcasts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PlaylistsRoute = ApiV1PlaylistsRouteImport.update({
+  id: '/api/v1/playlists',
+  path: '/api/v1/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaSourcesRoute = ApiV1MediaSourcesRouteImport.update({
+  id: '/api/v1/media-sources',
+  path: '/api/v1/media-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MediaRoute = ApiV1MediaRouteImport.update({
+  id: '/api/v1/media',
+  path: '/api/v1/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1HealthRoute = ApiV1HealthRouteImport.update({
+  id: '/api/v1/health',
+  path: '/api/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStationConfigRoute = ApiPublicStationConfigRouteImport.update({
   id: '/api/public/station-config',
   path: '/api/public/station-config',
@@ -372,6 +402,71 @@ const ApiPublicListenerStatsRoute = ApiPublicListenerStatsRouteImport.update({
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StreamingOutputsIdRoute = ApiV1StreamingOutputsIdRouteImport.update({
+  id: '/api/v1/streaming-outputs/$id',
+  path: '/api/v1/streaming-outputs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StreamMountsIdRoute = ApiV1StreamMountsIdRouteImport.update({
+  id: '/api/v1/stream-mounts/$id',
+  path: '/api/v1/stream-mounts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1StationsIdRoute = ApiV1StationsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1StationsRoute,
+} as any)
+const ApiV1SettingsGlobalRoute = ApiV1SettingsGlobalRouteImport.update({
+  id: '/api/v1/settings/global',
+  path: '/api/v1/settings/global',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SchedulerTestRoute = ApiV1SchedulerTestRouteImport.update({
+  id: '/api/v1/scheduler/test',
+  path: '/api/v1/scheduler/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SchedulerNextRoute = ApiV1SchedulerNextRouteImport.update({
+  id: '/api/v1/scheduler/next',
+  path: '/api/v1/scheduler/next',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SchedulerClockRoute = ApiV1SchedulerClockRouteImport.update({
+  id: '/api/v1/scheduler/clock',
+  path: '/api/v1/scheduler/clock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1PodcastsIdRoute = ApiV1PodcastsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1PodcastsRoute,
+} as any)
+const ApiV1PlaylistsIdRoute = ApiV1PlaylistsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1PlaylistsRoute,
+} as any)
+const ApiV1MediaIdRoute = ApiV1MediaIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1MediaRoute,
+} as any)
+const ApiV1MediaSourcesIdRoute = ApiV1MediaSourcesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1MediaSourcesRoute,
+} as any)
+const ApiV1LiveInputsIdRoute = ApiV1LiveInputsIdRouteImport.update({
+  id: '/api/v1/live-inputs/$id',
+  path: '/api/v1/live-inputs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1FallbackTracksIdRoute = ApiV1FallbackTracksIdRouteImport.update({
+  id: '/api/v1/fallback-tracks/$id',
+  path: '/api/v1/fallback-tracks/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRadioNewsRoute = ApiPublicRadioNewsRouteImport.update({
@@ -395,6 +490,69 @@ const ApiPublicAgentHeartbeatRoute = ApiPublicAgentHeartbeatRouteImport.update({
   path: '/api/public/agent/heartbeat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1StationsStationIdStreamingOutputsRoute =
+  ApiV1StationsStationIdStreamingOutputsRouteImport.update({
+    id: '/$stationId/streaming-outputs',
+    path: '/$stationId/streaming-outputs',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1StationsStationIdStreamMountsRoute =
+  ApiV1StationsStationIdStreamMountsRouteImport.update({
+    id: '/$stationId/stream-mounts',
+    path: '/$stationId/stream-mounts',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1StationsStationIdLiveInputsRoute =
+  ApiV1StationsStationIdLiveInputsRouteImport.update({
+    id: '/$stationId/live-inputs',
+    path: '/$stationId/live-inputs',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1StationsStationIdLiquidsoapConfigRoute =
+  ApiV1StationsStationIdLiquidsoapConfigRouteImport.update({
+    id: '/$stationId/liquidsoap-config',
+    path: '/$stationId/liquidsoap-config',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1StationsStationIdIcecastConfigRoute =
+  ApiV1StationsStationIdIcecastConfigRouteImport.update({
+    id: '/$stationId/icecast-config',
+    path: '/$stationId/icecast-config',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1StationsStationIdFallbackTracksRoute =
+  ApiV1StationsStationIdFallbackTracksRouteImport.update({
+    id: '/$stationId/fallback-tracks',
+    path: '/$stationId/fallback-tracks',
+    getParentRoute: () => ApiV1StationsRoute,
+  } as any)
+const ApiV1SettingsStationsStationIdRoute =
+  ApiV1SettingsStationsStationIdRouteImport.update({
+    id: '/api/v1/settings/stations/$stationId',
+    path: '/api/v1/settings/stations/$stationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1PodcastsIdEpisodesRoute = ApiV1PodcastsIdEpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
+  getParentRoute: () => ApiV1PodcastsIdRoute,
+} as any)
+const ApiV1PlaylistsIdItemsRoute = ApiV1PlaylistsIdItemsRouteImport.update({
+  id: '/items',
+  path: '/items',
+  getParentRoute: () => ApiV1PlaylistsIdRoute,
+} as any)
+const ApiV1MediaSourcesIdSyncRunsRoute =
+  ApiV1MediaSourcesIdSyncRunsRouteImport.update({
+    id: '/sync-runs',
+    path: '/sync-runs',
+    getParentRoute: () => ApiV1MediaSourcesIdRoute,
+  } as any)
+const ApiV1MediaSourcesIdSyncRoute = ApiV1MediaSourcesIdSyncRouteImport.update({
+  id: '/sync',
+  path: '/sync',
+  getParentRoute: () => ApiV1MediaSourcesIdRoute,
+} as any)
 const ApiPublicStationsStationIdPodcastsRoute =
   ApiPublicStationsStationIdPodcastsRouteImport.update({
     id: '/api/public/stations/$stationId/podcasts',
@@ -406,6 +564,12 @@ const ApiPublicRadioNewsIdRoute = ApiPublicRadioNewsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiPublicRadioNewsRoute,
 } as any)
+const ApiV1PlaylistsIdItemsMediaIdRoute =
+  ApiV1PlaylistsIdItemsMediaIdRouteImport.update({
+    id: '/$mediaId',
+    path: '/$mediaId',
+    getParentRoute: () => ApiV1PlaylistsIdItemsRoute,
+  } as any)
 const ApiPublicStationsStationIdEpisodesEpisodeIdRoute =
   ApiPublicStationsStationIdEpisodesEpisodeIdRouteImport.update({
     id: '/api/public/stations/$stationId/episodes/$episodeId',
@@ -424,170 +588,6 @@ const ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute =
     path: '/$podcastId/episodes',
     getParentRoute: () => ApiPublicStationsStationIdPodcastsRoute,
   } as any)
-const ApiV1StationsRoute = ApiV1StationsRouteImport.update({
-  id: '/api/v1/stations',
-  path: '/api/v1/stations',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1StationsIdRoute = ApiV1StationsIdRouteImport.update({
-  id: '/api/v1/stations/$id',
-  path: '/api/v1/stations/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaRoute = ApiV1MediaRouteImport.update({
-  id: '/api/v1/media',
-  path: '/api/v1/media',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaIdRoute = ApiV1MediaIdRouteImport.update({
-  id: '/api/v1/media/$id',
-  path: '/api/v1/media/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PlaylistsRoute = ApiV1PlaylistsRouteImport.update({
-  id: '/api/v1/playlists',
-  path: '/api/v1/playlists',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PlaylistsIdRoute = ApiV1PlaylistsIdRouteImport.update({
-  id: '/api/v1/playlists/$id',
-  path: '/api/v1/playlists/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PlaylistsIdItemsRoute = ApiV1PlaylistsIdItemsRouteImport.update({
-  id: '/api/v1/playlists/$id/items',
-  path: '/api/v1/playlists/$id/items',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PlaylistsIdItemsMediaIdRoute =
-  ApiV1PlaylistsIdItemsMediaIdRouteImport.update({
-    id: '/api/v1/playlists/$id/items/$mediaId',
-    path: '/api/v1/playlists/$id/items/$mediaId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1PodcastsRoute = ApiV1PodcastsRouteImport.update({
-  id: '/api/v1/podcasts',
-  path: '/api/v1/podcasts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PodcastsIdRoute = ApiV1PodcastsIdRouteImport.update({
-  id: '/api/v1/podcasts/$id',
-  path: '/api/v1/podcasts/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1PodcastsIdEpisodesRoute = ApiV1PodcastsIdEpisodesRouteImport.update({
-  id: '/api/v1/podcasts/$id/episodes',
-  path: '/api/v1/podcasts/$id/episodes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1SettingsGlobalRoute = ApiV1SettingsGlobalRouteImport.update({
-  id: '/api/v1/settings/global',
-  path: '/api/v1/settings/global',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1SettingsStationsStationIdRoute =
-  ApiV1SettingsStationsStationIdRouteImport.update({
-    id: '/api/v1/settings/stations/$stationId',
-    path: '/api/v1/settings/stations/$stationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1StationsStationIdIcecastConfigRoute =
-  ApiV1StationsStationIdIcecastConfigRouteImport.update({
-    id: '/api/v1/stations/$stationId/icecast-config',
-    path: '/api/v1/stations/$stationId/icecast-config',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1StationsStationIdLiquidsoapConfigRoute =
-  ApiV1StationsStationIdLiquidsoapConfigRouteImport.update({
-    id: '/api/v1/stations/$stationId/liquidsoap-config',
-    path: '/api/v1/stations/$stationId/liquidsoap-config',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1StationsStationIdStreamMountsRoute =
-  ApiV1StationsStationIdStreamMountsRouteImport.update({
-    id: '/api/v1/stations/$stationId/stream-mounts',
-    path: '/api/v1/stations/$stationId/stream-mounts',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1StreamMountsIdRoute = ApiV1StreamMountsIdRouteImport.update({
-  id: '/api/v1/stream-mounts/$id',
-  path: '/api/v1/stream-mounts/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1StationsStationIdLiveInputsRoute =
-  ApiV1StationsStationIdLiveInputsRouteImport.update({
-    id: '/api/v1/stations/$stationId/live-inputs',
-    path: '/api/v1/stations/$stationId/live-inputs',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1LiveInputsIdRoute = ApiV1LiveInputsIdRouteImport.update({
-  id: '/api/v1/live-inputs/$id',
-  path: '/api/v1/live-inputs/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1StationsStationIdFallbackTracksRoute =
-  ApiV1StationsStationIdFallbackTracksRouteImport.update({
-    id: '/api/v1/stations/$stationId/fallback-tracks',
-    path: '/api/v1/stations/$stationId/fallback-tracks',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1FallbackTracksIdRoute = ApiV1FallbackTracksIdRouteImport.update({
-  id: '/api/v1/fallback-tracks/$id',
-  path: '/api/v1/fallback-tracks/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1StationsStationIdStreamingOutputsRoute =
-  ApiV1StationsStationIdStreamingOutputsRouteImport.update({
-    id: '/api/v1/stations/$stationId/streaming-outputs',
-    path: '/api/v1/stations/$stationId/streaming-outputs',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1StreamingOutputsIdRoute = ApiV1StreamingOutputsIdRouteImport.update({
-  id: '/api/v1/streaming-outputs/$id',
-  path: '/api/v1/streaming-outputs/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaSourcesRoute = ApiV1MediaSourcesRouteImport.update({
-  id: '/api/v1/media-sources',
-  path: '/api/v1/media-sources',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaSourcesIdRoute = ApiV1MediaSourcesIdRouteImport.update({
-  id: '/api/v1/media-sources/$id',
-  path: '/api/v1/media-sources/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaSourcesIdSyncRoute = ApiV1MediaSourcesIdSyncRouteImport.update({
-  id: '/api/v1/media-sources/$id/sync',
-  path: '/api/v1/media-sources/$id/sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1MediaSourcesIdSyncRunsRoute =
-  ApiV1MediaSourcesIdSyncRunsRouteImport.update({
-    id: '/api/v1/media-sources/$id/sync-runs',
-    path: '/api/v1/media-sources/$id/sync-runs',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1SchedulerNextRoute = ApiV1SchedulerNextRouteImport.update({
-  id: '/api/v1/scheduler/next',
-  path: '/api/v1/scheduler/next',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1SchedulerClockRoute = ApiV1SchedulerClockRouteImport.update({
-  id: '/api/v1/scheduler/clock',
-  path: '/api/v1/scheduler/clock',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1SchedulerTestRoute = ApiV1SchedulerTestRouteImport.update({
-  id: '/api/v1/scheduler/test',
-  path: '/api/v1/scheduler/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1HealthRoute = ApiV1HealthRouteImport.update({
-  id: '/api/v1/health',
-  path: '/api/v1/health',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -644,46 +644,46 @@ export interface FileRoutesByFullPath {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/media': typeof ApiV1MediaRouteWithChildren
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRouteWithChildren
+  '/api/v1/playlists': typeof ApiV1PlaylistsRouteWithChildren
+  '/api/v1/podcasts': typeof ApiV1PodcastsRouteWithChildren
+  '/api/v1/stations': typeof ApiV1StationsRouteWithChildren
   '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRouteWithChildren
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRouteWithChildren
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRouteWithChildren
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
   '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
-  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
-  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
-  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
-  '/api/v1/stations': typeof ApiV1StationsRoute
-  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
-  '/api/v1/media': typeof ApiV1MediaRoute
-  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
-  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
-  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
-  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
-  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
-  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
-  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
-  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
-  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
-  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
-  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
-  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
-  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
-  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
-  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
-  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
-  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
-  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
-  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
-  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
-  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
-  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
-  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
-  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
-  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
-  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRouteWithChildren
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -740,46 +740,46 @@ export interface FileRoutesByTo {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/media': typeof ApiV1MediaRouteWithChildren
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRouteWithChildren
+  '/api/v1/playlists': typeof ApiV1PlaylistsRouteWithChildren
+  '/api/v1/podcasts': typeof ApiV1PodcastsRouteWithChildren
+  '/api/v1/stations': typeof ApiV1StationsRouteWithChildren
   '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRouteWithChildren
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRouteWithChildren
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRouteWithChildren
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
   '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
-  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
-  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
-  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
-  '/api/v1/stations': typeof ApiV1StationsRoute
-  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
-  '/api/v1/media': typeof ApiV1MediaRoute
-  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
-  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
-  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
-  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
-  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
-  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
-  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
-  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
-  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
-  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
-  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
-  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
-  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
-  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
-  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
-  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
-  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
-  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
-  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
-  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
-  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
-  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
-  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
-  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
-  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
-  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRouteWithChildren
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -837,46 +837,46 @@ export interface FileRoutesById {
   '/api/public/listener-stats': typeof ApiPublicListenerStatsRoute
   '/api/public/now-playing': typeof ApiPublicNowPlayingRoute
   '/api/public/station-config': typeof ApiPublicStationConfigRoute
+  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/media': typeof ApiV1MediaRouteWithChildren
+  '/api/v1/media-sources': typeof ApiV1MediaSourcesRouteWithChildren
+  '/api/v1/playlists': typeof ApiV1PlaylistsRouteWithChildren
+  '/api/v1/podcasts': typeof ApiV1PodcastsRouteWithChildren
+  '/api/v1/stations': typeof ApiV1StationsRouteWithChildren
   '/api/public/agent/heartbeat': typeof ApiPublicAgentHeartbeatRoute
   '/api/public/cron/podcast-sync': typeof ApiPublicCronPodcastSyncRoute
   '/api/public/cron/sync-worker': typeof ApiPublicCronSyncWorkerRoute
   '/api/public/radio/news': typeof ApiPublicRadioNewsRouteWithChildren
+  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
+  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
+  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRouteWithChildren
+  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
+  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRouteWithChildren
+  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRouteWithChildren
+  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
+  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
+  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
+  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
+  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
+  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
+  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
   '/api/public/radio/news/$id': typeof ApiPublicRadioNewsIdRouteWithChildren
   '/api/public/stations/$stationId/podcasts': typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
-  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
-  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
-  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
-  '/api/v1/stations': typeof ApiV1StationsRoute
-  '/api/v1/stations/$id': typeof ApiV1StationsIdRoute
-  '/api/v1/media': typeof ApiV1MediaRoute
-  '/api/v1/media/$id': typeof ApiV1MediaIdRoute
-  '/api/v1/playlists': typeof ApiV1PlaylistsRoute
-  '/api/v1/playlists/$id': typeof ApiV1PlaylistsIdRoute
-  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRoute
-  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
-  '/api/v1/podcasts': typeof ApiV1PodcastsRoute
-  '/api/v1/podcasts/$id': typeof ApiV1PodcastsIdRoute
-  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
-  '/api/v1/settings/global': typeof ApiV1SettingsGlobalRoute
-  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
-  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
-  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
-  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
-  '/api/v1/stream-mounts/$id': typeof ApiV1StreamMountsIdRoute
-  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
-  '/api/v1/live-inputs/$id': typeof ApiV1LiveInputsIdRoute
-  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
-  '/api/v1/fallback-tracks/$id': typeof ApiV1FallbackTracksIdRoute
-  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
-  '/api/v1/streaming-outputs/$id': typeof ApiV1StreamingOutputsIdRoute
-  '/api/v1/media-sources': typeof ApiV1MediaSourcesRoute
-  '/api/v1/media-sources/$id': typeof ApiV1MediaSourcesIdRoute
   '/api/v1/media-sources/$id/sync': typeof ApiV1MediaSourcesIdSyncRoute
   '/api/v1/media-sources/$id/sync-runs': typeof ApiV1MediaSourcesIdSyncRunsRoute
-  '/api/v1/scheduler/next': typeof ApiV1SchedulerNextRoute
-  '/api/v1/scheduler/clock': typeof ApiV1SchedulerClockRoute
-  '/api/v1/scheduler/test': typeof ApiV1SchedulerTestRoute
-  '/api/v1/health': typeof ApiV1HealthRoute
+  '/api/v1/playlists/$id/items': typeof ApiV1PlaylistsIdItemsRouteWithChildren
+  '/api/v1/podcasts/$id/episodes': typeof ApiV1PodcastsIdEpisodesRoute
+  '/api/v1/settings/stations/$stationId': typeof ApiV1SettingsStationsStationIdRoute
+  '/api/v1/stations/$stationId/fallback-tracks': typeof ApiV1StationsStationIdFallbackTracksRoute
+  '/api/v1/stations/$stationId/icecast-config': typeof ApiV1StationsStationIdIcecastConfigRoute
+  '/api/v1/stations/$stationId/liquidsoap-config': typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  '/api/v1/stations/$stationId/live-inputs': typeof ApiV1StationsStationIdLiveInputsRoute
+  '/api/v1/stations/$stationId/stream-mounts': typeof ApiV1StationsStationIdStreamMountsRoute
+  '/api/v1/stations/$stationId/streaming-outputs': typeof ApiV1StationsStationIdStreamingOutputsRoute
+  '/api/public/radio/news/$id/broadcasted': typeof ApiPublicRadioNewsIdBroadcastedRoute
+  '/api/public/stations/$stationId/episodes/$episodeId': typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
+  '/api/v1/playlists/$id/items/$mediaId': typeof ApiV1PlaylistsIdItemsMediaIdRoute
+  '/api/public/stations/$stationId/podcasts/$podcastId/episodes': typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -935,46 +935,46 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/v1/health'
+    | '/api/v1/media'
+    | '/api/v1/media-sources'
+    | '/api/v1/playlists'
+    | '/api/v1/podcasts'
+    | '/api/v1/stations'
     | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/test'
+    | '/api/v1/settings/global'
+    | '/api/v1/stations/$id'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/streaming-outputs/$id'
     | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
-    | '/api/public/radio/news/$id/broadcasted'
-    | '/api/public/stations/$stationId/episodes/$episodeId'
-    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
-    | '/api/v1/stations'
-    | '/api/v1/stations/$id'
-    | '/api/v1/media'
-    | '/api/v1/media/$id'
-    | '/api/v1/playlists'
-    | '/api/v1/playlists/$id'
-    | '/api/v1/playlists/$id/items'
-    | '/api/v1/playlists/$id/items/$mediaId'
-    | '/api/v1/podcasts'
-    | '/api/v1/podcasts/$id'
-    | '/api/v1/podcasts/$id/episodes'
-    | '/api/v1/settings/global'
-    | '/api/v1/settings/stations/$stationId'
-    | '/api/v1/stations/$stationId/icecast-config'
-    | '/api/v1/stations/$stationId/liquidsoap-config'
-    | '/api/v1/stations/$stationId/stream-mounts'
-    | '/api/v1/stream-mounts/$id'
-    | '/api/v1/stations/$stationId/live-inputs'
-    | '/api/v1/live-inputs/$id'
-    | '/api/v1/stations/$stationId/fallback-tracks'
-    | '/api/v1/fallback-tracks/$id'
-    | '/api/v1/stations/$stationId/streaming-outputs'
-    | '/api/v1/streaming-outputs/$id'
-    | '/api/v1/media-sources'
-    | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
-    | '/api/v1/scheduler/next'
-    | '/api/v1/scheduler/clock'
-    | '/api/v1/scheduler/test'
-    | '/api/v1/health'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/public/radio/news/$id/broadcasted'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1031,46 +1031,46 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/v1/health'
+    | '/api/v1/media'
+    | '/api/v1/media-sources'
+    | '/api/v1/playlists'
+    | '/api/v1/podcasts'
+    | '/api/v1/stations'
     | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/test'
+    | '/api/v1/settings/global'
+    | '/api/v1/stations/$id'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/streaming-outputs/$id'
     | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
-    | '/api/public/radio/news/$id/broadcasted'
-    | '/api/public/stations/$stationId/episodes/$episodeId'
-    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
-    | '/api/v1/stations'
-    | '/api/v1/stations/$id'
-    | '/api/v1/media'
-    | '/api/v1/media/$id'
-    | '/api/v1/playlists'
-    | '/api/v1/playlists/$id'
-    | '/api/v1/playlists/$id/items'
-    | '/api/v1/playlists/$id/items/$mediaId'
-    | '/api/v1/podcasts'
-    | '/api/v1/podcasts/$id'
-    | '/api/v1/podcasts/$id/episodes'
-    | '/api/v1/settings/global'
-    | '/api/v1/settings/stations/$stationId'
-    | '/api/v1/stations/$stationId/icecast-config'
-    | '/api/v1/stations/$stationId/liquidsoap-config'
-    | '/api/v1/stations/$stationId/stream-mounts'
-    | '/api/v1/stream-mounts/$id'
-    | '/api/v1/stations/$stationId/live-inputs'
-    | '/api/v1/live-inputs/$id'
-    | '/api/v1/stations/$stationId/fallback-tracks'
-    | '/api/v1/fallback-tracks/$id'
-    | '/api/v1/stations/$stationId/streaming-outputs'
-    | '/api/v1/streaming-outputs/$id'
-    | '/api/v1/media-sources'
-    | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
-    | '/api/v1/scheduler/next'
-    | '/api/v1/scheduler/clock'
-    | '/api/v1/scheduler/test'
-    | '/api/v1/health'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/public/radio/news/$id/broadcasted'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   id:
     | '__root__'
     | '/'
@@ -1127,46 +1127,46 @@ export interface FileRouteTypes {
     | '/api/public/listener-stats'
     | '/api/public/now-playing'
     | '/api/public/station-config'
+    | '/api/v1/health'
+    | '/api/v1/media'
+    | '/api/v1/media-sources'
+    | '/api/v1/playlists'
+    | '/api/v1/podcasts'
+    | '/api/v1/stations'
     | '/api/public/agent/heartbeat'
     | '/api/public/cron/podcast-sync'
     | '/api/public/cron/sync-worker'
     | '/api/public/radio/news'
+    | '/api/v1/fallback-tracks/$id'
+    | '/api/v1/live-inputs/$id'
+    | '/api/v1/media-sources/$id'
+    | '/api/v1/media/$id'
+    | '/api/v1/playlists/$id'
+    | '/api/v1/podcasts/$id'
+    | '/api/v1/scheduler/clock'
+    | '/api/v1/scheduler/next'
+    | '/api/v1/scheduler/test'
+    | '/api/v1/settings/global'
+    | '/api/v1/stations/$id'
+    | '/api/v1/stream-mounts/$id'
+    | '/api/v1/streaming-outputs/$id'
     | '/api/public/radio/news/$id'
     | '/api/public/stations/$stationId/podcasts'
-    | '/api/public/radio/news/$id/broadcasted'
-    | '/api/public/stations/$stationId/episodes/$episodeId'
-    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
-    | '/api/v1/stations'
-    | '/api/v1/stations/$id'
-    | '/api/v1/media'
-    | '/api/v1/media/$id'
-    | '/api/v1/playlists'
-    | '/api/v1/playlists/$id'
-    | '/api/v1/playlists/$id/items'
-    | '/api/v1/playlists/$id/items/$mediaId'
-    | '/api/v1/podcasts'
-    | '/api/v1/podcasts/$id'
-    | '/api/v1/podcasts/$id/episodes'
-    | '/api/v1/settings/global'
-    | '/api/v1/settings/stations/$stationId'
-    | '/api/v1/stations/$stationId/icecast-config'
-    | '/api/v1/stations/$stationId/liquidsoap-config'
-    | '/api/v1/stations/$stationId/stream-mounts'
-    | '/api/v1/stream-mounts/$id'
-    | '/api/v1/stations/$stationId/live-inputs'
-    | '/api/v1/live-inputs/$id'
-    | '/api/v1/stations/$stationId/fallback-tracks'
-    | '/api/v1/fallback-tracks/$id'
-    | '/api/v1/stations/$stationId/streaming-outputs'
-    | '/api/v1/streaming-outputs/$id'
-    | '/api/v1/media-sources'
-    | '/api/v1/media-sources/$id'
     | '/api/v1/media-sources/$id/sync'
     | '/api/v1/media-sources/$id/sync-runs'
-    | '/api/v1/scheduler/next'
-    | '/api/v1/scheduler/clock'
-    | '/api/v1/scheduler/test'
-    | '/api/v1/health'
+    | '/api/v1/playlists/$id/items'
+    | '/api/v1/podcasts/$id/episodes'
+    | '/api/v1/settings/stations/$stationId'
+    | '/api/v1/stations/$stationId/fallback-tracks'
+    | '/api/v1/stations/$stationId/icecast-config'
+    | '/api/v1/stations/$stationId/liquidsoap-config'
+    | '/api/v1/stations/$stationId/live-inputs'
+    | '/api/v1/stations/$stationId/stream-mounts'
+    | '/api/v1/stations/$stationId/streaming-outputs'
+    | '/api/public/radio/news/$id/broadcasted'
+    | '/api/public/stations/$stationId/episodes/$episodeId'
+    | '/api/v1/playlists/$id/items/$mediaId'
+    | '/api/public/stations/$stationId/podcasts/$podcastId/episodes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1224,43 +1224,27 @@ export interface RootRouteChildren {
   ApiPublicListenerStatsRoute: typeof ApiPublicListenerStatsRoute
   ApiPublicNowPlayingRoute: typeof ApiPublicNowPlayingRoute
   ApiPublicStationConfigRoute: typeof ApiPublicStationConfigRoute
+  ApiV1HealthRoute: typeof ApiV1HealthRoute
+  ApiV1MediaRoute: typeof ApiV1MediaRouteWithChildren
+  ApiV1MediaSourcesRoute: typeof ApiV1MediaSourcesRouteWithChildren
+  ApiV1PlaylistsRoute: typeof ApiV1PlaylistsRouteWithChildren
+  ApiV1PodcastsRoute: typeof ApiV1PodcastsRouteWithChildren
+  ApiV1StationsRoute: typeof ApiV1StationsRouteWithChildren
   ApiPublicAgentHeartbeatRoute: typeof ApiPublicAgentHeartbeatRoute
   ApiPublicCronPodcastSyncRoute: typeof ApiPublicCronPodcastSyncRoute
   ApiPublicCronSyncWorkerRoute: typeof ApiPublicCronSyncWorkerRoute
   ApiPublicRadioNewsRoute: typeof ApiPublicRadioNewsRouteWithChildren
-  ApiPublicStationsStationIdPodcastsRoute: typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
-  ApiPublicStationsStationIdEpisodesEpisodeIdRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
-  ApiV1StationsRoute: typeof ApiV1StationsRoute
-  ApiV1StationsIdRoute: typeof ApiV1StationsIdRoute
-  ApiV1MediaRoute: typeof ApiV1MediaRoute
-  ApiV1MediaIdRoute: typeof ApiV1MediaIdRoute
-  ApiV1PlaylistsRoute: typeof ApiV1PlaylistsRoute
-  ApiV1PlaylistsIdRoute: typeof ApiV1PlaylistsIdRoute
-  ApiV1PlaylistsIdItemsRoute: typeof ApiV1PlaylistsIdItemsRoute
-  ApiV1PlaylistsIdItemsMediaIdRoute: typeof ApiV1PlaylistsIdItemsMediaIdRoute
-  ApiV1PodcastsRoute: typeof ApiV1PodcastsRoute
-  ApiV1PodcastsIdRoute: typeof ApiV1PodcastsIdRoute
-  ApiV1PodcastsIdEpisodesRoute: typeof ApiV1PodcastsIdEpisodesRoute
-  ApiV1SettingsGlobalRoute: typeof ApiV1SettingsGlobalRoute
-  ApiV1SettingsStationsStationIdRoute: typeof ApiV1SettingsStationsStationIdRoute
-  ApiV1StationsStationIdIcecastConfigRoute: typeof ApiV1StationsStationIdIcecastConfigRoute
-  ApiV1StationsStationIdLiquidsoapConfigRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRoute
-  ApiV1StationsStationIdStreamMountsRoute: typeof ApiV1StationsStationIdStreamMountsRoute
-  ApiV1StreamMountsIdRoute: typeof ApiV1StreamMountsIdRoute
-  ApiV1StationsStationIdLiveInputsRoute: typeof ApiV1StationsStationIdLiveInputsRoute
-  ApiV1LiveInputsIdRoute: typeof ApiV1LiveInputsIdRoute
-  ApiV1StationsStationIdFallbackTracksRoute: typeof ApiV1StationsStationIdFallbackTracksRoute
   ApiV1FallbackTracksIdRoute: typeof ApiV1FallbackTracksIdRoute
-  ApiV1StationsStationIdStreamingOutputsRoute: typeof ApiV1StationsStationIdStreamingOutputsRoute
-  ApiV1StreamingOutputsIdRoute: typeof ApiV1StreamingOutputsIdRoute
-  ApiV1MediaSourcesRoute: typeof ApiV1MediaSourcesRoute
-  ApiV1MediaSourcesIdRoute: typeof ApiV1MediaSourcesIdRoute
-  ApiV1MediaSourcesIdSyncRoute: typeof ApiV1MediaSourcesIdSyncRoute
-  ApiV1MediaSourcesIdSyncRunsRoute: typeof ApiV1MediaSourcesIdSyncRunsRoute
-  ApiV1SchedulerNextRoute: typeof ApiV1SchedulerNextRoute
+  ApiV1LiveInputsIdRoute: typeof ApiV1LiveInputsIdRoute
   ApiV1SchedulerClockRoute: typeof ApiV1SchedulerClockRoute
+  ApiV1SchedulerNextRoute: typeof ApiV1SchedulerNextRoute
   ApiV1SchedulerTestRoute: typeof ApiV1SchedulerTestRoute
-  ApiV1HealthRoute: typeof ApiV1HealthRoute
+  ApiV1SettingsGlobalRoute: typeof ApiV1SettingsGlobalRoute
+  ApiV1StreamMountsIdRoute: typeof ApiV1StreamMountsIdRoute
+  ApiV1StreamingOutputsIdRoute: typeof ApiV1StreamingOutputsIdRoute
+  ApiPublicStationsStationIdPodcastsRoute: typeof ApiPublicStationsStationIdPodcastsRouteWithChildren
+  ApiV1SettingsStationsStationIdRoute: typeof ApiV1SettingsStationsStationIdRoute
+  ApiPublicStationsStationIdEpisodesEpisodeIdRoute: typeof ApiPublicStationsStationIdEpisodesEpisodeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1615,6 +1599,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/stations': {
+      id: '/api/v1/stations'
+      path: '/api/v1/stations'
+      fullPath: '/api/v1/stations'
+      preLoaderRoute: typeof ApiV1StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts': {
+      id: '/api/v1/podcasts'
+      path: '/api/v1/podcasts'
+      fullPath: '/api/v1/podcasts'
+      preLoaderRoute: typeof ApiV1PodcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/playlists': {
+      id: '/api/v1/playlists'
+      path: '/api/v1/playlists'
+      fullPath: '/api/v1/playlists'
+      preLoaderRoute: typeof ApiV1PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media-sources': {
+      id: '/api/v1/media-sources'
+      path: '/api/v1/media-sources'
+      fullPath: '/api/v1/media-sources'
+      preLoaderRoute: typeof ApiV1MediaSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/media': {
+      id: '/api/v1/media'
+      path: '/api/v1/media'
+      fullPath: '/api/v1/media'
+      preLoaderRoute: typeof ApiV1MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/health': {
+      id: '/api/v1/health'
+      path: '/api/v1/health'
+      fullPath: '/api/v1/health'
+      preLoaderRoute: typeof ApiV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/station-config': {
       id: '/api/public/station-config'
       path: '/api/public/station-config'
@@ -1641,6 +1667,97 @@ declare module '@tanstack/react-router' {
       path: '/api/public/health'
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/streaming-outputs/$id': {
+      id: '/api/v1/streaming-outputs/$id'
+      path: '/api/v1/streaming-outputs/$id'
+      fullPath: '/api/v1/streaming-outputs/$id'
+      preLoaderRoute: typeof ApiV1StreamingOutputsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stream-mounts/$id': {
+      id: '/api/v1/stream-mounts/$id'
+      path: '/api/v1/stream-mounts/$id'
+      fullPath: '/api/v1/stream-mounts/$id'
+      preLoaderRoute: typeof ApiV1StreamMountsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/stations/$id': {
+      id: '/api/v1/stations/$id'
+      path: '/$id'
+      fullPath: '/api/v1/stations/$id'
+      preLoaderRoute: typeof ApiV1StationsIdRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/settings/global': {
+      id: '/api/v1/settings/global'
+      path: '/api/v1/settings/global'
+      fullPath: '/api/v1/settings/global'
+      preLoaderRoute: typeof ApiV1SettingsGlobalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/scheduler/test': {
+      id: '/api/v1/scheduler/test'
+      path: '/api/v1/scheduler/test'
+      fullPath: '/api/v1/scheduler/test'
+      preLoaderRoute: typeof ApiV1SchedulerTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/scheduler/next': {
+      id: '/api/v1/scheduler/next'
+      path: '/api/v1/scheduler/next'
+      fullPath: '/api/v1/scheduler/next'
+      preLoaderRoute: typeof ApiV1SchedulerNextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/scheduler/clock': {
+      id: '/api/v1/scheduler/clock'
+      path: '/api/v1/scheduler/clock'
+      fullPath: '/api/v1/scheduler/clock'
+      preLoaderRoute: typeof ApiV1SchedulerClockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts/$id': {
+      id: '/api/v1/podcasts/$id'
+      path: '/$id'
+      fullPath: '/api/v1/podcasts/$id'
+      preLoaderRoute: typeof ApiV1PodcastsIdRouteImport
+      parentRoute: typeof ApiV1PodcastsRoute
+    }
+    '/api/v1/playlists/$id': {
+      id: '/api/v1/playlists/$id'
+      path: '/$id'
+      fullPath: '/api/v1/playlists/$id'
+      preLoaderRoute: typeof ApiV1PlaylistsIdRouteImport
+      parentRoute: typeof ApiV1PlaylistsRoute
+    }
+    '/api/v1/media/$id': {
+      id: '/api/v1/media/$id'
+      path: '/$id'
+      fullPath: '/api/v1/media/$id'
+      preLoaderRoute: typeof ApiV1MediaIdRouteImport
+      parentRoute: typeof ApiV1MediaRoute
+    }
+    '/api/v1/media-sources/$id': {
+      id: '/api/v1/media-sources/$id'
+      path: '/$id'
+      fullPath: '/api/v1/media-sources/$id'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdRouteImport
+      parentRoute: typeof ApiV1MediaSourcesRoute
+    }
+    '/api/v1/live-inputs/$id': {
+      id: '/api/v1/live-inputs/$id'
+      path: '/api/v1/live-inputs/$id'
+      fullPath: '/api/v1/live-inputs/$id'
+      preLoaderRoute: typeof ApiV1LiveInputsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/fallback-tracks/$id': {
+      id: '/api/v1/fallback-tracks/$id'
+      path: '/api/v1/fallback-tracks/$id'
+      fullPath: '/api/v1/fallback-tracks/$id'
+      preLoaderRoute: typeof ApiV1FallbackTracksIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/radio/news': {
@@ -1671,6 +1788,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAgentHeartbeatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/stations/$stationId/streaming-outputs': {
+      id: '/api/v1/stations/$stationId/streaming-outputs'
+      path: '/$stationId/streaming-outputs'
+      fullPath: '/api/v1/stations/$stationId/streaming-outputs'
+      preLoaderRoute: typeof ApiV1StationsStationIdStreamingOutputsRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/stations/$stationId/stream-mounts': {
+      id: '/api/v1/stations/$stationId/stream-mounts'
+      path: '/$stationId/stream-mounts'
+      fullPath: '/api/v1/stations/$stationId/stream-mounts'
+      preLoaderRoute: typeof ApiV1StationsStationIdStreamMountsRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/stations/$stationId/live-inputs': {
+      id: '/api/v1/stations/$stationId/live-inputs'
+      path: '/$stationId/live-inputs'
+      fullPath: '/api/v1/stations/$stationId/live-inputs'
+      preLoaderRoute: typeof ApiV1StationsStationIdLiveInputsRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/stations/$stationId/liquidsoap-config': {
+      id: '/api/v1/stations/$stationId/liquidsoap-config'
+      path: '/$stationId/liquidsoap-config'
+      fullPath: '/api/v1/stations/$stationId/liquidsoap-config'
+      preLoaderRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/stations/$stationId/icecast-config': {
+      id: '/api/v1/stations/$stationId/icecast-config'
+      path: '/$stationId/icecast-config'
+      fullPath: '/api/v1/stations/$stationId/icecast-config'
+      preLoaderRoute: typeof ApiV1StationsStationIdIcecastConfigRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/stations/$stationId/fallback-tracks': {
+      id: '/api/v1/stations/$stationId/fallback-tracks'
+      path: '/$stationId/fallback-tracks'
+      fullPath: '/api/v1/stations/$stationId/fallback-tracks'
+      preLoaderRoute: typeof ApiV1StationsStationIdFallbackTracksRouteImport
+      parentRoute: typeof ApiV1StationsRoute
+    }
+    '/api/v1/settings/stations/$stationId': {
+      id: '/api/v1/settings/stations/$stationId'
+      path: '/api/v1/settings/stations/$stationId'
+      fullPath: '/api/v1/settings/stations/$stationId'
+      preLoaderRoute: typeof ApiV1SettingsStationsStationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/podcasts/$id/episodes': {
+      id: '/api/v1/podcasts/$id/episodes'
+      path: '/episodes'
+      fullPath: '/api/v1/podcasts/$id/episodes'
+      preLoaderRoute: typeof ApiV1PodcastsIdEpisodesRouteImport
+      parentRoute: typeof ApiV1PodcastsIdRoute
+    }
+    '/api/v1/playlists/$id/items': {
+      id: '/api/v1/playlists/$id/items'
+      path: '/items'
+      fullPath: '/api/v1/playlists/$id/items'
+      preLoaderRoute: typeof ApiV1PlaylistsIdItemsRouteImport
+      parentRoute: typeof ApiV1PlaylistsIdRoute
+    }
+    '/api/v1/media-sources/$id/sync-runs': {
+      id: '/api/v1/media-sources/$id/sync-runs'
+      path: '/sync-runs'
+      fullPath: '/api/v1/media-sources/$id/sync-runs'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRunsRouteImport
+      parentRoute: typeof ApiV1MediaSourcesIdRoute
+    }
+    '/api/v1/media-sources/$id/sync': {
+      id: '/api/v1/media-sources/$id/sync'
+      path: '/sync'
+      fullPath: '/api/v1/media-sources/$id/sync'
+      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRouteImport
+      parentRoute: typeof ApiV1MediaSourcesIdRoute
+    }
     '/api/public/stations/$stationId/podcasts': {
       id: '/api/public/stations/$stationId/podcasts'
       path: '/api/public/stations/$stationId/podcasts'
@@ -1684,6 +1878,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/radio/news/$id'
       preLoaderRoute: typeof ApiPublicRadioNewsIdRouteImport
       parentRoute: typeof ApiPublicRadioNewsRoute
+    }
+    '/api/v1/playlists/$id/items/$mediaId': {
+      id: '/api/v1/playlists/$id/items/$mediaId'
+      path: '/$mediaId'
+      fullPath: '/api/v1/playlists/$id/items/$mediaId'
+      preLoaderRoute: typeof ApiV1PlaylistsIdItemsMediaIdRouteImport
+      parentRoute: typeof ApiV1PlaylistsIdItemsRoute
     }
     '/api/public/stations/$stationId/episodes/$episodeId': {
       id: '/api/public/stations/$stationId/episodes/$episodeId'
@@ -1706,225 +1907,133 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStationsStationIdPodcastsPodcastIdEpisodesRouteImport
       parentRoute: typeof ApiPublicStationsStationIdPodcastsRoute
     }
-    '/api/v1/stations': {
-      id: '/api/v1/stations'
-      path: '/api/v1/stations'
-      fullPath: '/api/v1/stations'
-      preLoaderRoute: typeof ApiV1StationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$id': {
-      id: '/api/v1/stations/$id'
-      path: '/api/v1/stations/$id'
-      fullPath: '/api/v1/stations/$id'
-      preLoaderRoute: typeof ApiV1StationsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media': {
-      id: '/api/v1/media'
-      path: '/api/v1/media'
-      fullPath: '/api/v1/media'
-      preLoaderRoute: typeof ApiV1MediaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media/$id': {
-      id: '/api/v1/media/$id'
-      path: '/api/v1/media/$id'
-      fullPath: '/api/v1/media/$id'
-      preLoaderRoute: typeof ApiV1MediaIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/playlists': {
-      id: '/api/v1/playlists'
-      path: '/api/v1/playlists'
-      fullPath: '/api/v1/playlists'
-      preLoaderRoute: typeof ApiV1PlaylistsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/playlists/$id': {
-      id: '/api/v1/playlists/$id'
-      path: '/api/v1/playlists/$id'
-      fullPath: '/api/v1/playlists/$id'
-      preLoaderRoute: typeof ApiV1PlaylistsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/playlists/$id/items': {
-      id: '/api/v1/playlists/$id/items'
-      path: '/api/v1/playlists/$id/items'
-      fullPath: '/api/v1/playlists/$id/items'
-      preLoaderRoute: typeof ApiV1PlaylistsIdItemsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/playlists/$id/items/$mediaId': {
-      id: '/api/v1/playlists/$id/items/$mediaId'
-      path: '/api/v1/playlists/$id/items/$mediaId'
-      fullPath: '/api/v1/playlists/$id/items/$mediaId'
-      preLoaderRoute: typeof ApiV1PlaylistsIdItemsMediaIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/podcasts': {
-      id: '/api/v1/podcasts'
-      path: '/api/v1/podcasts'
-      fullPath: '/api/v1/podcasts'
-      preLoaderRoute: typeof ApiV1PodcastsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/podcasts/$id': {
-      id: '/api/v1/podcasts/$id'
-      path: '/api/v1/podcasts/$id'
-      fullPath: '/api/v1/podcasts/$id'
-      preLoaderRoute: typeof ApiV1PodcastsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/podcasts/$id/episodes': {
-      id: '/api/v1/podcasts/$id/episodes'
-      path: '/api/v1/podcasts/$id/episodes'
-      fullPath: '/api/v1/podcasts/$id/episodes'
-      preLoaderRoute: typeof ApiV1PodcastsIdEpisodesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/settings/global': {
-      id: '/api/v1/settings/global'
-      path: '/api/v1/settings/global'
-      fullPath: '/api/v1/settings/global'
-      preLoaderRoute: typeof ApiV1SettingsGlobalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/settings/stations/$stationId': {
-      id: '/api/v1/settings/stations/$stationId'
-      path: '/api/v1/settings/stations/$stationId'
-      fullPath: '/api/v1/settings/stations/$stationId'
-      preLoaderRoute: typeof ApiV1SettingsStationsStationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/icecast-config': {
-      id: '/api/v1/stations/$stationId/icecast-config'
-      path: '/api/v1/stations/$stationId/icecast-config'
-      fullPath: '/api/v1/stations/$stationId/icecast-config'
-      preLoaderRoute: typeof ApiV1StationsStationIdIcecastConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/liquidsoap-config': {
-      id: '/api/v1/stations/$stationId/liquidsoap-config'
-      path: '/api/v1/stations/$stationId/liquidsoap-config'
-      fullPath: '/api/v1/stations/$stationId/liquidsoap-config'
-      preLoaderRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/stream-mounts': {
-      id: '/api/v1/stations/$stationId/stream-mounts'
-      path: '/api/v1/stations/$stationId/stream-mounts'
-      fullPath: '/api/v1/stations/$stationId/stream-mounts'
-      preLoaderRoute: typeof ApiV1StationsStationIdStreamMountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stream-mounts/$id': {
-      id: '/api/v1/stream-mounts/$id'
-      path: '/api/v1/stream-mounts/$id'
-      fullPath: '/api/v1/stream-mounts/$id'
-      preLoaderRoute: typeof ApiV1StreamMountsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/live-inputs': {
-      id: '/api/v1/stations/$stationId/live-inputs'
-      path: '/api/v1/stations/$stationId/live-inputs'
-      fullPath: '/api/v1/stations/$stationId/live-inputs'
-      preLoaderRoute: typeof ApiV1StationsStationIdLiveInputsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/live-inputs/$id': {
-      id: '/api/v1/live-inputs/$id'
-      path: '/api/v1/live-inputs/$id'
-      fullPath: '/api/v1/live-inputs/$id'
-      preLoaderRoute: typeof ApiV1LiveInputsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/fallback-tracks': {
-      id: '/api/v1/stations/$stationId/fallback-tracks'
-      path: '/api/v1/stations/$stationId/fallback-tracks'
-      fullPath: '/api/v1/stations/$stationId/fallback-tracks'
-      preLoaderRoute: typeof ApiV1StationsStationIdFallbackTracksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/fallback-tracks/$id': {
-      id: '/api/v1/fallback-tracks/$id'
-      path: '/api/v1/fallback-tracks/$id'
-      fullPath: '/api/v1/fallback-tracks/$id'
-      preLoaderRoute: typeof ApiV1FallbackTracksIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/stations/$stationId/streaming-outputs': {
-      id: '/api/v1/stations/$stationId/streaming-outputs'
-      path: '/api/v1/stations/$stationId/streaming-outputs'
-      fullPath: '/api/v1/stations/$stationId/streaming-outputs'
-      preLoaderRoute: typeof ApiV1StationsStationIdStreamingOutputsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/streaming-outputs/$id': {
-      id: '/api/v1/streaming-outputs/$id'
-      path: '/api/v1/streaming-outputs/$id'
-      fullPath: '/api/v1/streaming-outputs/$id'
-      preLoaderRoute: typeof ApiV1StreamingOutputsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media-sources': {
-      id: '/api/v1/media-sources'
-      path: '/api/v1/media-sources'
-      fullPath: '/api/v1/media-sources'
-      preLoaderRoute: typeof ApiV1MediaSourcesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media-sources/$id': {
-      id: '/api/v1/media-sources/$id'
-      path: '/api/v1/media-sources/$id'
-      fullPath: '/api/v1/media-sources/$id'
-      preLoaderRoute: typeof ApiV1MediaSourcesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media-sources/$id/sync': {
-      id: '/api/v1/media-sources/$id/sync'
-      path: '/api/v1/media-sources/$id/sync'
-      fullPath: '/api/v1/media-sources/$id/sync'
-      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/media-sources/$id/sync-runs': {
-      id: '/api/v1/media-sources/$id/sync-runs'
-      path: '/api/v1/media-sources/$id/sync-runs'
-      fullPath: '/api/v1/media-sources/$id/sync-runs'
-      preLoaderRoute: typeof ApiV1MediaSourcesIdSyncRunsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/scheduler/next': {
-      id: '/api/v1/scheduler/next'
-      path: '/api/v1/scheduler/next'
-      fullPath: '/api/v1/scheduler/next'
-      preLoaderRoute: typeof ApiV1SchedulerNextRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/scheduler/clock': {
-      id: '/api/v1/scheduler/clock'
-      path: '/api/v1/scheduler/clock'
-      fullPath: '/api/v1/scheduler/clock'
-      preLoaderRoute: typeof ApiV1SchedulerClockRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/scheduler/test': {
-      id: '/api/v1/scheduler/test'
-      path: '/api/v1/scheduler/test'
-      fullPath: '/api/v1/scheduler/test'
-      preLoaderRoute: typeof ApiV1SchedulerTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/health': {
-      id: '/api/v1/health'
-      path: '/api/v1/health'
-      fullPath: '/api/v1/health'
-      preLoaderRoute: typeof ApiV1HealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
+
+interface ApiV1MediaRouteChildren {
+  ApiV1MediaIdRoute: typeof ApiV1MediaIdRoute
+}
+
+const ApiV1MediaRouteChildren: ApiV1MediaRouteChildren = {
+  ApiV1MediaIdRoute: ApiV1MediaIdRoute,
+}
+
+const ApiV1MediaRouteWithChildren = ApiV1MediaRoute._addFileChildren(
+  ApiV1MediaRouteChildren,
+)
+
+interface ApiV1MediaSourcesIdRouteChildren {
+  ApiV1MediaSourcesIdSyncRoute: typeof ApiV1MediaSourcesIdSyncRoute
+  ApiV1MediaSourcesIdSyncRunsRoute: typeof ApiV1MediaSourcesIdSyncRunsRoute
+}
+
+const ApiV1MediaSourcesIdRouteChildren: ApiV1MediaSourcesIdRouteChildren = {
+  ApiV1MediaSourcesIdSyncRoute: ApiV1MediaSourcesIdSyncRoute,
+  ApiV1MediaSourcesIdSyncRunsRoute: ApiV1MediaSourcesIdSyncRunsRoute,
+}
+
+const ApiV1MediaSourcesIdRouteWithChildren =
+  ApiV1MediaSourcesIdRoute._addFileChildren(ApiV1MediaSourcesIdRouteChildren)
+
+interface ApiV1MediaSourcesRouteChildren {
+  ApiV1MediaSourcesIdRoute: typeof ApiV1MediaSourcesIdRouteWithChildren
+}
+
+const ApiV1MediaSourcesRouteChildren: ApiV1MediaSourcesRouteChildren = {
+  ApiV1MediaSourcesIdRoute: ApiV1MediaSourcesIdRouteWithChildren,
+}
+
+const ApiV1MediaSourcesRouteWithChildren =
+  ApiV1MediaSourcesRoute._addFileChildren(ApiV1MediaSourcesRouteChildren)
+
+interface ApiV1PlaylistsIdItemsRouteChildren {
+  ApiV1PlaylistsIdItemsMediaIdRoute: typeof ApiV1PlaylistsIdItemsMediaIdRoute
+}
+
+const ApiV1PlaylistsIdItemsRouteChildren: ApiV1PlaylistsIdItemsRouteChildren = {
+  ApiV1PlaylistsIdItemsMediaIdRoute: ApiV1PlaylistsIdItemsMediaIdRoute,
+}
+
+const ApiV1PlaylistsIdItemsRouteWithChildren =
+  ApiV1PlaylistsIdItemsRoute._addFileChildren(
+    ApiV1PlaylistsIdItemsRouteChildren,
+  )
+
+interface ApiV1PlaylistsIdRouteChildren {
+  ApiV1PlaylistsIdItemsRoute: typeof ApiV1PlaylistsIdItemsRouteWithChildren
+}
+
+const ApiV1PlaylistsIdRouteChildren: ApiV1PlaylistsIdRouteChildren = {
+  ApiV1PlaylistsIdItemsRoute: ApiV1PlaylistsIdItemsRouteWithChildren,
+}
+
+const ApiV1PlaylistsIdRouteWithChildren =
+  ApiV1PlaylistsIdRoute._addFileChildren(ApiV1PlaylistsIdRouteChildren)
+
+interface ApiV1PlaylistsRouteChildren {
+  ApiV1PlaylistsIdRoute: typeof ApiV1PlaylistsIdRouteWithChildren
+}
+
+const ApiV1PlaylistsRouteChildren: ApiV1PlaylistsRouteChildren = {
+  ApiV1PlaylistsIdRoute: ApiV1PlaylistsIdRouteWithChildren,
+}
+
+const ApiV1PlaylistsRouteWithChildren = ApiV1PlaylistsRoute._addFileChildren(
+  ApiV1PlaylistsRouteChildren,
+)
+
+interface ApiV1PodcastsIdRouteChildren {
+  ApiV1PodcastsIdEpisodesRoute: typeof ApiV1PodcastsIdEpisodesRoute
+}
+
+const ApiV1PodcastsIdRouteChildren: ApiV1PodcastsIdRouteChildren = {
+  ApiV1PodcastsIdEpisodesRoute: ApiV1PodcastsIdEpisodesRoute,
+}
+
+const ApiV1PodcastsIdRouteWithChildren = ApiV1PodcastsIdRoute._addFileChildren(
+  ApiV1PodcastsIdRouteChildren,
+)
+
+interface ApiV1PodcastsRouteChildren {
+  ApiV1PodcastsIdRoute: typeof ApiV1PodcastsIdRouteWithChildren
+}
+
+const ApiV1PodcastsRouteChildren: ApiV1PodcastsRouteChildren = {
+  ApiV1PodcastsIdRoute: ApiV1PodcastsIdRouteWithChildren,
+}
+
+const ApiV1PodcastsRouteWithChildren = ApiV1PodcastsRoute._addFileChildren(
+  ApiV1PodcastsRouteChildren,
+)
+
+interface ApiV1StationsRouteChildren {
+  ApiV1StationsIdRoute: typeof ApiV1StationsIdRoute
+  ApiV1StationsStationIdFallbackTracksRoute: typeof ApiV1StationsStationIdFallbackTracksRoute
+  ApiV1StationsStationIdIcecastConfigRoute: typeof ApiV1StationsStationIdIcecastConfigRoute
+  ApiV1StationsStationIdLiquidsoapConfigRoute: typeof ApiV1StationsStationIdLiquidsoapConfigRoute
+  ApiV1StationsStationIdLiveInputsRoute: typeof ApiV1StationsStationIdLiveInputsRoute
+  ApiV1StationsStationIdStreamMountsRoute: typeof ApiV1StationsStationIdStreamMountsRoute
+  ApiV1StationsStationIdStreamingOutputsRoute: typeof ApiV1StationsStationIdStreamingOutputsRoute
+}
+
+const ApiV1StationsRouteChildren: ApiV1StationsRouteChildren = {
+  ApiV1StationsIdRoute: ApiV1StationsIdRoute,
+  ApiV1StationsStationIdFallbackTracksRoute:
+    ApiV1StationsStationIdFallbackTracksRoute,
+  ApiV1StationsStationIdIcecastConfigRoute:
+    ApiV1StationsStationIdIcecastConfigRoute,
+  ApiV1StationsStationIdLiquidsoapConfigRoute:
+    ApiV1StationsStationIdLiquidsoapConfigRoute,
+  ApiV1StationsStationIdLiveInputsRoute: ApiV1StationsStationIdLiveInputsRoute,
+  ApiV1StationsStationIdStreamMountsRoute:
+    ApiV1StationsStationIdStreamMountsRoute,
+  ApiV1StationsStationIdStreamingOutputsRoute:
+    ApiV1StationsStationIdStreamingOutputsRoute,
+}
+
+const ApiV1StationsRouteWithChildren = ApiV1StationsRoute._addFileChildren(
+  ApiV1StationsRouteChildren,
+)
 
 interface ApiPublicRadioNewsIdRouteChildren {
   ApiPublicRadioNewsIdBroadcastedRoute: typeof ApiPublicRadioNewsIdBroadcastedRoute
@@ -2018,45 +2127,29 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicListenerStatsRoute: ApiPublicListenerStatsRoute,
   ApiPublicNowPlayingRoute: ApiPublicNowPlayingRoute,
   ApiPublicStationConfigRoute: ApiPublicStationConfigRoute,
+  ApiV1HealthRoute: ApiV1HealthRoute,
+  ApiV1MediaRoute: ApiV1MediaRouteWithChildren,
+  ApiV1MediaSourcesRoute: ApiV1MediaSourcesRouteWithChildren,
+  ApiV1PlaylistsRoute: ApiV1PlaylistsRouteWithChildren,
+  ApiV1PodcastsRoute: ApiV1PodcastsRouteWithChildren,
+  ApiV1StationsRoute: ApiV1StationsRouteWithChildren,
   ApiPublicAgentHeartbeatRoute: ApiPublicAgentHeartbeatRoute,
   ApiPublicCronPodcastSyncRoute: ApiPublicCronPodcastSyncRoute,
   ApiPublicCronSyncWorkerRoute: ApiPublicCronSyncWorkerRoute,
   ApiPublicRadioNewsRoute: ApiPublicRadioNewsRouteWithChildren,
+  ApiV1FallbackTracksIdRoute: ApiV1FallbackTracksIdRoute,
+  ApiV1LiveInputsIdRoute: ApiV1LiveInputsIdRoute,
+  ApiV1SchedulerClockRoute: ApiV1SchedulerClockRoute,
+  ApiV1SchedulerNextRoute: ApiV1SchedulerNextRoute,
+  ApiV1SchedulerTestRoute: ApiV1SchedulerTestRoute,
+  ApiV1SettingsGlobalRoute: ApiV1SettingsGlobalRoute,
+  ApiV1StreamMountsIdRoute: ApiV1StreamMountsIdRoute,
+  ApiV1StreamingOutputsIdRoute: ApiV1StreamingOutputsIdRoute,
   ApiPublicStationsStationIdPodcastsRoute:
     ApiPublicStationsStationIdPodcastsRouteWithChildren,
+  ApiV1SettingsStationsStationIdRoute: ApiV1SettingsStationsStationIdRoute,
   ApiPublicStationsStationIdEpisodesEpisodeIdRoute:
     ApiPublicStationsStationIdEpisodesEpisodeIdRoute,
-  ApiV1StationsRoute: ApiV1StationsRoute,
-  ApiV1StationsIdRoute: ApiV1StationsIdRoute,
-  ApiV1MediaRoute: ApiV1MediaRoute,
-  ApiV1MediaIdRoute: ApiV1MediaIdRoute,
-  ApiV1PlaylistsRoute: ApiV1PlaylistsRoute,
-  ApiV1PlaylistsIdRoute: ApiV1PlaylistsIdRoute,
-  ApiV1PlaylistsIdItemsRoute: ApiV1PlaylistsIdItemsRoute,
-  ApiV1PlaylistsIdItemsMediaIdRoute: ApiV1PlaylistsIdItemsMediaIdRoute,
-  ApiV1PodcastsRoute: ApiV1PodcastsRoute,
-  ApiV1PodcastsIdRoute: ApiV1PodcastsIdRoute,
-  ApiV1PodcastsIdEpisodesRoute: ApiV1PodcastsIdEpisodesRoute,
-  ApiV1SettingsGlobalRoute: ApiV1SettingsGlobalRoute,
-  ApiV1SettingsStationsStationIdRoute: ApiV1SettingsStationsStationIdRoute,
-  ApiV1StationsStationIdIcecastConfigRoute: ApiV1StationsStationIdIcecastConfigRoute,
-  ApiV1StationsStationIdLiquidsoapConfigRoute: ApiV1StationsStationIdLiquidsoapConfigRoute,
-  ApiV1StationsStationIdStreamMountsRoute: ApiV1StationsStationIdStreamMountsRoute,
-  ApiV1StreamMountsIdRoute: ApiV1StreamMountsIdRoute,
-  ApiV1StationsStationIdLiveInputsRoute: ApiV1StationsStationIdLiveInputsRoute,
-  ApiV1LiveInputsIdRoute: ApiV1LiveInputsIdRoute,
-  ApiV1StationsStationIdFallbackTracksRoute: ApiV1StationsStationIdFallbackTracksRoute,
-  ApiV1FallbackTracksIdRoute: ApiV1FallbackTracksIdRoute,
-  ApiV1StationsStationIdStreamingOutputsRoute: ApiV1StationsStationIdStreamingOutputsRoute,
-  ApiV1StreamingOutputsIdRoute: ApiV1StreamingOutputsIdRoute,
-  ApiV1MediaSourcesRoute: ApiV1MediaSourcesRoute,
-  ApiV1MediaSourcesIdRoute: ApiV1MediaSourcesIdRoute,
-  ApiV1MediaSourcesIdSyncRoute: ApiV1MediaSourcesIdSyncRoute,
-  ApiV1MediaSourcesIdSyncRunsRoute: ApiV1MediaSourcesIdSyncRunsRoute,
-  ApiV1SchedulerNextRoute: ApiV1SchedulerNextRoute,
-  ApiV1SchedulerClockRoute: ApiV1SchedulerClockRoute,
-  ApiV1SchedulerTestRoute: ApiV1SchedulerTestRoute,
-  ApiV1HealthRoute: ApiV1HealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
