@@ -24,15 +24,33 @@ export const playlistSchema = z.object({
   description: z.string().max(2000).optional().or(z.literal("")),
 });
 
+export const SCHEDULE_BLOCK_KINDS = ["music","jingle","ad","live","news","podcast"] as const;
+
+export const podcastSelectorSchema = z.object({
+  podcast_id: z.string().uuid("Podcast required"),
+  mode: z.enum(["latest", "specific"]).default("latest"),
+  episode_id: z.string().uuid().optional().or(z.literal("")),
+}).refine((v) => v.mode !== "specific" || !!v.episode_id, {
+  message: "Episode required when mode is 'specific'",
+  path: ["episode_id"],
+});
+
 export const scheduleBlockSchema = z.object({
   name: z.string().trim().min(2).max(120),
   station_id: z.string().uuid("Station required"),
   day_of_week: z.string(),
   start_time: z.string().regex(/^\d{2}:\d{2}/),
   end_time: z.string().regex(/^\d{2}:\d{2}/),
+  block_kind: z.enum(SCHEDULE_BLOCK_KINDS).default("music"),
   playlist_id: z.string().uuid().optional().or(z.literal("")),
   rotation_rule_id: z.string().uuid().optional().or(z.literal("")),
-}).refine((v) => v.end_time > v.start_time, { message: "End time must be after start", path: ["end_time"] });
+  podcast_selector: podcastSelectorSchema.optional().nullable(),
+})
+  .refine((v) => v.end_time > v.start_time, { message: "End time must be after start", path: ["end_time"] })
+  .refine((v) => v.block_kind !== "podcast" || !!v.podcast_selector, {
+    message: "Podcast selection required for podcast blocks",
+    path: ["podcast_selector"],
+  });
 
 export const rotationRuleSchema = z.object({
   name: z.string().trim().min(2).max(120),
